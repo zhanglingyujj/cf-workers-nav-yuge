@@ -187,7 +187,7 @@ function createCategorySection(categoryName, links, isHidden) {
 
     const cardContainer = document.createElement('div');
     const gridClasses = isAppLayout()
-        ? 'grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-[18px]'
+        ? 'grid-cols-[repeat(auto-fill,minmax(90px,1fr))] gap-[18px]'
         : 'grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-[18px]';
 
     cardContainer.className = `grid ${gridClasses} card-container relative`;
@@ -309,7 +309,7 @@ function ensureAddPlaceholder(cardContainer, categoryName) {
     if (cardContainer.querySelector('.add-card-placeholder')) return;
     const placeholder = document.createElement('div');
     const sizeClasses = isAppLayout()
-        ? 'w-16 h-16 rounded-[1.2rem] mx-auto'
+        ? 'w-[70px] h-[70px] rounded-2xl mx-auto'
         : 'min-h-[100px] p-4 rounded-2xl w-full';
 
     placeholder.className = `add-card-placeholder group flex flex-col h-full w-full ${sizeClasses} rounded-2xl border-2 border-dashed border-heritage-outline dark:border-slate-700 hover:border-heritage-500 dark:hover:border-heritage-500 hover:bg-heritage-50/50 dark:hover:bg-heritage-900/10 transition-all cursor-pointer flex items-center justify-center`;
