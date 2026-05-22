@@ -98,6 +98,9 @@ export function normalizeCategories(categories) {
     for (const key in categories) {
         if (Array.isArray(categories[key])) {
             categories[key] = { isHidden: false, links: categories[key] };
+        } else if (categories[key] && typeof categories[key] === 'object') {
+            categories[key].isHidden = Boolean(categories[key].isHidden);
+            categories[key].links = categories[key].links || [];
         }
     }
     return categories;

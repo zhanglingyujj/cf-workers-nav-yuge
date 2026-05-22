@@ -34,7 +34,7 @@ export async function handleLogin(request, env) {
 
         const response = new Response(JSON.stringify({
             valid: true,
-            token: `Bearer ${accessToken}`
+            token: accessToken
         }), {
             status: 200,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -90,7 +90,7 @@ export async function handleRefreshToken(request, env) {
         const newRefreshToken = await createJWT(newRefreshTokenPayload, env.JWT_SECRET);
 
         const response = new Response(JSON.stringify({
-            accessToken: `Bearer ${newAccessToken}`
+            accessToken: newAccessToken
         }), {
             status: 200,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -132,7 +132,7 @@ export async function handleGetLinks(request, env) {
         }
 
         if (isAuthorized) {
-            return new Response(JSON.stringify(parsedData), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json'} });
+            return new Response(JSON.stringify(parsedData), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'no-store'} });
         }
 
         const filteredCategories = {};
@@ -145,7 +145,7 @@ export async function handleGetLinks(request, env) {
                 }
             }
         }
-        return new Response(JSON.stringify({ categories: filteredCategories }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json'} });
+        return new Response(JSON.stringify({ categories: filteredCategories }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'no-store'} });
     }
     return new Response(JSON.stringify({ categories: {} }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json'} });
 }

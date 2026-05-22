@@ -11,7 +11,7 @@ export function createCardElement(link) {
     const card = document.createElement('div');
     let cardBaseClass = isAppLayout()
         ? 'flex flex-col items-center justify-start py-1 gap-1.5 hover:z-10'
-        : 'flex flex-col p-4 bg-white/90 dark:bg-[#1e293b]/60 backdrop-blur-md supports-[backdrop-filter]:bg-white/80 border border-gray-200 dark:border-slate-700/50 hover:border-emerald-500/50 dark:hover:border-emerald-400/50 shadow-sm hover:shadow-[0_8px_20px_-6px_rgba(0,0,0,0.1)] dark:shadow-none dark:hover:shadow-[0_8px_20px_-6px_rgba(0,0,0,0.4)] hover:-translate-y-1.5';
+        : 'flex items-center px-3 py-3 bg-white/50 dark:bg-[#1e293b]/40 backdrop-blur-md hover:bg-white/70 dark:hover:bg-[#1e293b]/60 shadow-sm hover:shadow-[0_0_20px_8px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_0_20px_10px_rgba(0,0,0,0.35)] transition-all duration-300 ease-[cubic-bezier(0.25,0.8,0.25,1)]';
 
     if (link.isPrivate && !isAppLayout()) {
         cardBaseClass += ' ring-1 ring-amber-400/40 bg-amber-50/80 dark:bg-amber-900/10 !border-amber-200 dark:!border-amber-700/50';
@@ -27,31 +27,43 @@ export function createCardElement(link) {
     card.dataset.isPrivate = link.isPrivate;
     card.dataset.url = link.url;
 
-    const header = document.createElement('div');
-    header.className = isAppLayout()
-        ? 'flex flex-col items-center justify-center w-full relative'
-        : 'flex items-center gap-3 mb-2.5 w-full';
+    if (isAppLayout()) {
+        const header = document.createElement('div');
+        header.className = 'flex flex-col items-center justify-center w-full relative';
 
-    const iconEl = isEditMode()
-        ? createIconPlaceholder(isAppLayout())
-        : createIconImage(link);
-    header.appendChild(iconEl);
+        const iconEl = isEditMode()
+            ? createIconPlaceholder(true)
+            : createIconImage(link);
+        header.appendChild(iconEl);
 
-    const title = document.createElement('div');
-    const titleAlign = isAppLayout()
-        ? 'text-center text-xs sm:text-sm font-medium mt-1 w-[120%] truncate px-1 text-slate-700 dark:text-slate-200 drop-shadow-sm'
-        : 'font-semibold text-sm flex-1 truncate text-slate-700 dark:text-slate-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors pointer-events-none';
+        const title = document.createElement('div');
+        title.className = 'card-title pointer-events-none text-center text-xs sm:text-sm font-medium mt-1 w-[120%] truncate px-1 heritage-primary dark:text-heritage-outline drop-shadow-sm';
+        title.textContent = link.name;
+        header.appendChild(title);
+        card.appendChild(header);
+    } else {
+        const iconContainer = document.createElement('div');
+        iconContainer.className = 'w-[70px] h-[70px] flex-shrink-0 flex items-center justify-center';
+        const iconEl = isEditMode()
+            ? createIconPlaceholder(false)
+            : createIconImage(link);
+        iconContainer.appendChild(iconEl);
+        card.appendChild(iconContainer);
 
-    title.className = `card-title pointer-events-none ${titleAlign}`;
-    title.textContent = link.name;
-    header.appendChild(title);
-    card.appendChild(header);
+        const textBlock = document.createElement('div');
+        textBlock.className = 'flex-1 min-w-0 ml-2.5 flex flex-col justify-center';
 
-    if (!isAppLayout()) {
+        const title = document.createElement('div');
+        title.className = 'card-title pointer-events-none font-semibold text-sm truncate heritage-primary dark:text-heritage-variant group-hover:text-heritage-600 dark:group-hover:text-heritage-400 transition-colors';
+        title.textContent = link.name;
+        textBlock.appendChild(title);
+
         const desc = document.createElement('div');
-        desc.className = 'text-xs text-slate-500 dark:text-slate-400 line-clamp-2 min-h-[1.25rem] card-tip leading-relaxed pointer-events-none w-full';
+        desc.className = 'text-xs text-heritage-secondary dark:text-slate-400 line-clamp-2 card-tip leading-relaxed pointer-events-none';
         desc.textContent = link.tips || '';
-        card.appendChild(desc);
+        textBlock.appendChild(desc);
+
+        card.appendChild(textBlock);
     }
 
     if (link.isPrivate && !isAppLayout()) {
@@ -86,7 +98,7 @@ export function updateCardElement(card, newLink) {
 
     const imgEl = card.querySelector('img');
     if (imgEl) {
-        const newSrc = (!newLink.icon || !newLink.icon.startsWith('http'))
+        const newSrc = (!newLink.icon || (!newLink.icon.startsWith('http') && !newLink.icon.startsWith('data:')))
             ? imgApi + newLink.url
             : newLink.icon;
         if (imgEl.src !== newSrc) {
@@ -103,8 +115,8 @@ export function updateCardElement(card, newLink) {
 function createIconPlaceholder(isApp) {
     const div = document.createElement('div');
     div.className = isApp
-        ? 'w-14 h-14 sm:w-16 sm:h-16 rounded-[1.2rem] bg-slate-200 dark:bg-slate-600 shadow-md'
-        : 'w-9 h-9 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700';
+        ? 'w-16 h-16 sm:w-[72px] sm:h-[72px] rounded-[1.2rem] bg-heritage-outline/40 dark:bg-slate-600/30 backdrop-blur-sm shadow-md'
+        : 'w-12 h-12 rounded-xl bg-heritage-variant dark:bg-slate-900 border border-heritage-outline dark:border-slate-700';
     return div;
 }
 
@@ -116,14 +128,14 @@ function createIconImage(link) {
 
     let iconClass = '';
     if (isAppLayout()) {
-        iconClass = 'w-14 h-14 sm:w-16 sm:h-16 rounded-[1.2rem] object-contain bg-white dark:bg-slate-600 p-2 shadow-md hover:shadow-lg transition-transform duration-300 group-hover:scale-105 group-active:scale-95 z-10';
+        iconClass = 'w-16 h-16 sm:w-[72px] sm:h-[72px] rounded-[1.2rem] object-contain bg-white/40 dark:bg-slate-600/30 backdrop-blur-sm p-2 shadow-md hover:shadow-[0_0_20px_5px_rgba(0,0,0,0.1)] transition-transform duration-300 group-hover:scale-105 group-active:scale-95 z-10';
         if (link.isPrivate) iconClass += ' ring-2 ring-amber-400';
     } else {
-        iconClass = 'w-9 h-9 rounded-lg object-contain bg-slate-100 dark:bg-slate-900 p-1 border border-slate-200 dark:border-slate-700 transition-transform group-hover:scale-105 pointer-events-none';
+        iconClass = 'w-12 h-12 rounded-xl object-contain bg-heritage-variant dark:bg-slate-900 p-0.5 transition-transform group-hover:scale-105 pointer-events-none';
     }
     img.className = iconClass;
 
-    const src = (!link.icon || !link.icon.startsWith('http'))
+    const src = (!link.icon || (!link.icon.startsWith('http') && !link.icon.startsWith('data:')))
         ? imgApi + link.url
         : link.icon;
     img.src = src;
@@ -144,8 +156,8 @@ function createEditControls(link, card) {
 
     const menuBtn = document.createElement('button');
     const btnStyle = isAppLayout()
-        ? 'w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 shadow-sm hover:bg-emerald-500 hover:text-white'
-        : 'w-7 h-7 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100/80 backdrop-blur-sm';
+        ? 'w-6 h-6 rounded-full bg-heritage-outline dark:bg-slate-700 text-heritage-primary dark:text-slate-300 shadow-sm hover:bg-heritage-500 hover:text-white'
+        : 'w-7 h-7 rounded-lg text-slate-400 hover:text-heritage-primary hover:bg-heritage-variant/80 backdrop-blur-sm';
 
     menuBtn.className = `${btnStyle} flex items-center justify-center transition-all duration-200`;
     menuBtn.innerHTML = '<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>';
@@ -154,11 +166,11 @@ function createEditControls(link, card) {
     dropdown.className = 'hidden absolute right-0 top-6 w-28 bg-white dark:bg-[#1e293b] rounded-xl shadow-xl ring-1 ring-black/5 dark:ring-white/10 overflow-hidden transform origin-top-right transition-all z-50 flex flex-col p-1 card-menu-dropdown';
 
     dropdown.innerHTML = `
-        <button class="menu-edit w-full text-left px-3 py-2 rounded-lg text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-emerald-50 dark:hover:bg-slate-700/50 hover:text-emerald-600 transition-colors flex items-center gap-2">
+        <button class="menu-edit w-full text-left px-3 py-2 rounded-lg text-xs font-medium text-heritage-primary dark:text-heritage-outline hover:bg-heritage-50 dark:hover:bg-slate-700/50 hover:text-heritage-600 transition-colors flex items-center gap-2">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
             编辑
         </button>
-        <button class="menu-delete w-full text-left px-3 py-2 rounded-lg text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-500 transition-colors flex items-center gap-2">
+        <button class="menu-delete w-full text-left px-3 py-2 rounded-lg text-xs font-medium heritage-primary dark:text-heritage-outline hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-500 transition-colors flex items-center gap-2">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
             删除
         </button>

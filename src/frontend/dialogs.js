@@ -60,7 +60,7 @@ function updateCategorySelectDropdown() {
     const categories = getCategories();
     Object.keys(categories).forEach(cat => {
         const item = document.createElement('div');
-        item.className = 'px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-emerald-50 dark:hover:bg-slate-700 cursor-pointer transition-colors';
+        item.className = 'px-4 py-2.5 text-sm text-heritage-primary dark:text-slate-200 hover:bg-heritage-50 dark:hover:bg-slate-700 cursor-pointer transition-colors';
         item.textContent = cat;
         item.addEventListener('click', () => {
             const catVal = getEl('category-select-value');
@@ -274,16 +274,13 @@ export function initDialogs() {
                     body: JSON.stringify({ password: pwd })
                 });
                 const data = await res.json();
-                if (data.valid) {
-                    localStorage.setItem('authToken', data.token);
-                    setLoggedIn(true);
-                    toggleOverlay('password-dialog-overlay', false);
-                    const { renderAll } = await import('./render.js');
-                    renderAll();
-                    await customAlert('登录成功');
-                } else {
-                    await customAlert('密码错误');
-                }
+if (data.valid) {
+                        localStorage.setItem('authToken', data.token);
+                        setLoggedIn(true);
+                        const { reloadLinksAfterLogin } = await import('./auth.js');
+                        await reloadLinksAfterLogin(data.token);
+                        toggleOverlay('password-dialog-overlay', false);
+                    }
             } catch (e) { await customAlert('Login Error'); }
         });
     }
@@ -325,8 +322,8 @@ export function initDialogs() {
                 if (await customConfirm('确定退出登录吗？')) {
                     localStorage.removeItem('authToken');
                     setLoggedIn(false);
-                    const { renderAll } = await import('./render.js');
-                    renderAll();
+                    const { checkLoginStatusAndLoad } = await import('./auth.js');
+                    await checkLoginStatusAndLoad();
                 }
             }
         });

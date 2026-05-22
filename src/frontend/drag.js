@@ -168,7 +168,7 @@ function touchStart(e) {
         document.body.appendChild(mobileClone);
 
         mobilePlaceholder.style.opacity = '0.3';
-        mobilePlaceholder.classList.add('border-dashed', 'border-2', 'border-emerald-400');
+        mobilePlaceholder.classList.add('border-dashed', 'border-2', 'border-heritage-400');
 
         if (navigator.vibrate) navigator.vibrate(50);
         updatePosition();
@@ -306,7 +306,7 @@ function touchStart(e) {
                     if (mobileClone) { mobileClone.remove(); mobileClone = null; }
                     if (mobilePlaceholder) {
                         mobilePlaceholder.style.opacity = '';
-                        mobilePlaceholder.classList.remove('border-dashed', 'border-2', 'border-emerald-400');
+                        mobilePlaceholder.classList.remove('border-dashed', 'border-2', 'border-heritage-400');
                         const newState = getCardState(mobilePlaceholder);
                         const changed = newState.category !== initialDragState.category || newState.index !== initialDragState.index;
                         if (changed) {

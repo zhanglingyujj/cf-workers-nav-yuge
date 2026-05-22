@@ -2,6 +2,8 @@
 import { initRender } from './render.js';
 import { getEl, clearElCache } from './utils.js';
 import { setAppLayout, isAppLayout, setEditMode, setLoggedIn } from './state.js';
+import { initDialogs } from './dialogs.js';
+import { initDrag } from './drag.js';
 
 // 暗色模式初始化 (对应 workers.js L153-167)
 (function initDarkMode() {
@@ -115,6 +117,80 @@ document.addEventListener('DOMContentLoaded', async () => {
         }, { passive: true });
     }
 
+    // 自定义背景 + 遮罩
+    const bgImageInput = getEl('bg-image-input');
+    const bgOpacitySlider = getEl('bg-opacity-slider');
+    const bgOpacityValue = getEl('bg-opacity-value');
+    const customBgImage = document.getElementById('custom-bg-image');
+    const bgMask = document.getElementById('bg-mask');
+
+    function applyBgImage(url) {
+        const blurVal = parseInt(localStorage.getItem('backgroundBlur')) || 2;
+        if (url && customBgImage) {
+            customBgImage.style.backgroundImage = `url(${url})`;
+            customBgImage.style.filter = `blur(${blurVal}px)`;
+            customBgImage.style.transform = 'scale(1.05)';
+            customBgImage.style.opacity = '1';
+        } else if (customBgImage) {
+            customBgImage.style.backgroundImage = '';
+            customBgImage.style.filter = '';
+            customBgImage.style.transform = '';
+            customBgImage.style.opacity = '0';
+        }
+    }
+
+    function applyBgOpacity(val) {
+        if (!bgMask) return;
+        const pct = val / 100;
+        const isDark = document.documentElement.classList.contains('dark');
+        bgMask.style.backgroundColor = isDark
+            ? `rgba(13, 14, 16, ${pct})`
+            : `rgba(247, 245, 242, ${pct})`;
+    }
+
+    if (bgImageInput) {
+        const saved = localStorage.getItem('backgroundImage') || '';
+        bgImageInput.value = saved;
+        applyBgImage(saved);
+        bgImageInput.addEventListener('input', () => {
+            const url = bgImageInput.value.trim();
+            localStorage.setItem('backgroundImage', url);
+            applyBgImage(url);
+        });
+    }
+
+    if (bgOpacitySlider && bgOpacityValue) {
+        const saved = parseInt(localStorage.getItem('backgroundOpacity')) || 20;
+        bgOpacitySlider.value = saved;
+        bgOpacityValue.textContent = saved + '%';
+        applyBgOpacity(saved);
+        bgOpacitySlider.addEventListener('input', () => {
+            const val = parseInt(bgOpacitySlider.value);
+            localStorage.setItem('backgroundOpacity', val);
+            bgOpacityValue.textContent = val + '%';
+            applyBgOpacity(val);
+        });
+    }
+
+    const bgBlurSlider = getEl('bg-blur-slider');
+    const bgBlurValue = getEl('bg-blur-value');
+    if (bgBlurSlider && bgBlurValue && customBgImage) {
+        const savedBlur = parseInt(localStorage.getItem('backgroundBlur')) || 2;
+        bgBlurSlider.value = savedBlur;
+        bgBlurValue.textContent = savedBlur + 'px';
+        if (customBgImage.style.backgroundImage) {
+            customBgImage.style.filter = `blur(${savedBlur}px)`;
+        }
+        bgBlurSlider.addEventListener('input', () => {
+            const val = parseInt(bgBlurSlider.value);
+            localStorage.setItem('backgroundBlur', val);
+            bgBlurValue.textContent = val + 'px';
+            if (customBgImage.style.backgroundImage) {
+                customBgImage.style.filter = `blur(${val}px)`;
+            }
+        });
+    }
+
     // 搜索引擎初始化
     const { initSearchEngines } = await import('./search.js');
     initSearchEngines(searchEngineBtn, searchEngineMenu, savePrefCheckbox, searchInput);
@@ -122,6 +198,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 工具提示
     const { initTooltip } = await import('./tooltip.js');
     initTooltip();
+
+    // 弹窗和按钮事件绑定
+    initDialogs();
 
     // 卡片点击 + 编辑模式关闭菜单
     const sectionsContainer = getEl('sections-container');
@@ -146,6 +225,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             document.querySelectorAll('.card-menu-dropdown').forEach(el => el.classList.add('hidden'));
         }
     });
+
+    // 拖拽事件
+    if (sectionsContainer) initDrag(sectionsContainer);
 
     // 加载数据
     const { checkLoginStatusAndLoad } = await import('./auth.js');

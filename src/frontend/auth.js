@@ -25,8 +25,11 @@ export async function validateTokenOrRedirect() {
 export async function fetchWithAuth(url, options = {}) {
     const token = localStorage.getItem('authToken');
     const headers = options.headers || {};
-    if (token) headers.Authorization = token;
+    if (token) {
+        headers.Authorization = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+    }
     options.headers = headers;
+    options.cache = 'no-store';
 
     let res = await fetch(url, options);
 
@@ -39,7 +42,7 @@ export async function fetchWithAuth(url, options = {}) {
             if (refreshRes.ok) {
                 const refreshData = await refreshRes.json();
                 localStorage.setItem('authToken', refreshData.accessToken);
-                headers.Authorization = refreshData.accessToken;
+                headers.Authorization = `Bearer ${refreshData.accessToken}`;
                 options.headers = headers;
                 res = await fetch(url, options);
             } else {
@@ -103,6 +106,21 @@ async function loadLinks() {
     } catch (error) {
         console.error('Error loading links:', error);
         await customAlert('加载链接时出错，请刷新页面重试');
+    }
+}
+
+export async function reloadLinksAfterLogin(token) {
+    try {
+        const response = await fetch('/api/getLinks', {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        if (!response.ok) throw new Error("HTTP error! status: " + response.status);
+        const data = await response.json();
+        if (data.categories) {
+            setCategories(data.categories);
+        }
+    } catch (error) {
+        console.error('Error reloading links after login:', error);
     }
 }
 

@@ -163,6 +163,7 @@ export function pinCategory(name) {
 export function setCategoryHidden(category, isHidden) {
     if (!_categories[category]) return;
     _categories[category].isHidden = isHidden;
+    markAllDirty();
     emit('categoriesChanged', { action: 'hidden', category, isHidden });
 }
 

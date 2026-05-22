@@ -49,11 +49,11 @@ function updateEngineUI(value) {
 function renderEngineMenu(menu) {
     const list = menu.querySelector('#search-engine-list') || menu.querySelector('div');
     if (!list) return;
-    list.innerHTML = '<div class="px-3 py-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">搜索引擎</div>';
+    list.innerHTML = '<div class="px-3 py-2 text-xs font-semibold text-heritage-secondary uppercase tracking-wider">搜索引擎</div>';
 
     engineList.forEach(key => {
         const btn = document.createElement('button');
-        btn.className = "w-full text-left px-3 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-emerald-50 dark:hover:bg-slate-700 hover:text-emerald-600 transition-colors flex items-center gap-3";
+        btn.className = "w-full text-left px-3 py-2.5 text-sm text-heritage-primary dark:text-heritage-outline hover:bg-heritage-50 dark:hover:bg-slate-700 hover:text-heritage-600 transition-colors flex items-center gap-3";
         btn.innerHTML = `${searchEngineIcons[key]}<span>${searchEngineLabels[key]}</span>`;
         btn.addEventListener('click', () => selectEngine(key));
         list.appendChild(btn);
@@ -94,16 +94,16 @@ export function doSearch(query) {
             section.id = cat;
 
             const titleContainer = document.createElement('div');
-            titleContainer.className = 'flex items-center gap-3 mb-5 pb-2 border-b border-slate-200/60 dark:border-slate-700/60';
+            titleContainer.className = 'flex items-center gap-3 mb-5 pb-2 border-b border-heritage-outline/60 dark:border-slate-700/60';
             const title = document.createElement('h2');
-            title.className = 'text-lg font-bold text-slate-700 dark:text-slate-100 flex items-center gap-2';
-            title.innerHTML = `<span class="w-1.5 h-5 bg-emerald-500 rounded-full inline-block shadow-sm"></span> ${cat}`;
+            title.className = 'text-lg font-bold text-heritage-primary dark:text-slate-100 flex items-center gap-2';
+            title.innerHTML = `<span class="w-1.5 h-5 bg-heritage-500 rounded-full inline-block shadow-sm"></span> ${cat}`;
             titleContainer.appendChild(title);
             section.appendChild(titleContainer);
 
             const cardContainer = document.createElement('div');
             const isApp = import('./state.js').then(m => m.isAppLayout());
-            cardContainer.className = 'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 card-container relative';
+            cardContainer.className = 'grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-[18px] card-container relative';
             cardContainer.dataset.category = cat;
             section.appendChild(cardContainer);
 
