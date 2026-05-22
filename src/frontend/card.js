@@ -11,7 +11,7 @@ export function createCardElement(link) {
     const card = document.createElement('div');
     let cardBaseClass = isAppLayout()
         ? 'flex flex-col items-center justify-start py-1 gap-1.5 hover:z-10'
-        : 'flex items-center px-3 py-3 bg-white/50 dark:bg-[#1e293b]/40 backdrop-blur-md hover:bg-white/70 dark:hover:bg-[#1e293b]/60 shadow-sm hover:shadow-[0_0_20px_8px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_0_20px_10px_rgba(0,0,0,0.35)] transition-all duration-300 ease-[cubic-bezier(0.25,0.8,0.25,1)]';
+        : 'flex items-center px-3 py-3 bg-white/30 dark:bg-[#1e293b]/30 backdrop-blur-md hover:bg-white/50 dark:hover:bg-[#1e293b]/40 shadow-sm hover:shadow-[0_0_20px_8px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_0_20px_10px_rgba(0,0,0,0.35)] transition-all duration-300 ease-[cubic-bezier(0.25,0.8,0.25,1)]';
 
     if (link.isPrivate && !isAppLayout()) {
         cardBaseClass += ' ring-1 ring-amber-400/40 bg-amber-50/80 dark:bg-amber-900/10 !border-amber-200 dark:!border-amber-700/50';
@@ -116,7 +116,7 @@ function createIconPlaceholder(isApp) {
     const div = document.createElement('div');
     div.className = isApp
         ? 'w-16 h-16 sm:w-[72px] sm:h-[72px] rounded-[1.2rem] bg-heritage-outline/40 dark:bg-slate-600/30 backdrop-blur-sm shadow-md'
-        : 'w-12 h-12 rounded-xl bg-heritage-variant dark:bg-slate-900 border border-heritage-outline dark:border-slate-700';
+        : 'w-12 h-12 rounded-xl bg-heritage-variant/40 dark:bg-slate-900/30 backdrop-blur-sm';
     return div;
 }
 
@@ -131,7 +131,7 @@ function createIconImage(link) {
         iconClass = 'w-16 h-16 sm:w-[72px] sm:h-[72px] rounded-[1.2rem] object-contain bg-white/40 dark:bg-slate-600/30 backdrop-blur-sm p-2 shadow-md hover:shadow-[0_0_20px_5px_rgba(0,0,0,0.1)] transition-transform duration-300 group-hover:scale-105 group-active:scale-95 z-10';
         if (link.isPrivate) iconClass += ' ring-2 ring-amber-400';
     } else {
-        iconClass = 'w-12 h-12 rounded-xl object-contain bg-heritage-variant dark:bg-slate-900 p-0.5 transition-transform group-hover:scale-105 pointer-events-none';
+        iconClass = 'w-12 h-12 rounded-xl object-contain bg-heritage-variant/40 dark:bg-slate-900/30 backdrop-blur-sm p-0.5 transition-transform group-hover:scale-105 pointer-events-none';
     }
     img.className = iconClass;
 
