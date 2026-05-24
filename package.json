@@ -1,0 +1,14 @@
+{
+  "name": "cf-workers-nav",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.js",
+    "deploy": "npm run build && wrangler deploy",
+    "dev": "wrangler dev"
+  },
+  "devDependencies": {
+    "esbuild": "^0.24.0"
+  }
+}
