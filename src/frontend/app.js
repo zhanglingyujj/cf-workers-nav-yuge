@@ -8,6 +8,12 @@ import { initDrag } from './drag.js';
 document.addEventListener('DOMContentLoaded', async () => {
     initRender();
 
+    // 立即加载链接数据（一次请求获取数据 + auth 状态）
+    const { loadLinks } = await import('./auth.js');
+    loadLinks();
+
+    loadBackgroundSettings();
+
     // 初始化 UI 组件 (来自 workers.js L657-765)
     const themeSwitch = getEl('theme-switch-checkbox');
 const darkModeToggleBtn = getEl('dark-mode-toggle-btn');
@@ -242,18 +248,4 @@ initSearchEngines(searchEngineBtn, searchEngineMenu, searchInput);
 
     // 拖拽事件
     if (sectionsContainer) initDrag(sectionsContainer);
-
-// 渐进式加载：立即触发链接加载，不等待 token 验证或背景设置
-    const { loadLinks, validateToken } = await import('./auth.js');
-    loadLinks();
-
-    loadBackgroundSettings();
-
-    validateToken().then(async isValid => {
-        const { setLoggedIn } = await import('./state.js');
-        if (isValid) {
-            setLoggedIn(true);
-            loadLinks();
-        }
-    });
 });

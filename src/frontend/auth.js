@@ -101,6 +101,7 @@ export async function loadLinks() {
 
         const data = await response.json();
         if (data.categories) {
+            setLoggedIn(data.isAuthenticated);
             setCategories(data.categories);
         }
         const { updateCategorySelectDropdown } = await import('./dialogs.js');

@@ -132,7 +132,7 @@ export async function handleGetLinks(request, env) {
         }
 
         if (isAuthorized) {
-            return new Response(JSON.stringify(parsedData), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'no-store'} });
+            return new Response(JSON.stringify({ categories: normalizedCategories, isAuthenticated: true }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'no-store'} });
         }
 
         const filteredCategories = {};
@@ -145,7 +145,7 @@ export async function handleGetLinks(request, env) {
                 }
             }
         }
-        return new Response(JSON.stringify({ categories: filteredCategories }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'no-store'} });
+        return new Response(JSON.stringify({ categories: filteredCategories, isAuthenticated: false }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'no-store'} });
     }
     return new Response(JSON.stringify({ categories: {} }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json'} });
 }
