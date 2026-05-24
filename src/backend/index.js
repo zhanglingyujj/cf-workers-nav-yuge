@@ -1,11 +1,7 @@
 import { HTML_CONTENT } from '../build/html-content.js';
 import { getCorsHeaders } from './utils.js';
 import { handleIconProxy } from './icon.js';
-<<<<<<< HEAD
 import { handleLogin, handleRefreshToken, handleValidateToken, handleGetLinks, handleSaveData, handleBackupData, handleExportData, handleImportData, handleGetSettings, handleSaveSettings } from './api.js';
-=======
-import { handleLogin, handleRefreshToken, handleValidateToken, handleGetLinks, handleSaveData, handleBackupData, handleExportData, handleImportData } from './api.js';
->>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de
 
 export default {
     async fetch(request, env, ctx) {
@@ -29,7 +25,7 @@ export default {
                     'X-Content-Type-Options': 'nosniff',
                     'X-Frame-Options': 'SAMEORIGIN',
                     'Referrer-Policy': 'strict-origin-when-cross-origin',
-                    'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self'; font-src 'self' data:;"
+                    'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; connect-src 'self' https://static.cloudflareinsights.com; font-src 'self' data: https://fonts.gstatic.com;"
                 }
             });
         }
@@ -66,14 +62,10 @@ export default {
             return handleImportData(request, env);
         }
 
-<<<<<<< HEAD
-        if (url.pathname === '/api/settings') {
+if (url.pathname === '/api/settings') {
             if (request.method === 'GET') return handleGetSettings(request, env);
             if (request.method === 'POST') return handleSaveSettings(request, env);
         }
-
-=======
->>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de
         return new Response('Not Found', { status: 404, headers: corsHeaders });
     }
 };

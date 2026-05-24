@@ -24,16 +24,8 @@ const searchEngineIcons = {
 let currentEngine = 'site';
 const engineList = ['site', 'baidu', 'bing', 'google'];
 
-<<<<<<< HEAD
 export function initSearchEngines(btn, menu, searchInput) {
     currentEngine = localStorage.getItem('searchEngine') || 'site';
-=======
-export function initSearchEngines(btn, menu, savePrefCheckbox, searchInput) {
-    const savedPref = localStorage.getItem('savePreferences') === 'true';
-    if (savedPref) {
-        currentEngine = localStorage.getItem('searchEngine') || 'site';
-    }
->>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de
     updateEngineUI(currentEngine);
 
     renderEngineMenu(menu);
@@ -68,14 +60,7 @@ function renderEngineMenu(menu) {
 function selectEngine(value) {
     currentEngine = value;
     updateEngineUI(value);
-<<<<<<< HEAD
-    localStorage.setItem('searchEngine', value);
-=======
-    const savePrefCheckbox = getEl('save-preference-checkbox');
-    if (savePrefCheckbox && savePrefCheckbox.checked) {
-        localStorage.setItem('searchEngine', value);
-    }
->>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de
+localStorage.setItem('searchEngine', value);
     const menu = getEl('search-engine-menu');
     if (menu) menu.classList.add('hidden');
 }
@@ -111,10 +96,6 @@ export function doSearch(query) {
             section.appendChild(titleContainer);
 
             const cardContainer = document.createElement('div');
-<<<<<<< HEAD
-=======
-            const isApp = import('./state.js').then(m => m.isAppLayout());
->>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de
             cardContainer.className = 'grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-[18px] card-container relative';
             cardContainer.dataset.category = cat;
             section.appendChild(cardContainer);

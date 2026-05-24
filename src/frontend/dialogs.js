@@ -1,10 +1,6 @@
 // dialogs.js - 弹窗管理 (添加/编辑卡片, 分类命名, confirm, alert, 密码登录)
 import { addLink, updateLink, removeLink, getCategories, addCategory, setLoggedIn, setEditMode, markAllDirty } from './state.js';
-<<<<<<< HEAD
 import { updateUIState, renderAll, renderCategoryButtons } from './render.js';
-=======
-import { updateUIState } from './render.js';
->>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de
 import { getEl } from './utils.js';
 
 function toggleOverlay(id, show) {
@@ -75,14 +71,6 @@ function updateCategorySelectDropdown() {
         });
         menu.appendChild(item);
     });
-<<<<<<< HEAD
-=======
-
-    const catBtn = getEl('category-select-btn');
-    if (catBtn) {
-        catBtn.onclick = (e) => { e.stopPropagation(); menu.classList.toggle('hidden'); };
-    }
->>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de
 }
 
 export function showEditDialog(link) {
@@ -154,16 +142,12 @@ async function updateCard(oldLink) {
         isPrivate: getEl('private-checkbox').checked
     };
 
-<<<<<<< HEAD
-    const categoryChanged = oldLink.category !== newLink.category;
+const categoryChanged = oldLink.category !== newLink.category;
     updateLink(oldLink.url, newLink);
     if (categoryChanged) {
         renderAll();
         renderCategoryButtons();
     }
-=======
-    updateLink(oldLink.url, newLink);
->>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de
     toggleOverlay('dialog-overlay', false);
 
     const { saveDataToServer } = await import('./auth.js');
@@ -293,9 +277,12 @@ export function initDialogs() {
 if (data.valid) {
                         localStorage.setItem('authToken', data.token);
                         setLoggedIn(true);
+                        toggleOverlay('password-dialog-overlay', false);
+                        const loadingMask = document.getElementById('loading-mask');
+                        if (loadingMask) loadingMask.classList.remove('hidden');
                         const { reloadLinksAfterLogin } = await import('./auth.js');
                         await reloadLinksAfterLogin(data.token);
-                        toggleOverlay('password-dialog-overlay', false);
+                        if (loadingMask) loadingMask.classList.add('hidden');
                     }
             } catch (e) { await customAlert('Login Error'); }
         });
@@ -345,19 +332,7 @@ if (data.valid) {
         });
     }
 
-<<<<<<< HEAD
-=======
-    // APP 布局切换
-    const layoutSwitch = getEl('layout-switch-checkbox');
-    if (layoutSwitch) {
-        layoutSwitch.addEventListener('change', async () => {
-            const { setAppLayout } = await import('./state.js');
-            setAppLayout(layoutSwitch.checked);
-        });
-    }
-
->>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de
-    // 新建分类按钮
+// 新建分类按钮
     const addCategoryBtn = document.querySelector('#add-category-container button');
     if (addCategoryBtn) {
         addCategoryBtn.addEventListener('click', () => addCategoryAction());

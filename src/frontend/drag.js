@@ -1,11 +1,7 @@
 // drag.js - 拖拽排序 (PC + 移动端) ★ 本地优先 + debounce 异步保存
 import { isEditMode, getCategories, reorderCards } from './state.js';
 import { debounce } from './utils.js';
-<<<<<<< HEAD
 import { patchCategory, renderAll } from './render.js';
-=======
-import { patchCategory } from './render.js';
->>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de
 
 let draggedCard = null;
 let initialDragState = { category: null, index: -1 };
@@ -62,26 +58,17 @@ async function drop(e) {
     e.preventDefault();
     if (!draggedCard) return;
 
-<<<<<<< HEAD
-    buildLinkIndex();
-=======
->>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de
+buildLinkIndex();
     const newState = getCardState(draggedCard);
     const changed = newState.category !== initialDragState.category || newState.index !== initialDragState.index;
     if (changed) {
         updateCardCategory(draggedCard, newState.category);
         const newLinks = readLinksFromDOM(newState.category);
         reorderCards(newState.category, newLinks);
-<<<<<<< HEAD
-        if (initialDragState.category !== newState.category) {
+if (initialDragState.category !== newState.category) {
             renderAll();
         } else {
             patchCategory(newState.category);
-=======
-        patchCategory(newState.category);
-        if (initialDragState.category !== newState.category) {
-            patchCategory(initialDragState.category);
->>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de
         }
         debouncedSaveOrder();
     }
@@ -108,11 +95,7 @@ function updateCardCategory(card, newCategory) {
 function readLinksFromDOM(categoryName) {
     const section = document.getElementById(categoryName);
     if (!section) return [];
-<<<<<<< HEAD
-    const cards = section.querySelectorAll('.card:not(.add-card-placeholder)');
-=======
-    const cards = section.querySelectorAll('.card');
->>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de
+const cards = section.querySelectorAll('.card:not(.add-card-placeholder)');
     return Array.from(cards).map(c => {
         const url = c.getAttribute('data-url');
         return findLinkByUrl(url);
@@ -310,7 +293,7 @@ function touchStart(e) {
         });
     }
 
-    function handleTouchEnd() {
+function handleTouchEnd() {
         if (mobileDragTimer) { clearTimeout(mobileDragTimer); mobileDragTimer = null; }
         if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
 
@@ -329,24 +312,15 @@ function touchStart(e) {
                         const newState = getCardState(mobilePlaceholder);
                         const changed = newState.category !== initialDragState.category || newState.index !== initialDragState.index;
                         if (changed) {
-<<<<<<< HEAD
                             buildLinkIndex();
-=======
->>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de
                             updateCardCategory(mobilePlaceholder, newState.category);
                             const newLinks = readLinksFromDOM(newState.category);
                             reorderCards(newState.category, newLinks);
                             if (initialDragState.category !== newState.category) {
-<<<<<<< HEAD
                                 renderAll();
                             } else {
                                 patchCategory(newState.category);
                             }
-=======
-                                patchCategory(initialDragState.category);
-                            }
-                            patchCategory(newState.category);
->>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de
                             debouncedSaveOrder();
                         }
                         mobilePlaceholder = null;

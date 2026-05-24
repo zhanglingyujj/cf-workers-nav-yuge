@@ -98,12 +98,8 @@ tailwind.config = {
         body.edit-mode .card,
         body.edit-mode .card:hover {
             transform: none !important;
-<<<<<<< HEAD
-            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
             overflow: visible !important;
-=======
-            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important; 
->>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de
         }
         
         html.dark body.edit-mode .card,
@@ -180,14 +176,8 @@ tailwind.config = {
     <script>
         (function () {
             let isDark;
-<<<<<<< HEAD
-            const savedTheme = localStorage.getItem('theme');
+const savedTheme = localStorage.getItem('theme');
             if (savedTheme) {
-=======
-            const savePreferences = localStorage.getItem('savePreferences');
-            if (savePreferences === 'true') {
-                const savedTheme = localStorage.getItem('theme');
->>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de
                 isDark = savedTheme === 'dark';
             } else {
                 const hour = new Date().getHours();
@@ -266,14 +256,11 @@ tailwind.config = {
 
                     <!-- Profile / Settings -->
                     <div class="relative flex items-center gap-2">
-<<<<<<< HEAD
-                        <!-- Dark Mode Toggle -->
+<!-- Dark Mode Toggle -->
                         <button id="dark-mode-toggle-btn" class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-heritage-primary dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800 transition-all text-sm font-medium border border-transparent hover:border-heritage-outline dark:hover:border-slate-700 hover:shadow-sm has-tooltip" data-tooltip="切换深色/浅色模式">
                             <svg id="dark-mode-icon-sun" class="w-4 h-4 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
                             <svg id="dark-mode-icon-moon" class="w-4 h-4 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
                         </button>
-=======
->>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de
                         <div id="profile-dropdown-wrapper" class="relative">
                             <button id="profile-menu-toggle" class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-heritage-primary dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800 transition-all text-sm font-medium border border-transparent hover:border-heritage-outline dark:hover:border-slate-700 hover:shadow-sm">
                                 <div class="w-7 h-7 rounded-full bg-gradient-to-br from-heritage-variant to-heritage-outline dark:from-slate-700 dark:to-slate-600 flex items-center justify-center shadow-inner">
@@ -308,12 +295,8 @@ tailwind.config = {
 <div class="h-px bg-heritage-variant dark:bg-slate-700/50 mx-1 my-1"></div>
 
                                     <!-- 自定义背景 -->
-<<<<<<< HEAD
-                                    <div id="bg-controls-section" class="hidden">
+<div id="bg-controls-section" class="hidden">
                                         <div class="px-3 py-2 text-xs space-y-2">
-=======
-                                    <div class="px-3 py-2 text-xs space-y-2">
->>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de
                                         <span class="font-semibold text-heritage-secondary uppercase tracking-wider">自定义背景</span>
                                         <input type="text" id="bg-image-input" placeholder="背景图 URL" class="w-full px-3 py-1.5 rounded-lg bg-heritage-variant dark:bg-slate-800 border border-heritage-outline dark:border-slate-600 text-heritage-primary dark:text-white text-xs outline-none focus:ring-1 focus:ring-heritage-500/50">
                                         <div class="flex items-center justify-between pt-1">
@@ -327,51 +310,9 @@ tailwind.config = {
                                         </div>
                                         <input type="range" id="bg-blur-slider" min="0" max="20" value="2" step="2" class="w-full h-1.5 bg-heritage-outline rounded-lg appearance-none cursor-pointer accent-heritage-500 dark:accent-heritage-400 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-heritage-500">
                                     </div>
-<<<<<<< HEAD
                                     </div>
 
                                     <div class="h-px bg-heritage-variant dark:bg-slate-700/50 mx-1 my-1"></div>
-=======
-
-                                    <div class="h-px bg-heritage-variant dark:bg-slate-700/50 mx-1 my-1"></div>
-
-                                    <!-- 【新增】APP 布局切换 -->
-                                    <div class="px-3 py-2.5 flex items-center justify-between text-sm text-heritage-primary dark:text-heritage-outline hover:bg-heritage-variant dark:hover:bg-slate-700/30 rounded-lg group">
-                                        <span class="flex items-center gap-3">
-                                            <svg class="w-4 h-4 text-heritage-secondary group-hover:text-heritage-primary dark:text-heritage-secondary dark:group-hover:text-slate-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect>
-                                                <rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect>
-                                            </svg>
-                                            APP 视图
-                                        </span>
-                                        <label class="relative inline-flex items-center cursor-pointer">
-                                            <input type="checkbox" id="layout-switch-checkbox" class="sr-only peer">
-                                            <div class="w-9 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-heritage-500"></div>
-                                        </label>
-                                    </div>
-                                    
-                                    <div class="px-3 py-2.5 flex items-center justify-between text-sm text-heritage-primary dark:text-heritage-outline hover:bg-heritage-variant dark:hover:bg-slate-700/30 rounded-lg group">
-                                        <span class="flex items-center gap-3">
-                                            <svg class="w-4 h-4 text-heritage-secondary group-hover:text-heritage-primary dark:text-heritage-secondary dark:group-hover:text-slate-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-                                            深色模式
-                                        </span>
-                                        <label class="relative inline-flex items-center cursor-pointer">
-                                            <input type="checkbox" id="theme-switch-checkbox" class="sr-only peer">
-                                            <div class="w-9 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-heritage-500"></div>
-                                        </label>
-                                    </div>
-                                    <div class="px-3 py-2.5 flex items-center justify-between text-sm text-heritage-primary dark:text-heritage-outline hover:bg-heritage-variant dark:hover:bg-slate-700/30 rounded-lg group">
-                                        <span class="flex items-center gap-3">
-                                            <svg class="w-4 h-4 text-heritage-secondary group-hover:text-heritage-primary dark:text-heritage-secondary dark:group-hover:text-slate-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
-                                            记住设置
-                                        </span>
-                                        <label class="relative inline-flex items-center cursor-pointer">
-                                            <input type="checkbox" id="save-preference-checkbox" class="sr-only peer">
-                                            <div class="w-9 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-heritage-500"></div>
-                                        </label>
-                                    </div>
-                                    <div class="h-px bg-heritage-variant dark:bg-slate-700/50 mx-1 my-1"></div>
->>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de
                                     <button id="login-Btn" class="w-full text-left px-3 py-2.5 rounded-lg text-sm text-heritage-primary dark:text-heritage-outline hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-500 transition-colors flex items-center gap-3 font-medium">
                                         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
                                         登录 / 退出
@@ -531,10 +472,6 @@ tailwind.config = {
     </div>
 
 
-<<<<<<< HEAD
-    <script>__FRONTEND_JS_PLACEHOLDER__</script>
-=======
-    <script>{{FRONTEND_JS}}</script>
->>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de
+<script>__FRONTEND_JS_PLACEHOLDER__</script>
 </body>
 </html>

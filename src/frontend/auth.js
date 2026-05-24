@@ -83,13 +83,15 @@ export async function saveDataToServer(actionName, data) {
 }
 
 export async function checkLoginStatusAndLoad() {
-    const isValid = await validateToken();
+    const [isValid] = await Promise.all([
+        validateToken(),
+        loadLinks()
+    ]);
     if (isValid) {
         setLoggedIn(true);
     } else {
         setLoggedIn(false);
     }
-    await loadLinks();
 }
 
 async function loadLinks() {
