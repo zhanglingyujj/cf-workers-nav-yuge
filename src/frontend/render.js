@@ -1,9 +1,15 @@
 // render.js - 增量 DOM 渲染引擎
 import {
+<<<<<<< HEAD
     getCategories, isEditMode, isLoggedIn,
     setFlushHandler, subscribe,
     addCategory, renameCategory, deleteCategory, moveCategory, pinCategory, setCategoryHidden,
     isCategoryAppLayout, setCategoryAppLayout
+=======
+    getCategories, isEditMode, isLoggedIn, isAppLayout,
+    setFlushHandler, subscribe,
+    addCategory, renameCategory, deleteCategory, moveCategory, pinCategory, setCategoryHidden
+>>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de
 } from './state.js';
 import { createCardElement, updateCardElement } from './card.js';
 import { getEl, clearElCache, debounce } from './utils.js';
@@ -183,6 +189,7 @@ function createCategorySection(categoryName, links, isHidden) {
     titleContainer.appendChild(title);
 
     if (isEditMode()) {
+<<<<<<< HEAD
         const catData = getCategories()[categoryName];
         const isApp = catData && catData.isAppLayout;
         titleContainer.appendChild(createCategoryControls(categoryName, isHidden, isApp));
@@ -194,6 +201,15 @@ function createCategorySection(categoryName, links, isHidden) {
     const gridClasses = isApp
         ? 'grid-cols-[repeat(auto-fill,minmax(90px,1fr))] gap-[18px]'
         : 'grid-cols-2 gap-[10px] sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] sm:gap-[18px]';
+=======
+        titleContainer.appendChild(createCategoryControls(categoryName, isHidden));
+    }
+
+    const cardContainer = document.createElement('div');
+    const gridClasses = isAppLayout()
+        ? 'grid-cols-[repeat(auto-fill,minmax(90px,1fr))] gap-[18px]'
+        : 'grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-[18px]';
+>>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de
 
     cardContainer.className = `grid ${gridClasses} card-container relative`;
     cardContainer.dataset.category = categoryName;
@@ -221,6 +237,7 @@ function updateSectionHeader(section, categoryName, isHidden) {
     if (existingControls) existingControls.remove();
 
     if (isEditMode()) {
+<<<<<<< HEAD
         const catData = getCategories()[categoryName];
         const isApp = catData && catData.isAppLayout;
         titleContainer.appendChild(createCategoryControls(categoryName, isHidden, isApp));
@@ -228,6 +245,13 @@ function updateSectionHeader(section, categoryName, isHidden) {
 }
 
 function createCategoryControls(categoryName, isHidden, isApp) {
+=======
+        titleContainer.appendChild(createCategoryControls(categoryName, isHidden));
+    }
+}
+
+function createCategoryControls(categoryName, isHidden) {
+>>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de
     const controls = document.createElement('div');
     controls.className = 'flex items-center gap-1 ml-auto bg-heritage-outline/50 dark:bg-slate-800/50 p-1 rounded-xl border border-heritage-outline/50 dark:border-slate-700/50 backdrop-blur-sm category-controls';
     const btnBase = "w-8 h-8 flex items-center justify-center rounded-lg transition-all duration-200 hover:scale-105 active:scale-95";
@@ -254,6 +278,7 @@ function createCategoryControls(categoryName, isHidden, isApp) {
             </label>
         </div>
         <div class="w-px h-4 bg-heritage-outline dark:bg-slate-600 mx-0.5"></div>
+<<<<<<< HEAD
         <div class="flex items-center justify-center w-8 h-8 has-tooltip cursor-pointer" data-tooltip="${isApp ? '列表视图' : 'APP视图'}">
             <label class="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" ${isApp ? 'checked' : ''} class="sr-only peer category-app-toggle">
@@ -261,6 +286,8 @@ function createCategoryControls(categoryName, isHidden, isApp) {
             </label>
         </div>
         <div class="w-px h-4 bg-heritage-outline dark:bg-slate-600 mx-0.5"></div>
+=======
+>>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de
         <button class="${btnBase} text-heritage-secondary hover:text-red-600 hover:bg-red-100 dark:text-heritage-secondary dark:hover:bg-red-900/30 dark:hover:text-red-400 has-tooltip" data-tooltip="删除分类">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
         </button>
@@ -272,9 +299,12 @@ function createCategoryControls(categoryName, isHidden, isApp) {
     });
     buttons[1].addEventListener('click', () => {
         moveCategory(categoryName, -1);
+<<<<<<< HEAD
         renderAll();
         renderCategoryButtons();
         setupScrollSpyNow();
+=======
+>>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de
         import('./auth.js').then(m => m.validateTokenOrRedirect()).then(v => {
             if (!v) return;
             return import('./auth.js').then(a => a.saveDataToServer('保存排序', getCategories()));
@@ -282,9 +312,12 @@ function createCategoryControls(categoryName, isHidden, isApp) {
     });
     buttons[2].addEventListener('click', () => {
         moveCategory(categoryName, 1);
+<<<<<<< HEAD
         renderAll();
         renderCategoryButtons();
         setupScrollSpyNow();
+=======
+>>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de
         import('./auth.js').then(m => m.validateTokenOrRedirect()).then(v => {
             if (!v) return;
             return import('./auth.js').then(a => a.saveDataToServer('保存排序', getCategories()));
@@ -292,9 +325,12 @@ function createCategoryControls(categoryName, isHidden, isApp) {
     });
     buttons[3].addEventListener('click', () => {
         pinCategory(categoryName);
+<<<<<<< HEAD
         renderAll();
         renderCategoryButtons();
         setupScrollSpyNow();
+=======
+>>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de
         import('./auth.js').then(m => m.validateTokenOrRedirect()).then(v => {
             if (!v) return;
             return import('./auth.js').then(a => a.saveDataToServer('保存排序', getCategories()));
@@ -325,6 +361,7 @@ function createCategoryControls(categoryName, isHidden, isApp) {
         });
     }
 
+<<<<<<< HEAD
     const appToggle = controls.querySelector('.category-app-toggle');
     if (appToggle) {
         appToggle.addEventListener('change', async function () {
@@ -341,15 +378,21 @@ function createCategoryControls(categoryName, isHidden, isApp) {
         });
     }
 
+=======
+>>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de
     return controls;
 }
 
 function ensureAddPlaceholder(cardContainer, categoryName) {
     if (cardContainer.querySelector('.add-card-placeholder')) return;
     const placeholder = document.createElement('div');
+<<<<<<< HEAD
     const catData = getCategories()[categoryName];
     const isApp = catData && catData.isAppLayout;
     const sizeClasses = isApp
+=======
+    const sizeClasses = isAppLayout()
+>>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de
         ? 'w-[70px] h-[70px] rounded-2xl mx-auto'
         : 'min-h-[100px] p-4 rounded-2xl w-full';
 
@@ -406,10 +449,13 @@ export function renderCategoryButtons() {
         btn.textContent = cat;
         btn.dataset.target = cat;
         btn.addEventListener('click', () => {
+<<<<<<< HEAD
             _manualScrollTarget = cat;
             highlightButton(cat);
             clearTimeout(_manualScrollTimer);
             _manualScrollTimer = setTimeout(() => { _manualScrollTarget = null; }, 1000);
+=======
+>>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de
             const section = document.getElementById(cat);
             if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
         });
@@ -419,8 +465,11 @@ export function renderCategoryButtons() {
 
 let _scrollObserver = null;
 let _animationFrameId = null;
+<<<<<<< HEAD
 let _manualScrollTarget = null;
 let _manualScrollTimer = null;
+=======
+>>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de
 
 function setupScrollSpyNow() {
     if (_scrollObserver) _scrollObserver.disconnect();
@@ -433,6 +482,7 @@ function setupScrollSpyNow() {
     let lastHighlightedId = null;
 
     _scrollObserver = new IntersectionObserver((entries) => {
+<<<<<<< HEAD
         if (_manualScrollTarget) return;
         const visibleSections = [];
         entries.forEach(entry => {
@@ -466,6 +516,16 @@ function setupScrollSpyNow() {
             _animationFrameId = requestAnimationFrame(() => highlightButton(targetId));
         }
     }, { root: null, rootMargin: '-80px 0px -60% 0px', threshold: 0 });
+=======
+        entries.forEach(entry => {
+            if (entry.isIntersecting && entry.target.id !== lastHighlightedId) {
+                lastHighlightedId = entry.target.id;
+                if (_animationFrameId) cancelAnimationFrame(_animationFrameId);
+                _animationFrameId = requestAnimationFrame(() => highlightButton(entry.target.id));
+            }
+        });
+    }, { root: null, rootMargin: '-80px 0px -80% 0px', threshold: 0 });
+>>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de
 
     sections.forEach(section => _scrollObserver.observe(section));
 }
@@ -507,11 +567,14 @@ export function updateUIState() {
         dataToolsMenu.classList.toggle('hidden', !isLoggedIn());
     }
 
+<<<<<<< HEAD
     const bgControlsSection = document.getElementById('bg-controls-section');
     if (bgControlsSection) {
         bgControlsSection.classList.toggle('hidden', !isLoggedIn());
     }
 
+=======
+>>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de
     if (editModeBtn) {
         if (isEditMode()) {
             editModeBtn.innerHTML = '<span class="text-red-500 flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>退出编辑</span>';

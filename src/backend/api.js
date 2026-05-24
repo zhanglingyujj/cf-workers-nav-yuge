@@ -215,6 +215,7 @@ export async function handleImportData(request, env) {
     await env.CARD_ORDER.put(DEFAULT_USER, JSON.stringify(cleanData));
     return new Response(JSON.stringify({ success: true }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json'} });
 }
+<<<<<<< HEAD
 
 export async function handleGetSettings(request, env) {
     const corsHeaders = getCorsHeaders(env, request);
@@ -234,3 +235,5 @@ export async function handleSaveSettings(request, env) {
         return new Response(JSON.stringify({ error: 'Bad Request' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json'} });
     }
 }
+=======
+>>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de

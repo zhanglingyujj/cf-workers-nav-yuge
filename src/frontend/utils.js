@@ -57,6 +57,7 @@ export function scheduleDOMWrite(fn) {
 const _elCache = new Map();
 export function getEl(id) {
     if (!_elCache.has(id)) {
+<<<<<<< HEAD
         const el = document.getElementById(id);
         if (el) _elCache.set(id, el);
         return el;
@@ -66,6 +67,11 @@ export function getEl(id) {
     const el = document.getElementById(id);
     if (el) _elCache.set(id, el);
     return el;
+=======
+        _elCache.set(id, document.getElementById(id));
+    }
+    return _elCache.get(id);
+>>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de
 }
 
 export function clearElCache() {

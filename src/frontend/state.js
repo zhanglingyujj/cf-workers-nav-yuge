@@ -2,6 +2,10 @@
 let _categories = {};
 let _isEditMode = false;
 let _isLoggedIn = false;
+<<<<<<< HEAD
+=======
+let _isAppLayout = localStorage.getItem('appLayout') === 'true';
+>>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de
 
 const _subscribers = {};
 const _dirtyCategories = new Set();
@@ -13,12 +17,20 @@ export function getState() {
         categories: _categories,
         isEditMode: _isEditMode,
         isLoggedIn: _isLoggedIn,
+<<<<<<< HEAD
+=======
+        isAppLayout: _isAppLayout,
+>>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de
     };
 }
 
 export function getCategories() { return _categories; }
 export function isEditMode() { return _isEditMode; }
 export function isLoggedIn() { return _isLoggedIn; }
+<<<<<<< HEAD
+=======
+export function isAppLayout() { return _isAppLayout; }
+>>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de
 
 export function setEditMode(v) {
     _isEditMode = v;
@@ -34,7 +46,17 @@ export function setLoggedIn(v) {
     emit('loggedIn', v);
 }
 
+<<<<<<< HEAD
 export function setAppLayout(v) {}
+=======
+export function setAppLayout(v) {
+    _isAppLayout = v;
+    localStorage.setItem('appLayout', v);
+    markAllDirty();
+    flushNow();
+    emit('appLayout', v);
+}
+>>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de
 
 export function setCategories(data) {
     const oldKeys = Object.keys(_categories);
@@ -165,6 +187,7 @@ export function reorderCards(categoryName, orderedLinks) {
     emit('linksChanged', { action: 'reorder', category: categoryName });
 }
 
+<<<<<<< HEAD
 export function isCategoryAppLayout(categoryName) {
     return _categories[categoryName] && _categories[categoryName].isAppLayout === true;
 }
@@ -176,6 +199,8 @@ export function setCategoryAppLayout(categoryName, v) {
     emit('categoriesChanged', { action: 'appLayout', category: categoryName, value: v });
 }
 
+=======
+>>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de
 export function markDirty(categoryName) {
     _dirtyCategories.add(categoryName);
     scheduleFlush();

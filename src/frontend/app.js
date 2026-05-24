@@ -1,16 +1,43 @@
 // app.js - 前端入口
 import { initRender } from './render.js';
 import { getEl, clearElCache } from './utils.js';
+<<<<<<< HEAD
 import { setEditMode, setLoggedIn } from './state.js';
 import { initDialogs } from './dialogs.js';
 import { initDrag } from './drag.js';
 
+=======
+import { setAppLayout, isAppLayout, setEditMode, setLoggedIn } from './state.js';
+import { initDialogs } from './dialogs.js';
+import { initDrag } from './drag.js';
+
+// 暗色模式初始化 (对应 workers.js L153-167)
+(function initDarkMode() {
+    let isDark;
+    const savePreferences = localStorage.getItem('savePreferences');
+    if (savePreferences === 'true') {
+        const savedTheme = localStorage.getItem('theme');
+        isDark = savedTheme === 'dark';
+    } else {
+        const hour = new Date().getHours();
+        isDark = (hour >= 21 || hour < 6);
+    }
+    window.isDarkTheme = isDark;
+    if (isDark) document.documentElement.classList.add('dark');
+})();
+
+>>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de
 document.addEventListener('DOMContentLoaded', async () => {
     initRender();
 
     // 初始化 UI 组件 (来自 workers.js L657-765)
     const themeSwitch = getEl('theme-switch-checkbox');
+<<<<<<< HEAD
     const darkModeToggleBtn = getEl('dark-mode-toggle-btn');
+=======
+    const layoutSwitch = getEl('layout-switch-checkbox');
+    const savePrefCheckbox = getEl('save-preference-checkbox');
+>>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de
     const searchInput = getEl('search-input');
     const clearSearchBtn = getEl('clear-search-button');
     const searchBtn = getEl('search-button');
@@ -22,6 +49,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const searchEngineMenu = getEl('search-engine-menu');
     const searchWrapper = getEl('search-engine-wrapper');
 
+<<<<<<< HEAD
     if (darkModeToggleBtn) {
         darkModeToggleBtn.addEventListener('click', () => {
             const isDark = !document.documentElement.classList.contains('dark');
@@ -29,6 +57,32 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (isDark) document.documentElement.classList.add('dark');
             else document.documentElement.classList.remove('dark');
             localStorage.setItem('theme', isDark ? 'dark' : 'light');
+=======
+    if (themeSwitch) {
+        themeSwitch.checked = document.documentElement.classList.contains('dark');
+        themeSwitch.addEventListener('change', (e) => {
+            const isDark = e.target.checked;
+            window.isDarkTheme = isDark;
+            if (isDark) document.documentElement.classList.add('dark');
+            else document.documentElement.classList.remove('dark');
+            if (savePrefCheckbox && savePrefCheckbox.checked) {
+                localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            }
+        });
+    }
+
+    if (layoutSwitch) layoutSwitch.checked = isAppLayout();
+
+    if (savePrefCheckbox) {
+        savePrefCheckbox.checked = localStorage.getItem('savePreferences') === 'true';
+        savePrefCheckbox.addEventListener('change', () => {
+            const enabled = savePrefCheckbox.checked;
+            localStorage.setItem('savePreferences', enabled);
+            if (!enabled) {
+                localStorage.removeItem('searchEngine');
+                localStorage.removeItem('theme');
+            }
+>>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de
         });
     }
 
@@ -84,7 +138,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         }, { passive: true });
     }
 
+<<<<<<< HEAD
     // 自定义背景 + 遮罩 (服务器持久化)
+=======
+    // 自定义背景 + 遮罩
+>>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de
     const bgImageInput = getEl('bg-image-input');
     const bgOpacitySlider = getEl('bg-opacity-slider');
     const bgOpacityValue = getEl('bg-opacity-value');
@@ -92,8 +150,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     const bgMask = document.getElementById('bg-mask');
 
     function applyBgImage(url) {
+<<<<<<< HEAD
         if (url && customBgImage) {
             const blurVal = bgBlurSlider ? parseInt(bgBlurSlider.value) : 2;
+=======
+        const blurVal = parseInt(localStorage.getItem('backgroundBlur')) || 2;
+        if (url && customBgImage) {
+>>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de
             customBgImage.style.backgroundImage = `url(${url})`;
             customBgImage.style.filter = `blur(${blurVal}px)`;
             customBgImage.style.transform = 'scale(1.05)';
@@ -115,6 +178,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             : `rgba(247, 245, 242, ${pct})`;
     }
 
+<<<<<<< HEAD
     // 从服务器加载设置 (公开接口, 无鉴权)
     async function loadBackgroundSettings() {
         try {
@@ -180,34 +244,75 @@ document.addEventListener('DOMContentLoaded', async () => {
             const url = bgImageInput.value.trim();
             applyBgImage(url);
             scheduleSaveSettings();
+=======
+    if (bgImageInput) {
+        const saved = localStorage.getItem('backgroundImage') || '';
+        bgImageInput.value = saved;
+        applyBgImage(saved);
+        bgImageInput.addEventListener('input', () => {
+            const url = bgImageInput.value.trim();
+            localStorage.setItem('backgroundImage', url);
+            applyBgImage(url);
+>>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de
         });
     }
 
     if (bgOpacitySlider && bgOpacityValue) {
+<<<<<<< HEAD
         bgOpacitySlider.addEventListener('input', () => {
             const val = parseInt(bgOpacitySlider.value);
             bgOpacityValue.textContent = val + '%';
             applyBgOpacity(val);
             scheduleSaveSettings();
+=======
+        const saved = parseInt(localStorage.getItem('backgroundOpacity')) || 20;
+        bgOpacitySlider.value = saved;
+        bgOpacityValue.textContent = saved + '%';
+        applyBgOpacity(saved);
+        bgOpacitySlider.addEventListener('input', () => {
+            const val = parseInt(bgOpacitySlider.value);
+            localStorage.setItem('backgroundOpacity', val);
+            bgOpacityValue.textContent = val + '%';
+            applyBgOpacity(val);
+>>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de
         });
     }
 
     const bgBlurSlider = getEl('bg-blur-slider');
     const bgBlurValue = getEl('bg-blur-value');
     if (bgBlurSlider && bgBlurValue && customBgImage) {
+<<<<<<< HEAD
         bgBlurSlider.addEventListener('input', () => {
             const val = parseInt(bgBlurSlider.value);
+=======
+        const savedBlur = parseInt(localStorage.getItem('backgroundBlur')) || 2;
+        bgBlurSlider.value = savedBlur;
+        bgBlurValue.textContent = savedBlur + 'px';
+        if (customBgImage.style.backgroundImage) {
+            customBgImage.style.filter = `blur(${savedBlur}px)`;
+        }
+        bgBlurSlider.addEventListener('input', () => {
+            const val = parseInt(bgBlurSlider.value);
+            localStorage.setItem('backgroundBlur', val);
+>>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de
             bgBlurValue.textContent = val + 'px';
             if (customBgImage.style.backgroundImage) {
                 customBgImage.style.filter = `blur(${val}px)`;
             }
+<<<<<<< HEAD
             scheduleSaveSettings();
+=======
+>>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de
         });
     }
 
     // 搜索引擎初始化
     const { initSearchEngines } = await import('./search.js');
+<<<<<<< HEAD
     initSearchEngines(searchEngineBtn, searchEngineMenu, searchInput);
+=======
+    initSearchEngines(searchEngineBtn, searchEngineMenu, savePrefCheckbox, searchInput);
+>>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de
 
     // 工具提示
     const { initTooltip } = await import('./tooltip.js');
@@ -243,7 +348,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 拖拽事件
     if (sectionsContainer) initDrag(sectionsContainer);
 
+<<<<<<< HEAD
     // 并行加载数据和背景设置
     const { checkLoginStatusAndLoad } = await import('./auth.js');
     await Promise.all([checkLoginStatusAndLoad(), loadBackgroundSettings()]);
+=======
+    // 加载数据
+    const { checkLoginStatusAndLoad } = await import('./auth.js');
+    await checkLoginStatusAndLoad();
+>>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de
 });

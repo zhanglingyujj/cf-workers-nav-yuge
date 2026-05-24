@@ -1,7 +1,11 @@
 import { HTML_CONTENT } from '../build/html-content.js';
 import { getCorsHeaders } from './utils.js';
 import { handleIconProxy } from './icon.js';
+<<<<<<< HEAD
 import { handleLogin, handleRefreshToken, handleValidateToken, handleGetLinks, handleSaveData, handleBackupData, handleExportData, handleImportData, handleGetSettings, handleSaveSettings } from './api.js';
+=======
+import { handleLogin, handleRefreshToken, handleValidateToken, handleGetLinks, handleSaveData, handleBackupData, handleExportData, handleImportData } from './api.js';
+>>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de
 
 export default {
     async fetch(request, env, ctx) {
@@ -62,11 +66,14 @@ export default {
             return handleImportData(request, env);
         }
 
+<<<<<<< HEAD
         if (url.pathname === '/api/settings') {
             if (request.method === 'GET') return handleGetSettings(request, env);
             if (request.method === 'POST') return handleSaveSettings(request, env);
         }
 
+=======
+>>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de
         return new Response('Not Found', { status: 404, headers: corsHeaders });
     }
 };

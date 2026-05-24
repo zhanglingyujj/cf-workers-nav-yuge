@@ -97,10 +97,16 @@ export function parseCookie(cookieHeader) {
 export function normalizeCategories(categories) {
     for (const key in categories) {
         if (Array.isArray(categories[key])) {
+<<<<<<< HEAD
             categories[key] = { isHidden: false, isAppLayout: false, links: categories[key] };
         } else if (categories[key] && typeof categories[key] === 'object') {
             categories[key].isHidden = Boolean(categories[key].isHidden);
             categories[key].isAppLayout = Boolean(categories[key].isAppLayout);
+=======
+            categories[key] = { isHidden: false, links: categories[key] };
+        } else if (categories[key] && typeof categories[key] === 'object') {
+            categories[key].isHidden = Boolean(categories[key].isHidden);
+>>>>>>> 8794ea6a7a21414ca907e492fc7d46678fc868de
             categories[key].links = categories[key].links || [];
         }
     }
