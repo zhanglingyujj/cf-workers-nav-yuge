@@ -94,7 +94,7 @@ export async function checkLoginStatusAndLoad() {
     }
 }
 
-async function loadLinks() {
+export async function loadLinks() {
     try {
         const response = await fetchWithAuth('/api/getLinks');
         if (!response.ok) throw new Error("HTTP error! status: " + response.status);

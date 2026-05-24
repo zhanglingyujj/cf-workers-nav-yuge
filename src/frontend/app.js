@@ -93,7 +93,7 @@ if (darkModeToggleBtn) {
 
     function applyBgImage(url) {
         if (url && customBgImage) {
-            const blurVal = bgBlurSlider ? parseInt(bgBlurSlider.value) : 2;
+            const blurVal = bgBlurSlider ? parseInt(bgBlurSlider.value) : 0;
             customBgImage.style.backgroundImage = `url(${url})`;
             customBgImage.style.filter = `blur(${blurVal}px)`;
             customBgImage.style.transform = 'scale(1.05)';
@@ -123,7 +123,7 @@ if (darkModeToggleBtn) {
             const settings = await res.json();
             const imgUrl = settings.backgroundImage || '';
             const opacity = settings.backgroundOpacity || 20;
-            const blurVal = settings.backgroundBlur || 2;
+            const blurVal = settings.backgroundBlur || 0;
             if (bgImageInput) bgImageInput.value = imgUrl;
             if (bgOpacitySlider && bgOpacityValue) {
                 bgOpacitySlider.value = opacity;
@@ -149,7 +149,7 @@ if (darkModeToggleBtn) {
                 applyBgOpacity(opacity);
             }
             if (bgBlurSlider && bgBlurValue && blurVal !== null) {
-                const blur = parseInt(blurVal) || 2;
+                const blur = parseInt(blurVal) || 0;
                 bgBlurSlider.value = blur;
                 bgBlurValue.textContent = blur + 'px';
             }
@@ -169,7 +169,7 @@ if (darkModeToggleBtn) {
                 body: JSON.stringify({
                     backgroundImage: bgImageInput ? bgImageInput.value.trim() : '',
                     backgroundOpacity: bgOpacitySlider ? parseInt(bgOpacitySlider.value) : 20,
-                    backgroundBlur: bgBlurSlider ? parseInt(bgBlurSlider.value) : 2,
+                    backgroundBlur: bgBlurSlider ? parseInt(bgBlurSlider.value) : 0,
                 }),
             });
         }, 500);
@@ -243,7 +243,17 @@ initSearchEngines(searchEngineBtn, searchEngineMenu, searchInput);
     // 拖拽事件
     if (sectionsContainer) initDrag(sectionsContainer);
 
-// 并行加载数据和背景设置
-    const { checkLoginStatusAndLoad } = await import('./auth.js');
-    await Promise.all([checkLoginStatusAndLoad(), loadBackgroundSettings()]);
+// 渐进式加载：立即触发链接加载，不等待 token 验证或背景设置
+    const { loadLinks, validateToken } = await import('./auth.js');
+    loadLinks();
+
+    loadBackgroundSettings();
+
+    validateToken().then(async isValid => {
+        const { setLoggedIn } = await import('./state.js');
+        if (isValid) {
+            setLoggedIn(true);
+            loadLinks();
+        }
+    });
 });
