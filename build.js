@@ -1,10 +1,115 @@
 import * as esbuild from 'esbuild';
-import { readFileSync, writeFileSync, unlinkSync } from 'fs';
+import { execSync } from 'child_process';
+import { readFileSync, writeFileSync, unlinkSync, mkdirSync, readdirSync } from 'fs';
+
+const TAILWIND_INPUT = 'src/frontend/input.css';
+const TAILWIND_OUTPUT = 'src/build/tailwind.css';
+const FRONTEND_DIR = 'src/frontend';
+
+// 源码中出现、但无需 CSS 定义的业务 class（JS 选择器钩子 / 历史遗留死类）
+// 若某工具类被误报缺失，先确认是否真的需要 safelist，而不是往这里塞
+const KNOWN_NON_CSS_CLASSES = new Set([
+    'mask-gradient', 'shadow-glass', 'animation-delay-2000', // Play CDN 时代就未定义的死类
+    'hover:border-heritage-300', // heritage-300 不在色板中，一直未生效
+    'custom-scrollbar',          // 无 CSS 定义且无 JS 引用的死类
+    'has-tooltip',               // JS 选择器钩子（tooltip.js 委托）
+]);
+
+function compileTailwindCss() {
+    mkdirSync('src/build', { recursive: true });
+    execSync(
+        `npx tailwindcss -c tailwind.config.js -i ${TAILWIND_INPUT} -o ${TAILWIND_OUTPUT} --minify`,
+        { stdio: 'pipe' }
+    );
+    return readFileSync(TAILWIND_OUTPUT, 'utf-8');
+}
+
+// ---------- --check-classes ----------
+
+const CLASS_TOKEN_RE = /^[\w\-:\/\[\]().#%,&]+$/;
+
+function addTokens(set, text, requireVariant) {
+    for (const t of text.split(/\s+/)) {
+        if (!t || !CLASS_TOKEN_RE.test(t)) continue;
+        // 去噪: 排除 id/路径选择器、URL、SVG path、大写专名等非 class token
+        if (/^[-:#\/.&,]/.test(t)) continue; // id/路径前缀 (允许 '[' 开头的任意属性变体)
+        if (t.endsWith(':')) continue;       // 'xxx:' 标签形式
+        if (t.includes('//')) continue;      // URL
+        if (/[A-Z]/.test(t)) continue;       // SVG path / Header 名等
+        if (!/[a-z]/.test(t)) continue;      // 纯数字/符号
+        if (requireVariant && !/[:\[]/.test(t)) continue; // JS 侧只查变体/任意值语法
+        set.add(t);
+    }
+}
+
+function extractSourceTokens() {
+    const tokens = new Set();
+    // HTML: class 属性（高置信，全部检查）
+    const html = readFileSync(`${FRONTEND_DIR}/index.html`, 'utf-8');
+    for (const m of html.matchAll(/\bclass\s*=\s*"([^"]*)"/g)) {
+        addTokens(tokens, m[1], false);
+    }
+    // JS: 字符串字面量与模板字符串（只检查变体/任意值语法，基础工具类由 HTML 侧覆盖）
+    for (const f of readdirSync(FRONTEND_DIR)) {
+        if (!f.endsWith('.js')) continue;
+        const src = readFileSync(`${FRONTEND_DIR}/${f}`, 'utf-8');
+        for (const m of src.matchAll(/'([^'\\]*)'|"([^"\\]*)"/g)) {
+            addTokens(tokens, m[1] ?? m[2], true);
+        }
+        for (const m of src.matchAll(/`([^`]*)`/g)) {
+            addTokens(tokens, m[1], true);
+        }
+    }
+    return tokens;
+}
+
+function unescapeCssClass(str) {
+    return str
+        .replace(/\\([0-9a-fA-F]{1,6}) ?/g, (_, hex) => String.fromCodePoint(parseInt(hex, 16)))
+        .replace(/\\(.)/g, '$1');
+}
+
+function extractCssClasses(css) {
+    const classes = new Set();
+    // class 名内的特殊字符（: / . [ ] ( ) # , 等）在 CSS 中均被转义为 \x 或 \xx 形式，
+    // 未转义的 . 为选择器分隔符；故 token 只需 \w 和 -
+    for (const m of css.matchAll(/\.((?:\\[0-9a-fA-F]{1,6} ?|\\.|[\w\-])+)/g)) {
+        classes.add(unescapeCssClass(m[1]));
+    }
+    return classes;
+}
+
+function checkClasses() {
+    const tailwindCss = compileTailwindCss();
+    const html = readFileSync(`${FRONTEND_DIR}/index.html`, 'utf-8');
+    let customCss = '';
+    for (const m of html.matchAll(/<style>([\s\S]*?)<\/style>/g)) {
+        if (!m[1].includes('__TAILWIND_CSS_PLACEHOLDER__')) customCss += m[1];
+    }
+    const cssClasses = extractCssClasses(tailwindCss + customCss);
+    const sourceTokens = extractSourceTokens();
+    const missing = [...sourceTokens]
+        .filter(t => !cssClasses.has(t) && !KNOWN_NON_CSS_CLASSES.has(t))
+        .sort();
+    unlinkSync(TAILWIND_OUTPUT);
+    if (missing.length) {
+        console.error(`--check-classes: ${missing.length} 个 class 未命中生成 CSS：`);
+        missing.forEach(t => console.error(`  ${t}`));
+        process.exit(1);
+    }
+    console.log(`--check-classes: OK (${sourceTokens.size} 个源码 class 全部命中)`);
+}
+
+// ---------- 构建 ----------
 
 async function build() {
+    // Step 0: 编译 Tailwind CSS (minified)
+    const tailwindCss = compileTailwindCss();
+    unlinkSync(TAILWIND_OUTPUT);
+
     // Step 1: 构建前端 JS bundle (IIFE, 所有 import/export → 闭包内)
     const frontendResult = await esbuild.build({
-        entryPoints: ['src/frontend/app.js'],
+        entryPoints: [`${FRONTEND_DIR}/app.js`],
         bundle: true,
         format: 'iife',
         target: 'es2020',
@@ -13,9 +118,10 @@ async function build() {
     });
     const frontendJs = frontendResult.outputFiles[0].text;
 
-    // Step 2: 读取 HTML 模板, 注入前端 JS
-    let html = readFileSync('src/frontend/index.html', 'utf-8');
-html = html.replace('__FRONTEND_JS_PLACEHOLDER__', () => frontendJs);
+    // Step 2: 读取 HTML 模板, 注入 CSS 与前端 JS
+    let html = readFileSync(`${FRONTEND_DIR}/index.html`, 'utf-8');
+    html = html.replace('__TAILWIND_CSS_PLACEHOLDER__', () => tailwindCss);
+    html = html.replace('__FRONTEND_JS_PLACEHOLDER__', () => frontendJs);
 
     // Step 3: 生成 html-content.js (使用 JSON.stringify 安全嵌入, 避免逃逸链)
     const htmlModule = '// Auto-generated by build.js\nexport const HTML_CONTENT = ' + JSON.stringify(html) + ';\n';
@@ -42,7 +148,11 @@ html = html.replace('__FRONTEND_JS_PLACEHOLDER__', () => frontendJs);
     console.log(`Build complete: dist/workers.js (${(size / 1024).toFixed(1)} KB)`);
 }
 
-build().catch(err => {
-    console.error('Build failed:', err);
-    process.exit(1);
-});
+if (process.argv.includes('--check-classes')) {
+    checkClasses();
+} else {
+    build().catch(err => {
+        console.error('Build failed:', err);
+        process.exit(1);
+    });
+}

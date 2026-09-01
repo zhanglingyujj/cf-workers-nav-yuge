@@ -55,6 +55,9 @@ npm run deploy
 ```bash
 npm run dev
 # 本地启动 http://localhost:8787，需先完成 wrangler secret put 设置密钥
+
+node build.js --check-classes
+# 校验源码中的 class 全部命中生成的 CSS，防止 Tailwind purge 误删
 ```
 
 ## 项目结构
@@ -70,7 +73,7 @@ npm run dev
 │   │   ├── icon.js           # 图标代理（HTMLRewriter + Cache API）
 │   │   └── backup.js         # 智能备份（10 分钟最小间隔）
 │   ├── frontend/             # 前端模块
-│   │   ├── index.html        # HTML 骨架（Tailwind CDN + 暗色模式检测）
+│   │   ├── index.html        # HTML 骨架（构建期内联 Tailwind CSS + 暗色模式检测）
 │   │   ├── app.js            # 入口：渐进式加载 + 并行初始化
 │   │   ├── state.js          # 集中状态 + 脏标记 + 订阅系统
 │   │   ├── render.js         # 增量 DOM 渲染（patchCategory + scrollspy）
@@ -81,9 +84,11 @@ npm run dev
 │   │   ├── dialogs.js        # 弹窗管理（添加/编辑/分类/确认/登录）
 │   │   ├── tooltip.js        # 鼠标跟随 tooltip
 │   │   ├── scrollspy.js      # IntersectionObserver 滚动高亮
-│   │   └── utils.js          # debounce / throttle / rafThrottle / getEl
+│   │   ├── utils.js          # debounce / throttle / rafThrottle / getEl
+│   │   └── input.css         # Tailwind 入口（三条 @tailwind 指令）
 │   └── build/                # 构建中间产物（自动生成 + 清理）
-├── build.js                  # esbuild 构建脚本
+├── build.js                  # 构建脚本（Tailwind 编译 + esbuild）
+├── tailwind.config.js       # Tailwind v3 配置（heritage/glass 色板）
 ├── dist/workers.js           # 构建产物（gitignore）
 ├── package.json
 ├── wrangler.toml
@@ -140,4 +145,4 @@ npm run dev
 
 ## 技术栈
 
-Cloudflare Workers · KV · Cache API · HTMLRewriter · Tailwind CSS (CDN) · esbuild · JWT (HS256)
+Cloudflare Workers · KV · Cache API · HTMLRewriter · Tailwind CSS v3（构建期编译内联） · esbuild · JWT (HS256)

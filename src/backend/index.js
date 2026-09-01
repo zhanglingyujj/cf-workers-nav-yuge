@@ -25,7 +25,7 @@ export default {
                     'X-Content-Type-Options': 'nosniff',
                     'X-Frame-Options': 'SAMEORIGIN',
                     'Referrer-Policy': 'strict-origin-when-cross-origin',
-                    'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; connect-src 'self' https://static.cloudflareinsights.com; font-src 'self' data: https://fonts.gstatic.com;"
+                    'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; connect-src 'self' https://static.cloudflareinsights.com; font-src 'self' data: https://fonts.gstatic.com;"
                 }
             });
         }
