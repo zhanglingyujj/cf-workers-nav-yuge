@@ -725,3 +725,16 @@ Cloudflare, Tailwind CSS, hmhm2022, xinac
 8. **Phase 7** → README
 
 每个 Commit 消息格式: `feat(scope): description`
+## Agent skills
+
+### Issue tracker
+
+Issues 跟踪在 GitHub Issues（通过 `gh` CLI）。See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+使用默认的五个 canonical triage 标签（`needs-triage` 等）。See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context：根目录 `CONTEXT.md` + `docs/adr/`。See `docs/agents/domain.md`.
