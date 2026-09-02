@@ -23,6 +23,52 @@ function toggleOverlay(id, show) {
     }
 }
 
+const BG_COLOR_PRESETS = [
+    '#2a2a2a6b', '#1e293bd9', '#B8422Ed9', '#4285F4d9', '#34A853d9',
+    '#FBBC05d9', '#EB4335d9', '#008373d9', '#6C7278d9',
+];
+
+function initBgColorPicker() {
+    const swatches = getEl('bg-color-swatches');
+    const input = getEl('bg-color-input');
+    if (!swatches || !input || swatches.childElementCount) return;
+
+    BG_COLOR_PRESETS.forEach(color => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.title = color;
+        btn.className = 'w-7 h-7 rounded-lg border border-white/20 transition-transform hover:scale-110';
+        btn.style.backgroundColor = color;
+        btn.addEventListener('click', () => {
+            input.value = color;
+            swatches.querySelectorAll('button').forEach(b => b.style.outline = '');
+            btn.style.outline = '2px solid #B8422E';
+        });
+        swatches.appendChild(btn);
+    });
+
+    const clearBtn = getEl('bg-color-clear');
+    if (clearBtn) {
+        clearBtn.addEventListener('click', () => {
+            input.value = '';
+            swatches.querySelectorAll('button').forEach(b => b.style.outline = '');
+        });
+    }
+}
+
+function setBgColorValue(color) {
+    const input = getEl('bg-color-input');
+    if (input) input.value = color || '';
+    const swatches = getEl('bg-color-swatches');
+    if (swatches) swatches.querySelectorAll('button').forEach(b => b.style.outline = '');
+}
+
+function getBgColorValue() {
+    const input = getEl('bg-color-input');
+    const v = (input && input.value.trim()) || '';
+    return /^#([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(v) ? v : '';
+}
+
 export function showAddDialog() {
     toggleOverlay('dialog-overlay', true);
     const nameInput = getEl('name-input');
@@ -36,6 +82,8 @@ export function showAddDialog() {
     if (urlInput) urlInput.value = '';
     if (tipsInput) tipsInput.value = '';
     if (iconInput) iconInput.value = '';
+    initBgColorPicker();
+    setBgColorValue('');
     if (privateCheckbox) privateCheckbox.checked = false;
     if (catValue) catValue.value = '';
     if (catText) catText.textContent = '请选择分类';
@@ -60,7 +108,7 @@ function updateCategorySelectDropdown() {
     const categories = getCategories();
     Object.keys(categories).forEach(cat => {
         const item = document.createElement('div');
-        item.className = 'px-4 py-2.5 text-sm text-heritage-primary dark:text-heritage-dark-200 hover:bg-heritage-50 dark:hover:bg-heritage-dark-700 cursor-pointer transition-colors';
+        item.className = 'px-4 py-2.5 text-sm text-heritage-dark-200 hover:bg-heritage-dark-700 cursor-pointer transition-colors';
         item.textContent = cat;
         item.addEventListener('click', () => {
             const catVal = getEl('category-select-value');
@@ -86,6 +134,8 @@ export function showEditDialog(link) {
     if (urlInput) urlInput.value = link.url;
     if (tipsInput) tipsInput.value = link.tips || '';
     if (iconInput) iconInput.value = link.icon || '';
+    initBgColorPicker();
+    setBgColorValue(link.backgroundColor || '');
     if (privateCheckbox) privateCheckbox.checked = link.isPrivate;
     if (catValue) catValue.value = link.category;
     if (catText) catText.textContent = link.category;
@@ -119,6 +169,7 @@ async function addCard() {
         name, url, category,
         tips: getEl('tips-input').value.trim(),
         icon: getEl('icon-input').value.trim(),
+        backgroundColor: getBgColorValue(),
         isPrivate: getEl('private-checkbox').checked
     };
 
@@ -138,6 +189,7 @@ async function updateCard(oldLink) {
         url: getEl('url-input').value.trim(),
         tips: getEl('tips-input').value.trim(),
         icon: getEl('icon-input').value.trim(),
+        backgroundColor: getBgColorValue(),
         category: getEl('category-select-value').value,
         isPrivate: getEl('private-checkbox').checked
     };

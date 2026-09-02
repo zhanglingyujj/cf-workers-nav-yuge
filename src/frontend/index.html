@@ -53,14 +53,8 @@
         body.edit-mode .card,
         body.edit-mode .card:hover {
             transform: none !important;
-box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
-            overflow: visible !important;
-        }
-        
-        html.dark body.edit-mode .card,
-        html.dark body.edit-mode .card:hover {
             box-shadow: none !important;
-            border-color: rgba(51, 65, 85, 0.5) !important;
+            overflow: visible !important;
         }
 
         .add-card-placeholder {
@@ -109,15 +103,6 @@ box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
         input:-webkit-autofill:hover, 
         input:-webkit-autofill:focus, 
         input:-webkit-autofill:active {
-            -webkit-transition: background-color 99999s ease-out;
-            -webkit-transition-delay: 99999s;
-            -webkit-text-fill-color: #475569 !important; 
-        }
-
-        html.dark input:-webkit-autofill,
-        html.dark input:-webkit-autofill:hover, 
-        html.dark input:-webkit-autofill:focus, 
-        html.dark input:-webkit-autofill:active {
             -webkit-text-fill-color: #CBD5E1 !important;
             box-shadow: 0 0 0px 1000px #1e293b inset !important;
             transition: background-color 5000s ease-in-out 0s;
@@ -127,57 +112,42 @@ box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
             z-index: 100;
             transition: opacity 0.1s ease-in-out;
         }
-    </style>
-    <script>
-        (function () {
-            let isDark;
-const savedTheme = localStorage.getItem('theme');
-            if (savedTheme) {
-                isDark = savedTheme === 'dark';
-            } else {
-                const hour = new Date().getHours();
-                isDark = (hour >= 21 || hour < 6);
-            }
-            window.isDarkTheme = isDark;
-            if (isDark) document.documentElement.classList.add('dark');
-        })();
-    </script>
-</head>
+    </style></head>
 
-<body class="min-h-screen font-sans text-heritage-primary dark:text-heritage-dark-100 selection:bg-heritage-200 dark:selection:bg-heritage-900 transition-colors duration-300">
+<body class="min-h-screen font-sans text-heritage-dark-100 selection:bg-heritage-900 transition-colors duration-300">
     
     <!-- 背景层 -->
-<div class="fixed inset-0 -z-10 h-full w-full overflow-hidden bg-heritage-neutral dark:bg-[#0D0E10]">
-        <div class="absolute inset-0 bg-gradient-to-br from-heritage-neutral to-heritage-variant dark:from-[#0D0E10] dark:to-[#1A1C1E]"></div>
-        <div class="absolute top-[-10%] left-[-10%] w-[800px] h-[800px] bg-heritage-200/30 dark:bg-heritage-900/20 rounded-full blur-[150px] mix-blend-multiply dark:mix-blend-screen animate-blob"></div>
-        <div class="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-heritage-100/30 dark:bg-heritage-900/10 rounded-full blur-[120px] mix-blend-multiply dark:mix-blend-screen animate-blob"></div>
+<div class="fixed inset-0 -z-10 h-full w-full overflow-hidden bg-[#0D0E10]">
+        <div class="absolute inset-0 bg-gradient-to-br from-[#0D0E10] to-[#1A1C1E]"></div>
+        <div class="absolute top-[-10%] left-[-10%] w-[800px] h-[800px] bg-heritage-900/20 rounded-full blur-[150px] mix-blend-screen animate-blob"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-heritage-900/10 rounded-full blur-[120px] mix-blend-screen animate-blob"></div>
         <div id="custom-bg-image" class="absolute inset-0 bg-center bg-cover bg-fixed bg-no-repeat transition-opacity duration-500 opacity-0"></div>
         <div id="bg-mask" class="absolute inset-0 transition-colors duration-300"></div>
     </div>
 
     <!-- 顶部固定导航 -->
     <div class="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
-        <div class="backdrop-blur-2xl bg-heritage-neutral/30 dark:bg-[#0D0E10]/30 border-b border-heritage-outline/40 dark:border-heritage-dark-700/40 shadow-sm supports-[backdrop-filter]:bg-heritage-neutral/40">
+        <div class="backdrop-blur-2xl bg-[#0D0E10]/30 border-b border-heritage-dark-700/40 shadow-sm supports-[backdrop-filter]:bg-[#0D0E10]/40">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex items-center justify-between h-16 gap-4">
                     
                     <!-- Logo -->
-<a class="flex items-center gap-2 flex-shrink-0 group cursor-pointer bg-heritage-surface/50 dark:bg-transparent hover:bg-heritage-surface dark:hover:bg-heritage-dark-800 px-3 py-1.5 rounded-xl border border-heritage-outline/50 dark:border-transparent transition-all duration-300 hover:shadow-md hover:shadow-heritage-500/10 hover:-translate-y-0.5" href="#" onclick="location.reload()">
+<a class="flex items-center gap-2 flex-shrink-0 group cursor-pointer bg-transparent hover:bg-heritage-dark-800 px-3 py-1.5 rounded-xl border border-transparent transition-all duration-300 hover:shadow-md hover:shadow-heritage-500/10 hover:-translate-y-0.5" href="#" onclick="location.reload()">
                         <div class="w-8 h-8 flex items-center justify-center bg-gradient-to-tr from-heritage-500 to-heritage-600 rounded-lg text-white shadow-lg shadow-heritage-500/30 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
                             </svg>
                         </div>
-                        <span class="font-bold text-lg tracking-wide text-heritage-primary dark:text-heritage-variant hidden sm:block">我的导航</span>
+                        <span class="font-bold text-lg tracking-wide text-heritage-variant hidden sm:block">我的导航</span>
                     </a>
 
                     <!-- Search Bar -->
                     <div class="flex-1 max-w-2xl mx-auto">
-                        <div class="relative flex items-center w-full h-10 rounded-xl focus-within:ring-2 focus-within:ring-heritage-500/50 focus-within:shadow-lg focus-within:-translate-y-0.5 bg-white dark:bg-heritage-dark-800 border border-heritage-outline dark:border-heritage-dark-600 shadow-sm hover:shadow-lg transition-all duration-300">
+                        <div class="relative flex items-center w-full h-10 rounded-xl focus-within:ring-2 focus-within:ring-heritage-500/50 focus-within:shadow-lg focus-within:-translate-y-0.5 bg-heritage-dark-800 border border-heritage-dark-600 shadow-sm hover:shadow-lg transition-all duration-300">
                             
                             <!-- Custom Search Engine Dropdown -->
                             <div class="relative h-full" id="search-engine-wrapper">
-                                <button id="search-engine-btn" class="h-full pl-3 pr-2 flex items-center gap-2 text-sm text-heritage-primary dark:text-heritage-dark-300 hover:text-heritage-500 hover:bg-heritage-variant dark:hover:bg-heritage-dark-700/50 rounded-l-xl transition-colors outline-none w-auto md:min-w-[5.5rem]">
+                                <button id="search-engine-btn" class="h-full pl-3 pr-2 flex items-center gap-2 text-sm text-heritage-dark-300 hover:text-heritage-500 hover:bg-heritage-dark-700/50 rounded-l-xl transition-colors outline-none w-auto md:min-w-[5.5rem]">
                                     <!-- 默认显示本站图标 -->
                                     <span id="current-engine-icon" class="flex-shrink-0 w-5 h-5 flex items-center justify-center">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
@@ -187,23 +157,23 @@ const savedTheme = localStorage.getItem('theme');
                                 </button>
                                 
                                 <!-- Dropdown Menu -->
-                                <div id="search-engine-menu" class="hidden absolute top-full left-0 mt-2 w-24 bg-white dark:bg-heritage-dark-800 rounded-xl shadow-xl border border-heritage-variant dark:border-heritage-dark-700 overflow-hidden z-50 dropdown-enter">
+                                <div id="search-engine-menu" class="hidden absolute top-full left-0 mt-2 w-24 bg-heritage-dark-800 rounded-xl shadow-xl border border-heritage-dark-700 overflow-hidden z-50 dropdown-enter">
                                     <div class="py-1" id="search-engine-list">
-                                        <div class="px-3 py-2 text-xs font-semibold text-heritage-secondary uppercase tracking-wider">搜索引擎</div>
+                                        <div class="px-3 py-2 text-xs font-semibold text-heritage-dark-300 uppercase tracking-wider">搜索引擎</div>
                                         <!-- JS 自动插入按钮 -->
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="h-4 w-px bg-heritage-outline dark:bg-heritage-dark-600 mx-1"></div>
+                            <div class="h-4 w-px bg-heritage-dark-600 mx-1"></div>
                             
-                            <input type="text" id="search-input" class="flex-1 bg-transparent border-none text-heritage-primary dark:text-heritage-outline text-sm focus:ring-0 placeholder-heritage-dark-400 h-full w-full outline-none px-2" placeholder="搜索">
+                            <input type="text" id="search-input" class="flex-1 bg-transparent border-none text-heritage-outline text-sm focus:ring-0 placeholder-heritage-dark-400 h-full w-full outline-none px-2" placeholder="搜索">
                             
-                            <button id="clear-search-button" class="hidden p-1.5 mr-1 rounded-full text-heritage-secondary hover:text-red-500 hover:bg-heritage-variant dark:hover:bg-heritage-dark-700 transition-all">
+                            <button id="clear-search-button" class="hidden p-1.5 mr-1 rounded-full text-heritage-dark-300 hover:text-red-500 hover:bg-heritage-dark-700 transition-all">
                                 <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"></path></svg>
                             </button>
                             
-                            <button id="search-button" class="h-full px-4 rounded-r-xl text-heritage-secondary dark:text-heritage-dark-300 hover:text-heritage-600 dark:hover:text-heritage-400 hover:bg-heritage-50 dark:hover:bg-heritage-dark-700/50 transition-colors border-l border-transparent dark:border-heritage-dark-700/50 flex items-center justify-center">
+                            <button id="search-button" class="h-full px-4 rounded-r-xl text-heritage-dark-300 hover:text-heritage-400 hover:bg-heritage-dark-700/50 transition-colors border-l border-transparent border-heritage-dark-700/50 flex items-center justify-center">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                             </button>
                         </div>
@@ -211,39 +181,34 @@ const savedTheme = localStorage.getItem('theme');
 
                     <!-- Profile / Settings -->
                     <div class="relative flex items-center gap-2">
-<!-- Dark Mode Toggle -->
-                        <button id="dark-mode-toggle-btn" class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-heritage-primary dark:text-heritage-dark-300 hover:bg-white dark:hover:bg-heritage-dark-800 transition-all text-sm font-medium border border-transparent hover:border-heritage-outline dark:hover:border-heritage-dark-700 hover:shadow-sm has-tooltip" data-tooltip="切换深色/浅色模式">
-                            <svg id="dark-mode-icon-sun" class="w-4 h-4 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-                            <svg id="dark-mode-icon-moon" class="w-4 h-4 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-                        </button>
                         <div id="profile-dropdown-wrapper" class="relative">
-                            <button id="profile-menu-toggle" class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-heritage-primary dark:text-heritage-dark-300 hover:bg-white dark:hover:bg-heritage-dark-800 transition-all text-sm font-medium border border-transparent hover:border-heritage-outline dark:hover:border-heritage-dark-700 hover:shadow-sm">
-                                <div class="w-7 h-7 rounded-full bg-gradient-to-br from-heritage-variant to-heritage-outline dark:from-heritage-dark-700 dark:to-heritage-dark-600 flex items-center justify-center shadow-inner">
-                                     <svg class="w-4 h-4 text-heritage-secondary dark:text-heritage-dark-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                            <button id="profile-menu-toggle" class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-heritage-dark-300 hover:bg-heritage-dark-800 transition-all text-sm font-medium border border-transparent hover:border-heritage-dark-700 hover:shadow-sm">
+                                <div class="w-7 h-7 rounded-full bg-gradient-to-br from-heritage-dark-700 to-heritage-dark-600 flex items-center justify-center shadow-inner">
+                                     <svg class="w-4 h-4 text-heritage-dark-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                                 </div>
                                 <span id="menu-toggle" class="hidden md:inline">设置</span>
                             </button>
                             
                             <!-- Dropdown Menu -->
-                            <div id="profile-dropdown" class="hidden absolute right-0 mt-2 w-60 bg-white dark:bg-heritage-dark-800 rounded-xl shadow-xl ring-1 ring-black/5 dark:ring-white/10 overflow-hidden transform origin-top-right transition-all z-50 dropdown-enter">
+                            <div id="profile-dropdown" class="hidden absolute right-0 mt-2 w-60 bg-heritage-dark-800 rounded-xl shadow-xl ring-1 ring-white/10 overflow-hidden transform origin-top-right transition-all z-50 dropdown-enter">
                                 <div class="p-2 space-y-1">
                                     <!-- Edit Mode -->
-                                    <button id="edit-mode-btn" class="w-full text-left px-3 py-2.5 rounded-lg text-sm text-heritage-primary dark:text-heritage-outline hover:bg-heritage-50 dark:hover:bg-heritage-dark-700/50 hover:text-heritage-600 transition-colors flex items-center gap-3 font-medium">
+                                    <button id="edit-mode-btn" class="w-full text-left px-3 py-2.5 rounded-lg text-sm text-heritage-outline hover:bg-heritage-dark-700/50 hover:text-heritage-600 transition-colors flex items-center gap-3 font-medium">
                                         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                                         编辑模式
                                     </button>
                                     
                                     <!-- 导入导出 (仅登录显示) -->
-                                    <div id="data-tools-menu" class="hidden border-t border-heritage-variant dark:border-heritage-dark-700/50 my-1 pt-1">
-                                         <button onclick="exportData()" class="w-full text-left px-3 py-2 rounded-lg text-sm text-heritage-primary dark:text-heritage-outline hover:bg-amber-50 dark:hover:bg-heritage-dark-700/50 hover:text-amber-600 transition-colors flex items-center gap-3">
+                                    <div id="data-tools-menu" class="hidden border-t border-heritage-dark-700/50 my-1 pt-1">
+                                         <button onclick="exportData()" class="w-full text-left px-3 py-2 rounded-lg text-sm text-heritage-outline hover:bg-heritage-dark-700/50 hover:text-amber-600 transition-colors flex items-center gap-3">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                                             导出配置
                                         </button>
-                                        <button onclick="importData()" class="w-full text-left px-3 py-2 rounded-lg text-sm text-heritage-primary dark:text-heritage-outline hover:bg-green-50 dark:hover:bg-heritage-dark-700/50 hover:text-green-600 transition-colors flex items-center gap-3">
+                                        <button onclick="importData()" class="w-full text-left px-3 py-2 rounded-lg text-sm text-heritage-outline hover:bg-heritage-dark-700/50 hover:text-green-600 transition-colors flex items-center gap-3">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4-4m0 0l-4 4m4-4v12"></path></svg>
                                             导入配置
                                         </button>
-                                        <button onclick="importBookmarks()" class="w-full text-left px-3 py-2 rounded-lg text-sm text-heritage-primary dark:text-heritage-outline hover:bg-blue-50 dark:hover:bg-heritage-dark-700/50 hover:text-blue-600 transition-colors flex items-center gap-3">
+                                        <button onclick="importBookmarks()" class="w-full text-left px-3 py-2 rounded-lg text-sm text-heritage-outline hover:bg-heritage-dark-700/50 hover:text-blue-600 transition-colors flex items-center gap-3">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h7l5 5v11a2 2 0 01-2 2H7a2 2 0 01-2-2V5zM14 3v6h6"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6M9 17h6"></path></svg>
                                             导入书签
                                         </button>
@@ -252,28 +217,28 @@ const savedTheme = localStorage.getItem('theme');
                                         <input type="file" id="bookmark-file-input" accept=".html,.htm,.json" class="hidden">
                                     </div>
                                     
-<div class="h-px bg-heritage-variant dark:bg-heritage-dark-700/50 mx-1 my-1"></div>
+<div class="h-px bg-heritage-dark-700/50 mx-1 my-1"></div>
 
                                     <!-- 自定义背景 -->
 <div id="bg-controls-section" class="hidden">
                                         <div class="px-3 py-2 text-xs space-y-2">
-                                        <span class="font-semibold text-heritage-secondary uppercase tracking-wider">自定义背景</span>
-                                        <input type="text" id="bg-image-input" placeholder="背景图 URL" class="w-full px-3 py-1.5 rounded-lg bg-heritage-variant dark:bg-heritage-dark-800 border border-heritage-outline dark:border-heritage-dark-600 text-heritage-primary dark:text-white text-xs outline-none focus:ring-1 focus:ring-heritage-500/50">
+                                        <span class="font-semibold text-heritage-dark-300 uppercase tracking-wider">自定义背景</span>
+                                        <input type="text" id="bg-image-input" placeholder="背景图 URL" class="w-full px-3 py-1.5 rounded-lg bg-heritage-dark-800 border border-heritage-dark-600 text-white text-xs outline-none focus:ring-1 focus:ring-heritage-500/50">
                                         <div class="flex items-center justify-between pt-1">
-                                            <span class="text-heritage-secondary">遮罩强度</span>
-                                            <span id="bg-opacity-value" class="font-medium text-heritage-primary dark:text-heritage-outline">20%</span>
+                                            <span class="text-heritage-dark-300">遮罩强度</span>
+                                            <span id="bg-opacity-value" class="font-medium text-heritage-outline">20%</span>
                                         </div>
-                                        <input type="range" id="bg-opacity-slider" min="0" max="100" value="20" class="w-full h-1.5 bg-heritage-outline rounded-lg appearance-none cursor-pointer accent-heritage-500 dark:accent-heritage-400 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-heritage-500">
+                                        <input type="range" id="bg-opacity-slider" min="0" max="100" value="20" class="w-full h-1.5 bg-heritage-dark-600 rounded-lg appearance-none cursor-pointer accent-heritage-400 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-heritage-500">
                                         <div class="flex items-center justify-between pt-1">
-                                            <span class="text-heritage-secondary">模糊程度</span>
-                                            <span id="bg-blur-value" class="font-medium text-heritage-primary dark:text-heritage-outline">0px</span>
+                                            <span class="text-heritage-dark-300">模糊程度</span>
+                                            <span id="bg-blur-value" class="font-medium text-heritage-outline">0px</span>
                                         </div>
-                                        <input type="range" id="bg-blur-slider" min="0" max="20" value="0" step="2" class="w-full h-1.5 bg-heritage-outline rounded-lg appearance-none cursor-pointer accent-heritage-500 dark:accent-heritage-400 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-heritage-500">
+                                        <input type="range" id="bg-blur-slider" min="0" max="20" value="0" step="2" class="w-full h-1.5 bg-heritage-dark-600 rounded-lg appearance-none cursor-pointer accent-heritage-400 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-heritage-500">
                                     </div>
                                     </div>
 
-                                    <div class="h-px bg-heritage-variant dark:bg-heritage-dark-700/50 mx-1 my-1"></div>
-                                    <button id="login-Btn" class="w-full text-left px-3 py-2.5 rounded-lg text-sm text-heritage-primary dark:text-heritage-outline hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-500 transition-colors flex items-center gap-3 font-medium">
+                                    <div class="h-px bg-heritage-dark-700/50 mx-1 my-1"></div>
+                                    <button id="login-Btn" class="w-full text-left px-3 py-2.5 rounded-lg text-sm text-heritage-outline hover:bg-red-900/20 hover:text-red-500 transition-colors flex items-center gap-3 font-medium">
                                         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
                                         登录 / 退出
                                     </button>
@@ -295,8 +260,8 @@ const savedTheme = localStorage.getItem('theme');
     <main class="pt-36 pb-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-screen">
         <!-- 添加分类按钮 (仅编辑模式显示) -->
         <div id="add-category-container" class="hidden mt-12 mb-8">
-            <button class="w-full py-4 rounded-2xl border-2 border-dashed border-heritage-dark-300 dark:border-heritage-dark-700 text-heritage-secondary dark:text-heritage-secondary hover:border-heritage-500 hover:text-heritage-600 dark:hover:border-heritage-500 dark:hover:text-heritage-500 hover:bg-heritage-50/50 dark:hover:bg-heritage-dark-800/50 transition-all flex items-center justify-center gap-2 group">
-                <div class="w-8 h-8 rounded-full bg-heritage-variant dark:bg-heritage-dark-800 group-hover:bg-heritage-100 dark:group-hover:bg-heritage-900/30 flex items-center justify-center transition-colors">
+            <button class="w-full py-4 rounded-2xl border-2 border-dashed border-heritage-dark-700 text-heritage-dark-300 hover:border-heritage-500 hover:text-heritage-500 hover:bg-heritage-dark-800/50 transition-all flex items-center justify-center gap-2 group">
+                <div class="w-8 h-8 rounded-full bg-heritage-dark-800 group-hover:bg-heritage-900/30 flex items-center justify-center transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                 </div>
                 <span class="font-medium text-lg">新建分类</span>
@@ -308,7 +273,7 @@ const savedTheme = localStorage.getItem('theme');
 
         <!-- 返回顶部按钮独立放置 -->
         <div class="fixed bottom-8 right-8 z-50">
-            <button id="back-to-top-btn" class="hidden w-12 h-12 rounded-2xl bg-white/90 dark:bg-heritage-dark-800/90 text-heritage-primary dark:text-heritage-dark-300 border border-heritage-outline dark:border-heritage-dark-700 shadow-lg backdrop-blur-sm flex items-center justify-center transition-all hover:scale-110 hover:bg-heritage-variant dark:hover:bg-heritage-dark-700 has-tooltip group" data-tooltip="返回顶部">
+            <button id="back-to-top-btn" class="hidden w-12 h-12 rounded-2xl bg-heritage-dark-800/90 text-heritage-dark-300 border border-heritage-dark-700 shadow-lg backdrop-blur-sm flex items-center justify-center transition-all hover:scale-110 hover:bg-heritage-dark-700 has-tooltip group" data-tooltip="返回顶部">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
             </button>
         </div>
@@ -317,50 +282,58 @@ const savedTheme = localStorage.getItem('theme');
 
     <!-- 模态框：添加/编辑链接 -->
     <div id="dialog-overlay" class="fixed inset-0 z-[60] bg-heritage-dark-900/60 backdrop-blur-sm flex items-center justify-center p-4 transition-opacity duration-300 overlay-hidden">
-        <div id="dialog-box" class="bg-white dark:bg-heritage-dark-800 rounded-2xl shadow-2xl w-full max-w-md p-6 transform transition-all duration-300 border border-heritage-variant dark:border-heritage-dark-700 dialog-scale-hidden">
-            <h3 class="text-xl font-bold mb-5 text-heritage-primary dark:text-heritage-variant flex items-center gap-2">
+        <div id="dialog-box" class="bg-heritage-dark-800 rounded-2xl shadow-2xl w-full max-w-md p-6 transform transition-all duration-300 border border-heritage-dark-700 dialog-scale-hidden">
+            <h3 class="text-xl font-bold mb-5 text-heritage-variant flex items-center gap-2">
                 <span class="w-1 h-6 bg-heritage-500 rounded-full"></span>
                 编辑信息
             </h3>
             <div class="space-y-4">
                 <div>
-                    <label class="block text-xs font-semibold text-heritage-secondary dark:text-heritage-secondary mb-1.5 uppercase tracking-wider">名称 <span class="text-red-500">*</span></label>
-                    <input type="text" id="name-input" class="w-full px-4 py-2.5 rounded-xl bg-heritage-variant dark:bg-heritage-dark-800 border border-heritage-outline dark:border-heritage-dark-600 focus:ring-2 focus:ring-heritage-500/50 focus:border-heritage-500 outline-none transition-all dark:text-white" placeholder="网站名称">
+                    <label class="block text-xs font-semibold text-heritage-dark-300 mb-1.5 uppercase tracking-wider">名称 <span class="text-red-500">*</span></label>
+                    <input type="text" id="name-input" class="w-full px-4 py-2.5 rounded-xl bg-heritage-dark-800 border border-heritage-dark-600 focus:ring-2 focus:ring-heritage-500/50 focus:border-heritage-500 outline-none transition-all text-white" placeholder="网站名称">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-heritage-secondary dark:text-heritage-secondary mb-1.5 uppercase tracking-wider">地址 <span class="text-red-500">*</span></label>
-                    <input type="text" id="url-input" class="w-full px-4 py-2.5 rounded-xl bg-heritage-variant dark:bg-heritage-dark-800 border border-heritage-outline dark:border-heritage-dark-600 focus:ring-2 focus:ring-heritage-500/50 focus:border-heritage-500 outline-none transition-all dark:text-white" placeholder="https://...">
+                    <label class="block text-xs font-semibold text-heritage-dark-300 mb-1.5 uppercase tracking-wider">地址 <span class="text-red-500">*</span></label>
+                    <input type="text" id="url-input" class="w-full px-4 py-2.5 rounded-xl bg-heritage-dark-800 border border-heritage-dark-600 focus:ring-2 focus:ring-heritage-500/50 focus:border-heritage-500 outline-none transition-all text-white" placeholder="https://...">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-heritage-secondary dark:text-heritage-secondary mb-1.5 uppercase tracking-wider">描述</label>
-                    <input type="text" id="tips-input" class="w-full px-4 py-2.5 rounded-xl bg-heritage-variant dark:bg-heritage-dark-800 border border-heritage-outline dark:border-heritage-dark-600 focus:ring-2 focus:ring-heritage-500/50 focus:border-heritage-500 outline-none transition-all dark:text-white" placeholder="简短的描述...">
+                    <label class="block text-xs font-semibold text-heritage-dark-300 mb-1.5 uppercase tracking-wider">描述</label>
+                    <input type="text" id="tips-input" class="w-full px-4 py-2.5 rounded-xl bg-heritage-dark-800 border border-heritage-dark-600 focus:ring-2 focus:ring-heritage-500/50 focus:border-heritage-500 outline-none transition-all text-white" placeholder="简短的描述...">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-heritage-secondary dark:text-heritage-secondary mb-1.5 uppercase tracking-wider">图标 URL</label>
-                    <input type="text" id="icon-input" class="w-full px-4 py-2.5 rounded-xl bg-heritage-variant dark:bg-heritage-dark-800 border border-heritage-outline dark:border-heritage-dark-600 focus:ring-2 focus:ring-heritage-500/50 focus:border-heritage-500 outline-none transition-all dark:text-white" placeholder="留空自动获取">
+                    <label class="block text-xs font-semibold text-heritage-dark-300 mb-1.5 uppercase tracking-wider">图标 URL</label>
+                    <input type="text" id="icon-input" class="w-full px-4 py-2.5 rounded-xl bg-heritage-dark-800 border border-heritage-dark-600 focus:ring-2 focus:ring-heritage-500/50 focus:border-heritage-500 outline-none transition-all text-white" placeholder="留空自动获取">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-heritage-dark-300 mb-1.5 uppercase tracking-wider">卡片背景色</label>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <div id="bg-color-swatches" class="flex gap-1.5"></div>
+                        <button type="button" id="bg-color-clear" class="px-2 py-1 rounded-lg text-xs text-heritage-dark-300 hover:bg-heritage-dark-700 border border-heritage-dark-600 transition-colors">默认</button>
+                        <input type="text" id="bg-color-input" placeholder="#RRGGBB[AA]" class="w-28 px-2 py-1.5 rounded-lg bg-heritage-dark-800 border border-heritage-dark-600 focus:ring-1 focus:ring-heritage-500/50 outline-none text-white text-xs">
+                    </div>
                 </div>
                 
                 <!-- Custom Category Dropdown -->
                 <div class="relative z-20" id="category-select-wrapper">
-                    <label class="block text-xs font-semibold text-heritage-secondary dark:text-heritage-secondary mb-1.5 uppercase tracking-wider">分类</label>
+                    <label class="block text-xs font-semibold text-heritage-dark-300 mb-1.5 uppercase tracking-wider">分类</label>
                     <input type="hidden" id="category-select-value">
-                    <button id="category-select-btn" class="w-full px-4 py-2.5 text-left rounded-xl bg-heritage-variant dark:bg-heritage-dark-800 border border-heritage-outline dark:border-heritage-dark-600 focus:ring-2 focus:ring-heritage-500/50 outline-none transition-all text-heritage-primary dark:text-white flex items-center justify-between">
+                    <button id="category-select-btn" class="w-full px-4 py-2.5 text-left rounded-xl bg-heritage-dark-800 border border-heritage-dark-600 focus:ring-2 focus:ring-heritage-500/50 outline-none transition-all text-white flex items-center justify-between">
                         <span id="category-select-text">请选择分类</span>
-                        <svg class="w-4 h-4 text-heritage-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        <svg class="w-4 h-4 text-heritage-dark-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                     </button>
                     <!-- Dropdown List -->
-                    <div id="category-select-menu" class="hidden absolute top-full left-0 mt-2 w-full max-h-48 overflow-y-auto bg-white dark:bg-heritage-dark-800 rounded-xl shadow-xl border border-heritage-variant dark:border-heritage-dark-700 z-50">
+                    <div id="category-select-menu" class="hidden absolute top-full left-0 mt-2 w-full max-h-48 overflow-y-auto bg-heritage-dark-800 rounded-xl shadow-xl border border-heritage-dark-700 z-50">
                         <!-- Items populated by JS -->
                     </div>
                 </div>
 
                 <div class="flex items-center gap-2 pt-2">
                     <input type="checkbox" id="private-checkbox" class="w-5 h-5 text-heritage-500 rounded focus:ring-heritage-500 border-gray-300 bg-gray-100">
-                    <label for="private-checkbox" class="text-sm text-heritage-primary dark:text-heritage-dark-300 font-medium">设为私密链接 (仅登录可见)</label>
+                    <label for="private-checkbox" class="text-sm text-heritage-dark-300 font-medium">设为私密链接 (仅登录可见)</label>
                 </div>
             </div>
             <div class="flex justify-end gap-3 mt-8">
-                <button id="dialog-cancel-btn" class="px-5 py-2.5 rounded-xl text-sm font-medium text-heritage-primary hover:bg-heritage-variant dark:text-heritage-dark-300 dark:hover:bg-heritage-dark-700 transition-colors">取消</button>
+                <button id="dialog-cancel-btn" class="px-5 py-2.5 rounded-xl text-sm font-medium text-heritage-dark-300 hover:bg-heritage-dark-700 transition-colors">取消</button>
                 <button id="dialog-confirm-btn" class="px-5 py-2.5 rounded-xl text-sm font-medium text-white bg-heritage-500 hover:bg-heritage-600 shadow-lg shadow-heritage-500/25 transition-all hover:translate-y-[-1px]">确定</button>
             </div>
         </div>
@@ -368,15 +341,15 @@ const savedTheme = localStorage.getItem('theme');
 
     <!-- 密码弹窗 -->
     <div id="password-dialog-overlay" class="fixed inset-0 z-[70] bg-heritage-dark-900/70 backdrop-blur-md flex items-center justify-center p-4 transition-opacity duration-300 overlay-hidden">
-        <div id="password-dialog-box" class="bg-white dark:bg-heritage-dark-800 rounded-2xl shadow-2xl p-8 w-full max-w-sm border border-heritage-variant dark:border-heritage-dark-700 text-center transform transition-all duration-300 dialog-scale-hidden">
-            <div class="w-16 h-16 bg-heritage-100 dark:bg-heritage-900/30 rounded-full flex items-center justify-center mx-auto mb-4 text-heritage-500">
+        <div id="password-dialog-box" class="bg-heritage-dark-800 rounded-2xl shadow-2xl p-8 w-full max-w-sm border border-heritage-dark-700 text-center transform transition-all duration-300 dialog-scale-hidden">
+            <div class="w-16 h-16 bg-heritage-900/30 rounded-full flex items-center justify-center mx-auto mb-4 text-heritage-500">
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
             </div>
-            <h3 class="text-xl font-bold mb-2 text-heritage-primary dark:text-white">身份验证</h3>
-            <p class="text-sm text-heritage-secondary dark:text-heritage-secondary mb-6">请输入管理员密码以继续操作</p>
-            <input type="password" id="password-input" placeholder="访问密码" class="w-full px-4 py-3 rounded-xl bg-heritage-variant dark:bg-heritage-dark-800 border border-heritage-outline dark:border-heritage-dark-600 focus:ring-2 focus:ring-heritage-500 focus:border-transparent outline-none mb-6 dark:text-white text-center tracking-widest text-lg transition-all">
+            <h3 class="text-xl font-bold mb-2 text-white">身份验证</h3>
+            <p class="text-sm text-heritage-dark-300 mb-6">请输入管理员密码以继续操作</p>
+            <input type="password" id="password-input" placeholder="访问密码" class="w-full px-4 py-3 rounded-xl bg-heritage-dark-800 border border-heritage-dark-600 focus:ring-2 focus:ring-heritage-500 focus:border-transparent outline-none mb-6 text-white text-center tracking-widest text-lg transition-all">
             <div class="flex gap-3">
-                <button id="password-cancel-btn" class="flex-1 py-2.5 rounded-xl text-heritage-primary bg-heritage-variant hover:bg-heritage-outline dark:bg-heritage-dark-700 dark:text-heritage-dark-300 dark:hover:bg-heritage-dark-600 font-medium transition-colors">取消</button>
+                <button id="password-cancel-btn" class="flex-1 py-2.5 rounded-xl bg-heritage-dark-700 text-heritage-dark-300 hover:bg-heritage-dark-600 font-medium transition-colors">取消</button>
                 <button id="password-confirm-btn" class="flex-1 py-2.5 rounded-xl text-white bg-heritage-500 hover:bg-heritage-600 shadow-lg shadow-heritage-500/25 font-medium transition-colors">确认登录</button>
             </div>
         </div>
@@ -384,9 +357,9 @@ const savedTheme = localStorage.getItem('theme');
 
     <!-- 自定义 Alert -->
     <div id="custom-alert-overlay" class="fixed inset-0 z-[110] bg-heritage-dark-900/50 backdrop-blur-[2px] flex items-center justify-center p-4 transition-opacity duration-300 overlay-hidden">
-        <div id="custom-alert-box" class="bg-white dark:bg-heritage-dark-800 rounded-2xl shadow-2xl p-6 max-w-sm w-full border border-heritage-variant dark:border-heritage-dark-700 transform transition-all duration-300 dialog-scale-hidden">
-            <h3 id="custom-alert-title" class="text-lg font-bold mb-2 text-heritage-primary dark:text-white">提示</h3>
-            <p id="custom-alert-content" class="text-heritage-primary dark:text-heritage-dark-300 mb-6 text-sm leading-relaxed"></p>
+        <div id="custom-alert-box" class="bg-heritage-dark-800 rounded-2xl shadow-2xl p-6 max-w-sm w-full border border-heritage-dark-700 transform transition-all duration-300 dialog-scale-hidden">
+            <h3 id="custom-alert-title" class="text-lg font-bold mb-2 text-white">提示</h3>
+            <p id="custom-alert-content" class="text-heritage-dark-300 mb-6 text-sm leading-relaxed"></p>
             <div class="flex justify-end">
                 <button id="custom-alert-confirm" class="px-5 py-2 bg-heritage-500 hover:bg-heritage-600 text-white rounded-xl text-sm font-medium transition-colors shadow-lg shadow-heritage-500/20">我知道了</button>
             </div>
@@ -395,11 +368,11 @@ const savedTheme = localStorage.getItem('theme');
 
     <!-- 自定义 Confirm -->
     <div id="custom-confirm-overlay" class="fixed inset-0 z-[80] bg-heritage-dark-900/50 backdrop-blur-[2px] flex items-center justify-center p-4 transition-opacity duration-300 overlay-hidden">
-        <div id="custom-confirm-box" class="bg-white dark:bg-heritage-dark-800 rounded-2xl shadow-2xl p-6 max-w-sm w-full border border-heritage-variant dark:border-heritage-dark-700 transform transition-all duration-300 dialog-scale-hidden">
-            <h3 class="text-lg font-bold mb-3 text-heritage-primary dark:text-white">确认操作</h3>
-            <p id="custom-confirm-message" class="text-heritage-primary dark:text-heritage-dark-300 mb-6 text-sm"></p>
+        <div id="custom-confirm-box" class="bg-heritage-dark-800 rounded-2xl shadow-2xl p-6 max-w-sm w-full border border-heritage-dark-700 transform transition-all duration-300 dialog-scale-hidden">
+            <h3 class="text-lg font-bold mb-3 text-white">确认操作</h3>
+            <p id="custom-confirm-message" class="text-heritage-dark-300 mb-6 text-sm"></p>
             <div class="flex justify-end gap-3">
-                <button id="custom-confirm-cancel" class="px-4 py-2 text-sm text-heritage-primary hover:bg-heritage-variant rounded-xl dark:text-heritage-secondary dark:hover:bg-heritage-dark-700 transition-colors font-medium">取消</button>
+                <button id="custom-confirm-cancel" class="px-4 py-2 text-sm rounded-xl text-heritage-dark-300 hover:bg-heritage-dark-700 transition-colors font-medium">取消</button>
                 <button id="custom-confirm-ok" class="px-4 py-2 text-sm text-white bg-heritage-500 hover:bg-heritage-600 rounded-xl shadow-lg shadow-heritage-500/20 transition-colors font-medium">确定</button>
             </div>
         </div>
@@ -407,28 +380,27 @@ const savedTheme = localStorage.getItem('theme');
 
     <!-- 分类输入弹窗 -->
     <div id="category-dialog" class="fixed inset-0 z-[65] bg-heritage-dark-900/50 backdrop-blur-sm flex items-center justify-center p-4 transition-opacity duration-300 overlay-hidden">
-        <div id="category-dialog-box" class="bg-white dark:bg-heritage-dark-800 rounded-2xl p-6 w-full max-w-sm shadow-2xl border border-heritage-variant dark:border-heritage-dark-700 transform transition-all duration-300 dialog-scale-hidden">
-            <h3 id="category-dialog-title" class="text-lg font-bold mb-4 text-heritage-primary dark:text-white">分类名称</h3>
-            <input type="text" id="category-name-input" class="w-full px-4 py-2.5 rounded-xl bg-heritage-variant dark:bg-heritage-dark-800 border border-heritage-outline dark:border-heritage-dark-600 focus:ring-2 focus:ring-heritage-500 outline-none mb-6 dark:text-white transition-all" placeholder="输入分类名称">
+        <div id="category-dialog-box" class="bg-heritage-dark-800 rounded-2xl p-6 w-full max-w-sm shadow-2xl border border-heritage-dark-700 transform transition-all duration-300 dialog-scale-hidden">
+            <h3 id="category-dialog-title" class="text-lg font-bold mb-4 text-white">分类名称</h3>
+            <input type="text" id="category-name-input" class="w-full px-4 py-2.5 rounded-xl bg-heritage-dark-800 border border-heritage-dark-600 focus:ring-2 focus:ring-heritage-500 outline-none mb-6 text-white transition-all" placeholder="输入分类名称">
             <div class="flex justify-end gap-3">
-                <button id="category-cancel-btn" class="px-4 py-2 text-sm rounded-xl text-heritage-primary bg-heritage-variant hover:bg-heritage-outline dark:bg-heritage-dark-700 dark:text-heritage-dark-300 font-medium">取消</button>
+                <button id="category-cancel-btn" class="px-4 py-2 text-sm rounded-xl hover:bg-heritage-outline bg-heritage-dark-700 text-heritage-dark-300 font-medium">取消</button>
                 <button id="category-confirm-btn" class="px-4 py-2 text-sm rounded-xl text-white bg-heritage-500 hover:bg-heritage-600 shadow-md font-medium">确定</button>
             </div>
         </div>
     </div>
 
     <!-- Loading Mask (z-index 100) -->
-    <div id="loading-mask" class="fixed inset-0 z-[100] bg-white/90 dark:bg-heritage-dark-900/90 backdrop-blur-sm hidden flex flex-col items-center justify-center transition-opacity">
+    <div id="loading-mask" class="fixed inset-0 z-[100] bg-heritage-dark-900/90 backdrop-blur-sm hidden flex flex-col items-center justify-center transition-opacity">
         <div class="relative w-16 h-16">
-            <div class="absolute inset-0 border-4 border-heritage-outline dark:border-heritage-dark-700 rounded-full"></div>
+            <div class="absolute inset-0 border-4 border-heritage-dark-700 rounded-full"></div>
             <div class="absolute inset-0 border-4 border-heritage-500 rounded-full border-t-transparent animate-spin"></div>
         </div>
-        <p class="mt-4 text-heritage-600 dark:text-heritage-400 font-medium animate-pulse tracking-wide">加载中...</p>
+        <p class="mt-4 text-heritage-400 font-medium animate-pulse tracking-wide">加载中...</p>
     </div>
 
     <!-- Tooltip Container -->
-    <div id="custom-tooltip" class="fixed hidden pointer-events-none max-w-xs whitespace-pre-wrap border leading-relaxed tracking-wide backdrop-blur-md rounded-xl px-4 py-2 text-sm transition-opacity duration-150
-        bg-white/90 dark:bg-heritage-dark-800/90 text-heritage-primary dark:text-heritage-outline border-heritage-outline/50 dark:border-heritage-dark-700/50">
+    <div id="custom-tooltip" class="fixed hidden pointer-events-none max-w-xs whitespace-pre-wrap border leading-relaxed tracking-wide backdrop-blur-md rounded-xl px-4 py-2 text-sm transition-opacity duration-150 bg-heritage-dark-800/90 text-heritage-outline border-heritage-dark-700/50">
     </div>
 
 

@@ -175,11 +175,11 @@ function createCategorySection(categoryName, links, isHidden) {
     section.id = categoryName;
 
     const titleContainer = document.createElement('div');
-    titleContainer.className = 'flex items-center gap-3 mb-5 pb-2 border-b border-heritage-outline/60 dark:border-heritage-dark-700/60';
+    titleContainer.className = 'flex items-center gap-3 mb-5 pb-2 border-b border-heritage-dark-700/60';
 
     const title = document.createElement('h2');
-    title.className = 'text-lg font-bold heritage-primary dark:text-heritage-variant flex items-center gap-2';
-    title.innerHTML = `<span class="w-1.5 h-5 bg-heritage-500 rounded-full inline-block shadow-sm"></span> ${categoryName}`;
+    title.className = 'text-xl font-extrabold text-white flex items-center gap-2 mb-1 drop-shadow-sm';
+    title.textContent = categoryName;
     titleContainer.appendChild(title);
 
     if (isEditMode()) {
@@ -192,8 +192,8 @@ const catData = getCategories()[categoryName];
     const catData = getCategories()[categoryName];
     const isApp = catData && catData.isAppLayout;
     const gridClasses = isApp
-        ? 'grid-cols-[repeat(auto-fill,minmax(90px,1fr))] gap-[18px]'
-        : 'grid-cols-2 gap-[10px] sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] sm:gap-[18px]';
+        ? 'grid-cols-[repeat(auto-fill,minmax(75px,1fr))] gap-[18px]'
+        : 'grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-[18px] sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))]';
 
     cardContainer.className = `grid ${gridClasses} card-container relative`;
     cardContainer.dataset.category = categoryName;
@@ -229,39 +229,39 @@ const catData = getCategories()[categoryName];
 
 function createCategoryControls(categoryName, isHidden, isApp) {
     const controls = document.createElement('div');
-    controls.className = 'flex items-center gap-1 ml-auto bg-heritage-outline/50 dark:bg-heritage-dark-800/50 p-1 rounded-xl border border-heritage-outline/50 dark:border-heritage-dark-700/50 backdrop-blur-sm category-controls';
+    controls.className = 'flex items-center gap-1 ml-auto bg-heritage-dark-800/50 p-1 rounded-xl border border-heritage-dark-700/50 backdrop-blur-sm category-controls';
     const btnBase = "w-8 h-8 flex items-center justify-center rounded-lg transition-all duration-200 hover:scale-105 active:scale-95";
 
     controls.innerHTML = `
-        <button class="${btnBase} text-heritage-secondary hover:text-blue-600 hover:bg-blue-100 dark:text-heritage-secondary dark:hover:bg-blue-900/30 dark:hover:text-blue-400 has-tooltip" data-tooltip="重命名">
+        <button class="${btnBase} text-heritage-dark-300 hover:bg-blue-900/30 hover:text-blue-400 has-tooltip" data-tooltip="重命名">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
         </button>
-        <div class="w-px h-4 bg-heritage-outline dark:bg-heritage-dark-600 mx-0.5"></div>
-        <button class="${btnBase} text-heritage-secondary hover:text-heritage-600 hover:bg-heritage-100 dark:text-heritage-secondary dark:hover:bg-heritage-900/30 dark:hover:text-heritage-400 has-tooltip" data-tooltip="上移">
+        <div class="w-px h-4 bg-heritage-dark-600 mx-0.5"></div>
+        <button class="${btnBase} text-heritage-dark-300 hover:bg-heritage-900/30 hover:text-heritage-400 has-tooltip" data-tooltip="上移">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
         </button>
-        <button class="${btnBase} text-heritage-secondary hover:text-heritage-600 hover:bg-heritage-100 dark:text-heritage-secondary dark:hover:bg-heritage-900/30 dark:hover:text-heritage-400 has-tooltip" data-tooltip="下移">
+        <button class="${btnBase} text-heritage-dark-300 hover:bg-heritage-900/30 hover:text-heritage-400 has-tooltip" data-tooltip="下移">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
         </button>
-        <button class="${btnBase} text-heritage-secondary hover:text-amber-600 hover:bg-amber-100 dark:text-heritage-secondary dark:hover:bg-amber-900/30 dark:hover:text-amber-400 has-tooltip" data-tooltip="置顶">
+        <button class="${btnBase} text-heritage-dark-300 hover:bg-amber-900/30 hover:text-amber-400 has-tooltip" data-tooltip="置顶">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3h14M18 13l-6-6l-6 6M12 7v14"></path></svg>
         </button>
-        <div class="w-px h-4 bg-heritage-outline dark:bg-heritage-dark-600 mx-0.5"></div>
+        <div class="w-px h-4 bg-heritage-dark-600 mx-0.5"></div>
         <div class="flex items-center justify-center w-8 h-8 has-tooltip cursor-pointer" data-tooltip="${isHidden ? '显示分类' : '隐藏分类'}">
             <label class="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" ${isHidden ? 'checked' : ''} class="sr-only peer category-hide-toggle">
-                <div class="w-3.5 h-3.5 rounded-full border-2 border-heritage-dark-400 peer-focus:outline-none dark:border-heritage-dark-500 peer-checked:bg-heritage-dark-500 peer-checked:border-heritage-dark-500 transition-colors"></div>
+                <div class="w-3.5 h-3.5 rounded-full border-2 peer-focus:outline-none border-heritage-dark-500 peer-checked:bg-heritage-dark-500 peer-checked:border-heritage-dark-500 transition-colors"></div>
             </label>
         </div>
-        <div class="w-px h-4 bg-heritage-outline dark:bg-heritage-dark-600 mx-0.5"></div>
+        <div class="w-px h-4 bg-heritage-dark-600 mx-0.5"></div>
 <div class="flex items-center justify-center w-8 h-8 has-tooltip cursor-pointer" data-tooltip="${isApp ? '列表视图' : 'APP视图'}">
             <label class="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" ${isApp ? 'checked' : ''} class="sr-only peer category-app-toggle">
-                <div class="w-3.5 h-3.5 rounded-full border-2 border-heritage-dark-400 peer-focus:outline-none dark:border-heritage-dark-500 peer-checked:bg-heritage-500 peer-checked:border-heritage-500 transition-colors"></div>
+                <div class="w-3.5 h-3.5 rounded-full border-2 peer-focus:outline-none border-heritage-dark-500 peer-checked:bg-heritage-500 peer-checked:border-heritage-500 transition-colors"></div>
             </label>
         </div>
-        <div class="w-px h-4 bg-heritage-outline dark:bg-heritage-dark-600 mx-0.5"></div>
-        <button class="${btnBase} text-heritage-secondary hover:text-red-600 hover:bg-red-100 dark:text-heritage-secondary dark:hover:bg-red-900/30 dark:hover:text-red-400 has-tooltip" data-tooltip="删除分类">
+        <div class="w-px h-4 bg-heritage-dark-600 mx-0.5"></div>
+        <button class="${btnBase} text-heritage-dark-300 hover:bg-red-900/30 hover:text-red-400 has-tooltip" data-tooltip="删除分类">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
         </button>
     `;
@@ -353,11 +353,11 @@ const catData = getCategories()[categoryName];
         ? 'w-[70px] h-[70px] rounded-2xl mx-auto'
         : 'min-h-[100px] p-4 rounded-2xl w-full';
 
-    placeholder.className = `add-card-placeholder group flex flex-col h-full w-full ${sizeClasses} rounded-2xl border-2 border-dashed border-heritage-outline dark:border-heritage-dark-700 hover:border-heritage-500 dark:hover:border-heritage-500 hover:bg-heritage-50/50 dark:hover:bg-heritage-900/10 transition-all cursor-pointer flex items-center justify-center`;
+    placeholder.className = `add-card-placeholder group flex flex-col h-full w-full ${sizeClasses} rounded-2xl border-2 border-dashed border-heritage-dark-700 hover:border-heritage-500 hover:bg-heritage-dark-900/40 transition-all cursor-pointer flex items-center justify-center`;
 
     placeholder.innerHTML = `
-        <div class="w-10 h-10 rounded-full bg-heritage-variant dark:bg-heritage-dark-800 group-hover:bg-heritage-100 dark:group-hover:bg-heritage-900/30 flex items-center justify-center transition-colors pointer-events-none">
-            <svg class="w-6 h-6 text-heritage-secondary group-hover:text-heritage-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+        <div class="w-10 h-10 rounded-full bg-heritage-dark-800/80 group-hover:bg-heritage-dark-700/80 flex items-center justify-center transition-colors pointer-events-none">
+            <svg class="w-6 h-6 text-heritage-dark-300 group-hover:text-heritage-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
         </div>
     `;
 
@@ -402,7 +402,7 @@ export function renderCategoryButtons() {
 
     visibleCategories.forEach(cat => {
         const btn = document.createElement('button');
-        btn.className = 'category-button whitespace-nowrap px-4 py-1.5 text-xs font-medium rounded-xl border border-heritage-outline dark:border-heritage-dark-600 transition-all active:scale-95 shadow-sm scroll-snap-align-start bg-heritage-variant dark:bg-heritage-dark-800 text-heritage-primary dark:text-heritage-outline hover:bg-heritage-50 hover:text-heritage-600 dark:hover:bg-heritage-dark-700 dark:hover:border-heritage-500/50';
+        btn.className = 'category-button whitespace-nowrap px-4 py-1.5 text-xs font-medium rounded-xl border border-heritage-dark-600 transition-all active:scale-95 shadow-sm scroll-snap-align-start bg-heritage-dark-800 text-heritage-outline hover:text-heritage-400 hover:bg-heritage-dark-700 hover:border-heritage-500/50';
         btn.textContent = cat;
         btn.dataset.target = cat;
         btn.addEventListener('click', () => {
@@ -472,18 +472,18 @@ if (_manualScrollTarget) return;
 
 function highlightButton(id) {
     const buttons = document.querySelectorAll('.category-button');
-    const activeClass = 'bg-heritage-500 text-white shadow-md dark:bg-heritage-600';
-    const inactiveClass = 'bg-heritage-variant dark:bg-heritage-dark-800 text-heritage-primary dark:text-heritage-outline hover:bg-heritage-50 hover:text-heritage-600 dark:hover:bg-heritage-dark-700';
+    const activeClass = 'text-white shadow-md bg-heritage-600';
+    const inactiveClass = 'bg-heritage-dark-800 text-heritage-outline hover:text-heritage-400 hover:bg-heritage-dark-700';
 
     buttons.forEach(btn => {
         if (btn.dataset.target === id) {
-            if (!btn.classList.contains('bg-heritage-500')) {
+            if (!btn.classList.contains('bg-heritage-600')) {
                 btn.classList.remove(...inactiveClass.split(' '));
                 btn.classList.add(...activeClass.split(' '));
                 btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
             }
         } else {
-            if (btn.classList.contains('bg-heritage-500')) {
+            if (btn.classList.contains('bg-heritage-600')) {
                 btn.classList.remove(...activeClass.split(' '));
                 btn.classList.add(...inactiveClass.split(' '));
             }
@@ -520,7 +520,7 @@ const bgControlsSection = document.getElementById('bg-controls-section');
         } else {
             editModeBtn.innerHTML = isLoggedIn()
                 ? '<span class="flex items-center gap-3"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>进入编辑模式</span>'
-                : '<span class="flex items-center gap-3 text-heritage-secondary"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>编辑模式 (需登录)</span>';
+                : '<span class="flex items-center gap-3 text-heritage-dark-300"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>编辑模式 (需登录)</span>';
             document.body.classList.remove('edit-mode');
             if (addCategoryContainer) addCategoryContainer.classList.add('hidden');
         }

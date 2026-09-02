@@ -32,6 +32,7 @@ function addTokens(set, text, requireVariant) {
         if (/^[-:#\/.&,]/.test(t)) continue; // id/路径前缀 (允许 '[' 开头的任意属性变体)
         if (t.endsWith(':')) continue;       // 'xxx:' 标签形式
         if (t.includes('//')) continue;      // URL
+        if (t.includes('[href]')) continue; // querySelector 标签选择器
         if (/[A-Z]/.test(t)) continue;       // SVG path / Header 名等
         if (!/[a-z]/.test(t)) continue;      // 纯数字/符号
         if (requireVariant && !/[:\[]/.test(t)) continue; // JS 侧只查变体/任意值语法

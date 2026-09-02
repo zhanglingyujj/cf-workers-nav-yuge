@@ -15,8 +15,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadBackgroundSettings();
 
     // 初始化 UI 组件 (来自 workers.js L657-765)
-    const themeSwitch = getEl('theme-switch-checkbox');
-const darkModeToggleBtn = getEl('dark-mode-toggle-btn');
     const searchInput = getEl('search-input');
     const clearSearchBtn = getEl('clear-search-button');
     const searchBtn = getEl('search-button');
@@ -28,17 +26,7 @@ const darkModeToggleBtn = getEl('dark-mode-toggle-btn');
     const searchEngineMenu = getEl('search-engine-menu');
     const searchWrapper = getEl('search-engine-wrapper');
 
-if (darkModeToggleBtn) {
-        darkModeToggleBtn.addEventListener('click', () => {
-            const isDark = !document.documentElement.classList.contains('dark');
-            window.isDarkTheme = isDark;
-            if (isDark) document.documentElement.classList.add('dark');
-            else document.documentElement.classList.remove('dark');
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
-        });
-    }
-
-    if (menuToggleBtn && dropdown) {
+if (menuToggleBtn && dropdown) {
         menuToggleBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             dropdown.classList.toggle('hidden');
@@ -114,11 +102,7 @@ if (darkModeToggleBtn) {
 
     function applyBgOpacity(val) {
         if (!bgMask) return;
-        const pct = val / 100;
-        const isDark = document.documentElement.classList.contains('dark');
-        bgMask.style.backgroundColor = isDark
-            ? `rgba(13, 14, 16, ${pct})`
-            : `rgba(247, 245, 242, ${pct})`;
+        bgMask.style.backgroundColor = `rgba(13, 14, 16, ${val / 100})`;
     }
 
 // 从服务器加载设置 (公开接口, 无鉴权)
