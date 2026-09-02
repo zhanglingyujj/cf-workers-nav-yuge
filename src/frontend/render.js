@@ -157,11 +157,6 @@ export function patchCategory(categoryName) {
         }
     });
 
-    if (isEditMode()) {
-        ensureAddPlaceholder(cardContainer, categoryName);
-    } else {
-        removeAddPlaceholder(cardContainer);
-    }
 }
 
 function createCategorySection(categoryName, links, isHidden) {
@@ -206,10 +201,6 @@ const catData = getCategories()[categoryName];
         if (card) cardContainer.appendChild(card);
     });
 
-    if (isEditMode()) {
-        ensureAddPlaceholder(cardContainer, categoryName);
-    }
-
     return section;
 }
 
@@ -236,6 +227,10 @@ function createCategoryControls(categoryName, isHidden, isApp) {
     const divider = '<div class="w-px h-4 bg-white/15 mx-0.5" aria-hidden="true"></div>';
 
     controls.innerHTML = `
+        <button class="${btnBase} has-tooltip" aria-label="新增链接" data-tooltip="新增链接">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+        </button>
+        ${divider}
         <button class="${btnBase} has-tooltip" aria-label="重命名分组" data-tooltip="重命名">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
         </button>
@@ -271,9 +266,18 @@ function createCategoryControls(categoryName, isHidden, isApp) {
 
     const buttons = controls.querySelectorAll('button');
     buttons[0].addEventListener('click', () => {
-        import('./dialogs.js').then(m => m.editCategoryName(categoryName));
+        import('./dialogs.js').then(m => {
+            m.showAddDialog();
+            const catVal = document.getElementById('category-select-value');
+            const catText = document.getElementById('category-select-text');
+            if (catVal) catVal.value = categoryName;
+            if (catText) catText.textContent = categoryName;
+        });
     });
     buttons[1].addEventListener('click', () => {
+        import('./dialogs.js').then(m => m.editCategoryName(categoryName));
+    });
+    buttons[2].addEventListener('click', () => {
         moveCategory(categoryName, -1);
         renderAll();
         renderCategoryButtons();
@@ -283,7 +287,7 @@ function createCategoryControls(categoryName, isHidden, isApp) {
             return import('./auth.js').then(a => a.saveDataToServer('保存排序', getCategories()));
         });
     });
-    buttons[2].addEventListener('click', () => {
+    buttons[3].addEventListener('click', () => {
         moveCategory(categoryName, 1);
         renderAll();
         renderCategoryButtons();
@@ -293,7 +297,7 @@ function createCategoryControls(categoryName, isHidden, isApp) {
             return import('./auth.js').then(a => a.saveDataToServer('保存排序', getCategories()));
         });
     });
-    buttons[3].addEventListener('click', () => {
+    buttons[4].addEventListener('click', () => {
         pinCategory(categoryName);
         renderAll();
         renderCategoryButtons();
@@ -303,7 +307,7 @@ function createCategoryControls(categoryName, isHidden, isApp) {
             return import('./auth.js').then(a => a.saveDataToServer('保存排序', getCategories()));
         });
     });
-    buttons[4].addEventListener('click', async () => {
+    buttons[5].addEventListener('click', async () => {
         const { validateTokenOrRedirect } = await import('./auth.js');
         if (!await validateTokenOrRedirect()) return;
         const { customConfirm } = await import('./dialogs.js');
@@ -347,48 +351,6 @@ const appToggle = controls.querySelector('.category-app-toggle');
     return controls;
 }
 
-function ensureAddPlaceholder(cardContainer, categoryName) {
-    if (cardContainer.querySelector('.add-card-placeholder')) return;
-    const placeholder = document.createElement('div');
-const catData = getCategories()[categoryName];
-    const isApp = catData && catData.isAppLayout;
-    const sizeClasses = isApp
-        ? 'w-[70px] h-[70px] rounded-2xl mx-auto'
-        : 'min-h-[100px] p-4 rounded-2xl w-full';
-
-    placeholder.className = `add-card-placeholder group flex flex-col h-full w-full ${sizeClasses} rounded-2xl border-2 border-dashed border-heritage-dark-700 hover:border-heritage-500 hover:bg-heritage-dark-900/40 transition-all cursor-pointer flex items-center justify-center`;
-
-    placeholder.innerHTML = `
-        <div class="w-10 h-10 rounded-full bg-heritage-dark-800/80 group-hover:bg-heritage-dark-700/80 flex items-center justify-center transition-colors pointer-events-none">
-            <svg class="w-6 h-6 text-heritage-dark-300 group-hover:text-heritage-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-        </div>
-    `;
-
-    placeholder.addEventListener('click', () => {
-        import('./dialogs.js').then(m => {
-            m.showAddDialog();
-            const catVal = document.getElementById('category-select-value');
-            const catText = document.getElementById('category-select-text');
-            if (catVal) catVal.value = categoryName;
-            if (catText) catText.textContent = categoryName;
-        });
-    });
-
-    placeholder.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        const dragging = document.querySelector('.card.dragging');
-        if (dragging && dragging.parentElement === cardContainer) {
-            cardContainer.insertBefore(dragging, placeholder);
-        }
-    });
-
-    cardContainer.appendChild(placeholder);
-}
-
-function removeAddPlaceholder(cardContainer) {
-    const placeholder = cardContainer.querySelector('.add-card-placeholder');
-    if (placeholder) placeholder.remove();
-}
 
 export function renderCategoryButtons() {
     const container = getEl(buttonsContainerId) || document.getElementById('category-buttons-container');
