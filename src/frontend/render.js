@@ -175,7 +175,7 @@ function createCategorySection(categoryName, links, isHidden) {
     section.id = categoryName;
 
     const titleContainer = document.createElement('div');
-    titleContainer.className = 'flex items-center gap-3 mb-6';
+    titleContainer.className = 'flex flex-wrap items-center gap-3 mb-6';
 
     const title = document.createElement('h2');
     title.className = 'text-xl font-extrabold text-white flex items-center gap-2 mb-1 drop-shadow-sm';
@@ -229,39 +229,42 @@ const catData = getCategories()[categoryName];
 
 function createCategoryControls(categoryName, isHidden, isApp) {
     const controls = document.createElement('div');
-    controls.className = 'flex items-center gap-1 ml-auto bg-heritage-dark-800/50 p-1 rounded-xl border border-heritage-dark-700/50 backdrop-blur-sm category-controls';
-    const btnBase = "w-8 h-8 flex items-center justify-center rounded-lg transition-all duration-200 hover:scale-105 active:scale-95";
+    controls.setAttribute('role', 'toolbar');
+    controls.setAttribute('aria-label', `${categoryName}分组操作`);
+    controls.className = 'flex flex-wrap items-center gap-0.5 category-controls';
+    const btnBase = "w-8 h-8 flex items-center justify-center rounded-lg transition-all duration-200 text-white/80 hover:text-white hover:bg-white/10 active:scale-95 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/60";
+    const divider = '<div class="w-px h-4 bg-white/15 mx-0.5" aria-hidden="true"></div>';
 
     controls.innerHTML = `
-        <button class="${btnBase} text-heritage-dark-300 hover:bg-blue-900/30 hover:text-blue-400 has-tooltip" data-tooltip="重命名">
+        <button class="${btnBase} has-tooltip" aria-label="重命名分组" data-tooltip="重命名">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
         </button>
-        <div class="w-px h-4 bg-heritage-dark-600 mx-0.5"></div>
-        <button class="${btnBase} text-heritage-dark-300 hover:bg-heritage-900/30 hover:text-heritage-400 has-tooltip" data-tooltip="上移">
+        ${divider}
+        <button class="${btnBase} has-tooltip" aria-label="上移分组" data-tooltip="上移">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
         </button>
-        <button class="${btnBase} text-heritage-dark-300 hover:bg-heritage-900/30 hover:text-heritage-400 has-tooltip" data-tooltip="下移">
+        <button class="${btnBase} has-tooltip" aria-label="下移分组" data-tooltip="下移">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
         </button>
-        <button class="${btnBase} text-heritage-dark-300 hover:bg-amber-900/30 hover:text-amber-400 has-tooltip" data-tooltip="置顶">
+        <button class="${btnBase} has-tooltip" aria-label="置顶分组" data-tooltip="置顶">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3h14M18 13l-6-6l-6 6M12 7v14"></path></svg>
         </button>
-        <div class="w-px h-4 bg-heritage-dark-600 mx-0.5"></div>
-        <div class="flex items-center justify-center w-8 h-8 has-tooltip cursor-pointer" data-tooltip="${isHidden ? '显示分类' : '隐藏分类'}">
+        ${divider}
+        <div class="flex items-center justify-center w-8 h-8 has-tooltip cursor-pointer" aria-label="切换分组可见性" data-tooltip="${isHidden ? '显示分类' : '隐藏分类'}">
             <label class="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" ${isHidden ? 'checked' : ''} class="sr-only peer category-hide-toggle">
-                <div class="w-3.5 h-3.5 rounded-full border-2 peer-focus:outline-none border-heritage-dark-500 peer-checked:bg-heritage-dark-500 peer-checked:border-heritage-dark-500 transition-colors"></div>
+                <div class="w-3.5 h-3.5 rounded-full border-2 peer-focus:outline-none peer-focus-visible:ring-1 peer-focus-visible:ring-white/60 border-white/60 peer-checked:bg-white/70 peer-checked:border-white/70 transition-colors"></div>
             </label>
         </div>
-        <div class="w-px h-4 bg-heritage-dark-600 mx-0.5"></div>
-<div class="flex items-center justify-center w-8 h-8 has-tooltip cursor-pointer" data-tooltip="${isApp ? '列表视图' : 'APP视图'}">
+        ${divider}
+<div class="flex items-center justify-center w-8 h-8 has-tooltip cursor-pointer" aria-label="切换APP视图" data-tooltip="${isApp ? '列表视图' : 'APP视图'}">
             <label class="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" ${isApp ? 'checked' : ''} class="sr-only peer category-app-toggle">
-                <div class="w-3.5 h-3.5 rounded-full border-2 peer-focus:outline-none border-heritage-dark-500 peer-checked:bg-heritage-500 peer-checked:border-heritage-500 transition-colors"></div>
+                <div class="w-3.5 h-3.5 rounded-full border-2 peer-focus:outline-none peer-focus-visible:ring-1 peer-focus-visible:ring-white/60 border-white/60 peer-checked:bg-heritage-500 peer-checked:border-heritage-500 transition-colors"></div>
             </label>
         </div>
-        <div class="w-px h-4 bg-heritage-dark-600 mx-0.5"></div>
-        <button class="${btnBase} text-heritage-dark-300 hover:bg-red-900/30 hover:text-red-400 has-tooltip" data-tooltip="删除分类">
+        ${divider}
+        <button class="${btnBase} hover:text-red-400 hover:bg-red-900/30 has-tooltip" aria-label="删除分组" data-tooltip="删除分类">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
         </button>
     `;
