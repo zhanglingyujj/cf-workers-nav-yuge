@@ -6,7 +6,7 @@ import {
     isCategoryAppLayout, setCategoryAppLayout
 } from './state.js';
 import { createCardElement, updateCardElement } from './card.js';
-import { getEl, clearElCache } from './utils.js';
+import { getEl } from './utils.js';
 import { commit, commitSoon } from './commit.js';
 
 const containerId = 'sections-container';
@@ -37,6 +37,7 @@ export function getFilteredCategoriesByKeyword(query) {
 
 export function initRender() {
     setFlushHandler((dirtyCategories) => {
+        reconcileSections();
         dirtyCategories.forEach(cat => patchCategory(cat));
         renderCategoryButtons();
         setupScrollSpyNow();
@@ -46,15 +47,39 @@ export function initRender() {
         renderAll();
         updateUIState();
     });
-    subscribe('appLayout', () => {
-        clearElCache();
-        renderAll();
-    });
     subscribe('loggedIn', () => renderAll());
     subscribe('categoriesLoaded', () => {
         renderAll();
         updateUIState();
     });
+}
+
+// 渲染集对账：移除已消失的分组 section，并按数据顺序重排现有 section
+function reconcileSections() {
+    const container = getEl(containerId);
+    if (!container) return;
+    const categories = getCategories();
+
+    for (const name of _renderedCategories) {
+        const data = categories[name];
+        if (!data || (!isEditMode() && !isLoggedIn() && data.isHidden)) {
+            const section = document.getElementById(name);
+            if (section) section.remove();
+            _renderedCategories.delete(name);
+        }
+    }
+
+    let ref = null;
+    for (const key of Object.keys(categories)) {
+        const section = document.getElementById(key);
+        if (!section) continue;
+        if (ref) {
+            if (ref.nextSibling !== section) container.insertBefore(section, ref.nextSibling);
+        } else if (container.firstChild !== section) {
+            container.insertBefore(section, container.firstChild);
+        }
+        ref = section;
+    }
 }
 
 export function renderAll() {
@@ -279,25 +304,13 @@ function createCategoryControls(categoryName, isHidden, isApp) {
         import('./dialogs.js').then(m => m.editCategoryName(categoryName));
     });
     buttons[2].addEventListener('click', () => {
-        moveCategory(categoryName, -1);
-        renderAll();
-        renderCategoryButtons();
-        setupScrollSpyNow();
-        commit('保存排序');
+        if (moveCategory(categoryName, -1)) commit('保存排序');
     });
     buttons[3].addEventListener('click', () => {
-        moveCategory(categoryName, 1);
-        renderAll();
-        renderCategoryButtons();
-        setupScrollSpyNow();
-        commit('保存排序');
+        if (moveCategory(categoryName, 1)) commit('保存排序');
     });
     buttons[4].addEventListener('click', () => {
-        pinCategory(categoryName);
-        renderAll();
-        renderCategoryButtons();
-        setupScrollSpyNow();
-        commit('保存排序');
+        if (pinCategory(categoryName)) commit('保存排序');
     });
     buttons[5].addEventListener('click', async () => {
         const { validateTokenOrRedirect } = await import('./auth.js');
@@ -305,7 +318,6 @@ function createCategoryControls(categoryName, isHidden, isApp) {
         const { customConfirm } = await import('./dialogs.js');
         if (await customConfirm(`确定删除 "${categoryName}" 分类及其所有链接吗？`)) {
             deleteCategory(categoryName);
-            renderCategoryButtons();
             await commit('删除分类');
         }
     });

@@ -125,9 +125,9 @@ export function deleteCategory(name) {
 export function moveCategory(name, direction) {
     const keys = Object.keys(_categories);
     const idx = keys.indexOf(name);
-    if (idx < 0) return;
+    if (idx < 0) return false;
     const newIdx = idx + direction;
-    if (newIdx < 0 || newIdx >= keys.length) return;
+    if (newIdx < 0 || newIdx >= keys.length) return false;
     const newCategories = {};
     const reordered = [...keys];
     [reordered[idx], reordered[newIdx]] = [reordered[newIdx], reordered[idx]];
@@ -135,12 +135,13 @@ export function moveCategory(name, direction) {
     _categories = newCategories;
     markAllDirty();
     emit('categoriesChanged', { action: 'move', name, direction });
+    return true;
 }
 
 export function pinCategory(name) {
     const keys = Object.keys(_categories);
     const idx = keys.indexOf(name);
-    if (idx <= 0) return;
+    if (idx <= 0) return false;
     const newCategories = {};
     const reordered = [...keys];
     reordered.splice(idx, 1);
@@ -149,6 +150,7 @@ export function pinCategory(name) {
     _categories = newCategories;
     markAllDirty();
     emit('categoriesChanged', { action: 'pin', name });
+    return true;
 }
 
 export function setCategoryHidden(category, isHidden) {
