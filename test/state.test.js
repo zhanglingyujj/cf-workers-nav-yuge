@@ -1,0 +1,127 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {
+    getCategories, isEditMode, isLoggedIn,
+    setEditMode, setLoggedIn, setCategories,
+    addLink, updateLink, removeLink,
+    addCategory, renameCategory, deleteCategory,
+    moveCategory, pinCategory, setCategoryHidden,
+    reorderCards, isCategoryAppLayout, setCategoryAppLayout,
+    setFlushHandler, subscribe,
+} from '../src/frontend/state.js';
+
+function flushNow() {
+    // setTimeout(0) 回退调度器：等一帧让 flush 执行
+    return new Promise(r => setTimeout(r, 10));
+}
+
+function link(url, category, extra = {}) {
+    return { name: url, url, category, isPrivate: false, ...extra };
+}
+
+test('setCategories 装载数据并触发 categoriesLoaded', () => {
+    let loaded = null;
+    const unsub = subscribe('categoriesLoaded', c => { loaded = c; });
+    setCategories({ 工具: { isHidden: false, links: [link('a.com', '工具')] } });
+    assert.deepEqual(Object.keys(getCategories()), ['工具']);
+    assert.equal(loaded, getCategories());
+    unsub();
+});
+
+test('addLink 标记所在分类为脏', async () => {
+    const dirty = new Set();
+    setFlushHandler(d => d.forEach(c => dirty.add(c)));
+    setCategories({ A: { isHidden: false, links: [] } });
+    addLink('A', link('x.com', 'A'));
+    await flushNow();
+    assert.deepEqual([...dirty], ['A']);
+});
+
+test('updateLink 跨分类移动时两个分类都标记脏', async () => {
+    const dirty = new Set();
+    setFlushHandler(d => d.forEach(c => dirty.add(c)));
+    setCategories({
+        A: { isHidden: false, links: [link('x.com', 'A')] },
+        B: { isHidden: false, links: [] },
+    });
+    updateLink('x.com', link('x.com', 'B'));
+    await flushNow();
+    assert.deepEqual([...dirty].sort(), ['A', 'B']);
+    assert.equal(getCategories().A.links.length, 0);
+    assert.equal(getCategories().B.links.length, 1);
+});
+
+test('removeLink 按原 URL 定位并删除', () => {
+    setCategories({ A: { isHidden: false, links: [link('x.com', 'A')] } });
+    removeLink('x.com');
+    assert.equal(getCategories().A.links.length, 0);
+    removeLink('不存在.com'); // 不抛错
+});
+
+test('reorderCards 覆盖分类链接顺序', () => {
+    setCategories({ A: { isHidden: false, links: [link('1.com', 'A'), link('2.com', 'A')] } });
+    reorderCards('A', [link('2.com', 'A'), link('1.com', 'A')]);
+    assert.deepEqual(getCategories().A.links.map(l => l.url), ['2.com', '1.com']);
+});
+
+test('分类 mutator：add/rename/delete 的返回值与数据一致性', () => {
+    setCategories({ A: { isHidden: false, links: [] } });
+    assert.equal(addCategory('B'), true);
+    assert.equal(addCategory('B'), false); // 重名
+    assert.equal(renameCategory('A', 'C'), true);
+    assert.ok(getCategories().C);
+    assert.equal(renameCategory('C', 'B'), false); // 目标名已存在
+    assert.equal(deleteCategory('B'), true);
+    assert.equal(deleteCategory('B'), false);
+});
+
+test('moveCategory/pinCategory 返回值反映是否实际移动', () => {
+    setCategories({
+        A: { isHidden: false, links: [] },
+        B: { isHidden: false, links: [] },
+    });
+    assert.equal(moveCategory('A', -1), false); // 已在顶部
+    assert.equal(moveCategory('A', 1), true);
+    assert.deepEqual(Object.keys(getCategories()), ['B', 'A']);
+    assert.equal(pinCategory('A'), true);
+    assert.deepEqual(Object.keys(getCategories()), ['A', 'B']);
+    assert.equal(pinCategory('A'), false); // 已在顶部
+});
+
+test('APP 布局开关读写', () => {
+    setCategories({ A: { isHidden: false, links: [] } });
+    assert.equal(isCategoryAppLayout('A'), false);
+    setCategoryAppLayout('A', true);
+    assert.equal(isCategoryAppLayout('A'), true);
+});
+
+test('订阅事件触发与退订', () => {
+    const seen = [];
+    const unsub = subscribe('editMode', v => seen.push(v));
+    setEditMode(true);
+    setEditMode(false);
+    unsub();
+    setEditMode(true);
+    assert.deepEqual(seen, [true, false]);
+    assert.equal(isEditMode(), true);
+    setEditMode(false);
+    assert.equal(isLoggedIn(), false);
+    setLoggedIn(true);
+    assert.equal(isLoggedIn(), true);
+});
+
+test('同一帧内多次变更合并为一次 flush', async () => {
+    let flushCount = 0;
+    setFlushHandler(() => flushCount++);
+    setCategories({
+        A: { isHidden: false, links: [] },
+        B: { isHidden: false, links: [] },
+    });
+    await flushNow(); // setCategories 的 flushNow 已清空
+    flushCount = 0;
+    addLink('A', link('1.com', 'A'));
+    addLink('A', link('2.com', 'A'));
+    addLink('B', link('3.com', 'B'));
+    await flushNow();
+    assert.equal(flushCount, 1);
+});

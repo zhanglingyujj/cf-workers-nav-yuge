@@ -1,4 +1,9 @@
 // state.js - 集中状态管理 + 脏标记增量渲染
+// 调度器：浏览器走 requestAnimationFrame，非浏览器环境（node:test）回退 setTimeout(0)
+const _scheduleFlushFrame = typeof requestAnimationFrame === 'function'
+    ? (fn) => requestAnimationFrame(fn)
+    : (fn) => setTimeout(fn, 0);
+
 let _categories = {};
 let _isEditMode = false;
 let _isLoggedIn = false;
@@ -193,7 +198,7 @@ export function markAllDirty() {
 function scheduleFlush() {
     if (!_renderScheduled) {
         _renderScheduled = true;
-        requestAnimationFrame(() => {
+        _scheduleFlushFrame(() => {
             _renderScheduled = false;
             const dirty = new Set(_dirtyCategories);
             _dirtyCategories.clear();
