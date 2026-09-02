@@ -171,6 +171,63 @@ function createIconImage(link, className) {
     return img;
 }
 
+// 共享单例编辑菜单：全站一份，打开时按卡片绑定动作，避免每卡一个 body 级下拉泄漏
+let _sharedMenu = null;
+let _sharedMenuBtn = null;
+
+function getSharedMenu() {
+    if (_sharedMenu) return _sharedMenu;
+
+    const dropdown = document.createElement('div');
+    dropdown.className = 'hidden fixed w-28 bg-heritage-dark-800 rounded-xl shadow-xl ring-1 ring-white/10 overflow-hidden transform origin-top-right transition-all z-[9999] flex flex-col p-1 card-menu-dropdown';
+
+    dropdown.innerHTML = `
+        <button class="menu-edit w-full text-left px-3 py-2 rounded-lg text-xs font-medium text-heritage-outline hover:bg-heritage-dark-700/50 hover:text-heritage-600 transition-colors flex items-center gap-2">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+            编辑
+        </button>
+        <button class="menu-delete w-full text-left px-3 py-2 rounded-lg text-xs font-medium text-heritage-outline hover:bg-red-900/20 hover:text-red-500 transition-colors flex items-center gap-2">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+            删除
+        </button>
+    `;
+    document.body.appendChild(dropdown);
+    _sharedMenu = dropdown;
+    return dropdown;
+}
+
+function openCardMenu(menuBtn, card, link, categoryName) {
+    const dropdown = getSharedMenu();
+    const btnRect = menuBtn.getBoundingClientRect();
+    let top = btnRect.top + btnRect.height + 4;
+    let left = btnRect.right - 112;
+    if (left < 0) left = btnRect.left;
+    if (top + 100 > window.innerHeight) top = btnRect.top - 100;
+    dropdown.style.top = top + 'px';
+    dropdown.style.left = left + 'px';
+
+    dropdown.querySelector('.menu-edit').onclick = (e) => {
+        e.stopPropagation();
+        dropdown.classList.add('hidden');
+        _sharedMenuBtn = null;
+        import('./dialogs.js').then(m => m.showEditDialog(link, categoryName));
+    };
+    dropdown.querySelector('.menu-delete').onclick = (e) => {
+        e.stopPropagation();
+        dropdown.classList.add('hidden');
+        _sharedMenuBtn = null;
+        import('./dialogs.js').then(m => m.removeCard(card));
+    };
+
+    if (!dropdown.classList.contains('hidden') && _sharedMenuBtn === menuBtn) {
+        dropdown.classList.add('hidden');
+        _sharedMenuBtn = null;
+    } else {
+        dropdown.classList.remove('hidden');
+        _sharedMenuBtn = menuBtn;
+    }
+}
+
 function createEditControls(link, card, isApp, categoryName) {
     const actionWrapper = document.createElement('div');
     actionWrapper.className = isApp
@@ -185,46 +242,9 @@ function createEditControls(link, card, isApp, categoryName) {
     menuBtn.className = `${btnStyle} flex items-center justify-center transition-all duration-200`;
     menuBtn.innerHTML = '<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>';
 
-    const dropdown = document.createElement('div');
-    dropdown.className = 'hidden fixed w-28 bg-heritage-dark-800 rounded-xl shadow-xl ring-1 ring-white/10 overflow-hidden transform origin-top-right transition-all z-[9999] flex flex-col p-1 card-menu-dropdown';
-    document.body.appendChild(dropdown);
-
-    dropdown.innerHTML = `
-        <button class="menu-edit w-full text-left px-3 py-2 rounded-lg text-xs font-medium text-heritage-outline hover:bg-heritage-dark-700/50 hover:text-heritage-600 transition-colors flex items-center gap-2">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-            编辑
-        </button>
-        <button class="menu-delete w-full text-left px-3 py-2 rounded-lg text-xs font-medium text-heritage-outline hover:bg-red-900/20 hover:text-red-500 transition-colors flex items-center gap-2">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-            删除
-        </button>
-    `;
-
     menuBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        const btnRect = menuBtn.getBoundingClientRect();
-        let top = btnRect.top + btnRect.height + 4;
-        let left = btnRect.right - 112;
-        if (left < 0) left = btnRect.left;
-        if (top + 100 > window.innerHeight) top = btnRect.top - 100;
-        dropdown.style.top = top + 'px';
-        dropdown.style.left = left + 'px';
-        document.querySelectorAll('.card-menu-dropdown').forEach(el => {
-            if (el !== dropdown) el.classList.add('hidden');
-        });
-        dropdown.classList.toggle('hidden');
-    });
-
-    dropdown.querySelector('.menu-edit').addEventListener('click', (e) => {
-        e.stopPropagation();
-        dropdown.classList.add('hidden');
-        import('./dialogs.js').then(m => m.showEditDialog(link, categoryName));
-    });
-
-    dropdown.querySelector('.menu-delete').addEventListener('click', (e) => {
-        e.stopPropagation();
-        dropdown.classList.add('hidden');
-        import('./dialogs.js').then(m => m.removeCard(card));
+        openCardMenu(menuBtn, card, link, categoryName);
     });
 
     actionWrapper.appendChild(menuBtn);
