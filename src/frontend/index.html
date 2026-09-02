@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Card Tab - 我的导航</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>⭐</text></svg>">
+    <link rel="icon" href="/icon.svg">
+    <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="apple-touch-icon" href="/icon.svg">
+    <meta name="theme-color" content="#B8422E">
     <link rel="preconnect" href="https://api.xinac.net">
     <link rel="dns-prefetch" href="https://api.xinac.net">
     <style>__TAILWIND_CSS_PLACEHOLDER__</style>
@@ -240,8 +243,13 @@ const savedTheme = localStorage.getItem('theme');
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4-4m0 0l-4 4m4-4v12"></path></svg>
                                             导入配置
                                         </button>
+                                        <button onclick="importBookmarks()" class="w-full text-left px-3 py-2 rounded-lg text-sm text-heritage-primary dark:text-heritage-outline hover:bg-blue-50 dark:hover:bg-heritage-dark-700/50 hover:text-blue-600 transition-colors flex items-center gap-3">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h7l5 5v11a2 2 0 01-2 2H7a2 2 0 01-2-2V5zM14 3v6h6"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6M9 17h6"></path></svg>
+                                            导入书签
+                                        </button>
                                         <!-- 文件输入框 (隐藏) -->
                                         <input type="file" id="import-file-input" accept=".json" class="hidden">
+                                        <input type="file" id="bookmark-file-input" accept=".html,.htm,.json" class="hidden">
                                     </div>
                                     
 <div class="h-px bg-heritage-variant dark:bg-heritage-dark-700/50 mx-1 my-1"></div>

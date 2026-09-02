@@ -355,6 +355,11 @@ if (data.valid) {
             const { importData } = await import('./auth.js');
             await importData(importFileInput);
         });
+        const bookmarkFileInput = getEl('bookmark-file-input');
+        document.getElementById('data-tools-menu')?.querySelector('[onclick="importBookmarks()"]')?.addEventListener('click', async () => {
+            const { importBookmarks } = await import('./bookmarks.js');
+            importBookmarks(bookmarkFileInput);
+        });
     }
 
     // 分类选择下拉 (在编辑弹窗中)

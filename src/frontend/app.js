@@ -248,4 +248,15 @@ initSearchEngines(searchEngineBtn, searchEngineMenu, searchInput);
 
     // 拖拽事件
     if (sectionsContainer) initDrag(sectionsContainer);
+
+    // 全局快捷键
+    const { initShortcuts } = await import('./shortcuts.js');
+    initShortcuts();
+
+    // PWA：注册 service worker
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js').catch(() => { });
+        });
+    }
 });

@@ -1,4 +1,5 @@
 import { HTML_CONTENT } from '../build/html-content.js';
+import { MANIFEST, ICON_SVG, SW_JS } from './pwa.js';
 import { getCorsHeaders } from './utils.js';
 import { handleIconProxy } from './icon.js';
 import { handleLogin, handleRefreshToken, handleValidateToken, handleGetLinks, handleSaveData, handleBackupData, handleExportData, handleImportData, handleGetSettings, handleSaveSettings } from './api.js';
@@ -27,6 +28,33 @@ export default {
                     'Referrer-Policy': 'strict-origin-when-cross-origin',
                     'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://static.cloudflareinsights.com; font-src 'self' data:;"
                 }
+            });
+        }
+
+        if (url.pathname === '/manifest.webmanifest') {
+            return new Response(MANIFEST, {
+                headers: {
+                    'Content-Type': 'application/manifest+json',
+                    'Cache-Control': 'public, max-age=86400',
+                },
+            });
+        }
+
+        if (url.pathname === '/icon.svg') {
+            return new Response(ICON_SVG, {
+                headers: {
+                    'Content-Type': 'image/svg+xml',
+                    'Cache-Control': 'public, max-age=86400',
+                },
+            });
+        }
+
+        if (url.pathname === '/sw.js') {
+            return new Response(SW_JS, {
+                headers: {
+                    'Content-Type': 'application/javascript',
+                    'Cache-Control': 'no-cache',
+                },
             });
         }
 

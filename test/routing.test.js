@@ -47,3 +47,21 @@ test('未知路径：404', async () => {
     const res = await worker.fetch(new Request('https://example.com/api/nope'), env, ctx);
     assert.equal(res.status, 404);
 });
+
+test('PWA 资源：manifest / icon.svg / sw.js 均可访问', async () => {
+    const manifest = await worker.fetch(new Request('https://example.com/manifest.webmanifest'), env, ctx);
+    assert.equal(manifest.status, 200);
+    assert.match(manifest.headers.get('Content-Type'), /manifest\+json/);
+    assert.equal(JSON.parse(await manifest.text()).name, 'Card Tab - 我的导航');
+
+    const icon = await worker.fetch(new Request('https://example.com/icon.svg'), env, ctx);
+    assert.equal(icon.status, 200);
+    assert.match(icon.headers.get('Content-Type'), /image\/svg\+xml/);
+    assert.match(await icon.text(), /<svg/);
+
+    const sw = await worker.fetch(new Request('https://example.com/sw.js'), env, ctx);
+    assert.equal(sw.status, 200);
+    assert.match(sw.headers.get('Content-Type'), /javascript/);
+    const swBody = await sw.text();
+    assert.ok(swBody.includes('addEventListener')); // ensure sw code body is valid
+});
