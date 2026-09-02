@@ -175,7 +175,7 @@ function createCategorySection(categoryName, links, isHidden) {
     section.id = categoryName;
 
     const titleContainer = document.createElement('div');
-    titleContainer.className = 'flex items-center gap-3 mb-5 pb-2 border-b border-heritage-dark-700/60';
+    titleContainer.className = 'flex items-center gap-3 mb-6';
 
     const title = document.createElement('h2');
     title.className = 'text-xl font-extrabold text-white flex items-center gap-2 mb-1 drop-shadow-sm';
@@ -192,7 +192,7 @@ const catData = getCategories()[categoryName];
     const catData = getCategories()[categoryName];
     const isApp = catData && catData.isAppLayout;
     const gridClasses = isApp
-        ? 'grid-cols-[repeat(auto-fill,minmax(75px,1fr))] gap-[18px]'
+        ? 'grid-cols-[repeat(auto-fill,minmax(64px,80px))] justify-start gap-x-4 gap-y-3'
         : 'grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-[18px] sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))]';
 
     cardContainer.className = `grid ${gridClasses} card-container relative`;

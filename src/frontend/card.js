@@ -5,16 +5,21 @@ import { getEl } from './utils.js';
 const imgApi = '/api/icon?url=';
 const fallbackSrc = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'%3E%3C/circle%3E%3Cline x1='12' y1='8' x2='12' y2='12'%3E%3C/line%3E%3Cline x1='12' y1='16' x2='12.01' y2='16'%3E%3C/line%3E%3C/svg%3E";
 
-// Sun-Panel 默认卡片底色 #2a2a2a6b
-const DEFAULT_CARD_BG = 'rgba(42, 42, 42, 0.42)';
+// Sun-Panel 默认详情卡底色 #2a2a2a6b；本项目调轻为 0.32 + 极弱亮边
+const DEFAULT_CARD_BG = 'rgba(42, 42, 42, 0.32)';
+// 极简卡（APP 布局）图标槽玻璃底：接近透明，仅作轻微衬托
+const APP_ICON_BG = 'rgba(42, 42, 42, 0.15)';
 
 export function cardBackgroundColor(link) {
+    if (isCategoryAppLayout(link.category)) {
+        return link.backgroundColor || APP_ICON_BG;
+    }
     return link.backgroundColor || DEFAULT_CARD_BG;
 }
 
-// 照搬 Sun-Panel：按背景亮度自动黑白文字
+// 照搬 Sun-Panel 亮度算法，半透明色按叠加深底（42,42,42）后的合成色计算
 function textColorForBackground(bg) {
-    let r = 42, g = 42, b = 42;
+    let r = 42, g = 42, b = 42, alpha = 1;
     const m = /^#([0-9a-f]{3,8})$/i.exec(bg || '');
     if (m) {
         let hex = m[1];
@@ -22,7 +27,12 @@ function textColorForBackground(bg) {
         r = parseInt(hex.substring(0, 2), 16);
         g = parseInt(hex.substring(2, 4), 16);
         b = parseInt(hex.substring(4, 6), 16);
+        if (hex.length === 8) alpha = parseInt(hex.substring(6, 8), 16) / 255;
     }
+    // 合成到深色玻璃底 (42,42,42)
+    r = Math.round(r * alpha + 42 * (1 - alpha));
+    g = Math.round(g * alpha + 42 * (1 - alpha));
+    b = Math.round(b * alpha + 42 * (1 - alpha));
     const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
     return luminance > 0.5 ? '#1A1C1E' : '#FFFFFF';
 }
@@ -34,7 +44,7 @@ export function createCardElement(link) {
     const card = document.createElement('div');
     card.className = isApp
         ? 'group relative h-full w-full flex flex-col items-center justify-start py-1 transition-all duration-200 cursor-pointer select-none card'
-        : 'group relative h-full w-full flex items-center px-2 py-2 rounded-2xl transition-all duration-200 cursor-pointer select-none card hover:shadow-[0_0_20px_10px_rgba(0,0,0,0.2)]';
+        : 'group relative h-full w-full flex items-center px-2 py-2 rounded-2xl border border-white/[0.08] transition-all duration-200 cursor-pointer select-none card hover:shadow-[0_0_20px_10px_rgba(0,0,0,0.2)]';
 
     if (isEditMode()) {
         card.setAttribute('draggable', 'true');
@@ -47,15 +57,15 @@ export function createCardElement(link) {
     const bg = cardBackgroundColor(link);
 
     if (isApp) {
-        // 极简卡：70px 图标槽（玻璃底在槽上）+ 下方居中标题，无描述
+        // 极简卡：70px 图标槽（极轻玻璃底，图标为主角）+ 下方居中标题，无描述
         const iconSlot = document.createElement('div');
         iconSlot.className = 'w-[70px] h-[70px] rounded-2xl overflow-hidden flex items-center justify-center transition-all duration-200 hover:shadow-[0_0_20px_10px_rgba(0,0,0,0.2)]';
         iconSlot.style.backgroundColor = bg;
-        iconSlot.appendChild(createIconImage(link, 'w-[50px] h-[50px] object-contain'));
+        iconSlot.appendChild(createIconImage(link, 'w-[58px] h-[58px] object-contain'));
         card.appendChild(iconSlot);
 
         const title = document.createElement('div');
-        title.className = 'card-title pointer-events-none text-center text-sm mt-[2px] w-full truncate px-1 text-white drop-shadow-sm';
+        title.className = 'card-title pointer-events-none text-center text-sm font-medium mt-[2px] w-full truncate px-1 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.45)]';
         title.textContent = link.name;
         card.appendChild(title);
     } else {
