@@ -274,7 +274,7 @@ function createCategoryControls(categoryName, isHidden, isApp) {
         <div class="flex items-center justify-center w-8 h-8 has-tooltip cursor-pointer" aria-label="切换分组可见性" data-tooltip="${isHidden ? '显示分类' : '隐藏分类'}">
             <label class="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" ${isHidden ? 'checked' : ''} class="sr-only peer category-hide-toggle">
-                <div class="w-3.5 h-3.5 rounded-full border-2 peer-focus:outline-none peer-focus-visible:ring-1 peer-focus-visible:ring-white/60 border-white/60 peer-checked:bg-white/70 peer-checked:border-white/70 transition-colors"></div>
+                <div class="w-3.5 h-3.5 rounded-full border-2 peer-focus:outline-none peer-focus-visible:ring-1 peer-focus-visible:ring-white/60 border-white/60 peer-checked:bg-heritage-500 peer-checked:border-heritage-500 transition-colors"></div>
             </label>
         </div>
         ${divider}

@@ -50,7 +50,7 @@ function renderEngineMenu(menu) {
 
     engineList.forEach(key => {
         const btn = document.createElement('button');
-        btn.className = "w-full text-left px-3 py-2.5 text-sm text-heritage-outline hover:bg-heritage-dark-700 hover:text-heritage-400 transition-colors flex items-center gap-3";
+        btn.className = "w-full text-left px-3 py-2.5 text-sm text-heritage-outline hover:bg-heritage-dark-700/50 hover:text-heritage-500 transition-colors flex items-center gap-3";
         btn.innerHTML = `${searchEngineIcons[key]}<span>${searchEngineLabels[key]}</span>`;
         btn.addEventListener('click', () => selectEngine(key));
         list.appendChild(btn);

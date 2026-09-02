@@ -136,12 +136,11 @@ export function updateCardElement(card, newLink, categoryName) {
     applyTooltip(card, newLink, isCategoryAppLayout(categoryName || newLink.category));
 }
 
-// 悬停提示：极简卡始终显示完整名称（截断兜底），有描述时附描述；详情卡仅在有描述时提示
+// 悬停提示：仅详情卡在有描述时提示；APP 布局名称常显在图标下方，不再悬停提示
 function applyTooltip(card, link, isApp) {
-    if (isEditMode()) return;
-    if (isApp) {
-        card.classList.add('has-tooltip');
-        card.setAttribute('data-tooltip', link.tips ? `${link.name}\n${link.tips}` : link.name);
+    if (isEditMode() || isApp) {
+        card.classList.remove('has-tooltip');
+        card.removeAttribute('data-tooltip');
     } else if (link.tips) {
         card.classList.add('has-tooltip');
         card.setAttribute('data-tooltip', link.tips);
@@ -182,7 +181,7 @@ function getSharedMenu() {
     dropdown.className = 'hidden fixed w-28 bg-heritage-dark-800 rounded-xl shadow-xl ring-1 ring-white/10 overflow-hidden transform origin-top-right transition-all z-[9999] flex flex-col p-1 card-menu-dropdown';
 
     dropdown.innerHTML = `
-        <button class="menu-edit w-full text-left px-3 py-2 rounded-lg text-xs font-medium text-heritage-outline hover:bg-heritage-dark-700/50 hover:text-heritage-600 transition-colors flex items-center gap-2">
+        <button class="menu-edit w-full text-left px-3 py-2 rounded-lg text-xs font-medium text-heritage-outline hover:bg-heritage-dark-700/50 hover:text-heritage-500 transition-colors flex items-center gap-2">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
             编辑
         </button>
@@ -235,9 +234,7 @@ function createEditControls(link, card, isApp, categoryName) {
         : 'absolute top-2 right-2 z-50';
 
     const menuBtn = document.createElement('button');
-    const btnStyle = isApp
-        ? 'w-6 h-6 rounded-full bg-heritage-dark-700 text-heritage-dark-300 shadow-sm hover:bg-heritage-500 hover:text-white'
-        : 'w-7 h-7 rounded-lg text-white/70 hover:text-white hover:bg-heritage-dark-700/80 backdrop-blur-sm';
+    const btnStyle = 'w-6 h-6 rounded-full bg-heritage-dark-900/70 ring-1 ring-white/10 backdrop-blur-sm text-heritage-dark-200 hover:bg-heritage-500 hover:text-white hover:ring-heritage-500 shadow-sm';
 
     menuBtn.className = `${btnStyle} flex items-center justify-center transition-all duration-200`;
     menuBtn.innerHTML = '<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>';

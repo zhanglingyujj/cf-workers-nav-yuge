@@ -109,7 +109,7 @@ function updateCategorySelectDropdown() {
     const categories = getCategories();
     Object.keys(categories).forEach(cat => {
         const item = document.createElement('div');
-        item.className = 'px-4 py-2.5 text-sm text-heritage-dark-200 hover:bg-heritage-dark-700 cursor-pointer transition-colors';
+        item.className = 'px-3 py-2.5 text-sm text-heritage-outline hover:bg-heritage-dark-700/50 hover:text-heritage-500 cursor-pointer transition-colors';
         item.textContent = cat;
         item.addEventListener('click', () => {
             const catVal = getEl('category-select-value');
