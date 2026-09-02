@@ -113,10 +113,12 @@ export async function handleIconProxy(request, ctx, env) {
                 status: 200,
                 headers: {
                     'Content-Type': 'image/svg+xml',
-                    'Cache-Control': 'public, max-age=3600'
+                    // 浏览器仍缓存 1 小时；负面缓存写入 CF Cache 1 天，避免失败站点被重复抓取
+                    'Cache-Control': 'public, max-age=3600, s-maxage=86400'
                 }
             });
             response.headers.set('X-Icon-Cache-Status', 'DEFAULT');
+            ctx.waitUntil(cache.put(cacheKey, response.clone()));
         }
         response.headers.set('Access-Control-Allow-Origin', corsHeaders['Access-Control-Allow-Origin']);
     }

@@ -136,7 +136,7 @@ node build.js --check-classes
 | `ACCESS_TOKEN_EXPIRY` | Access Token 有效期（秒） | `7200`（2h） | |
 | `REFRESH_TOKEN_EXPIRY` | Refresh Token 有效期（秒） | `2592000`（30d） | |
 | `MAX_BACKUPS` | 最大备份保留数 | `10` | |
-| `ICON_CACHE_MAX_AGE` | 图标缓存时间（秒） | `604800`（7d） | |
+| `ICON_CACHE_MAX_AGE` | 图标缓存时间（秒） | `2592000`（30d） | |
 | `HTML_CACHE_MAX_AGE` | HTML 页面缓存时间（秒） | `3600`（1h） | |
 | `USE_EXTERNAL_ICON_API` | 使用外部图标 API | — | |
 | `MAX_BACKUPS` | 最大备份数 | `10` | |
