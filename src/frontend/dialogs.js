@@ -1,6 +1,7 @@
 // dialogs.js - 弹窗管理 (添加/编辑卡片, 分类命名, confirm, alert, 密码登录)
-import { addLink, updateLink, removeLink, getCategories, addCategory, setLoggedIn, setEditMode, markAllDirty } from './state.js';
+import { addLink, updateLink, removeLink, getCategories, addCategory, setLoggedIn, setEditMode } from './state.js';
 import { updateUIState, renderAll, renderCategoryButtons } from './render.js';
+import { commit } from './commit.js';
 import { getEl } from './utils.js';
 
 function toggleOverlay(id, show) {
@@ -176,8 +177,7 @@ async function addCard() {
     addLink(category, newLink);
     toggleOverlay('dialog-overlay', false);
 
-    const { saveDataToServer } = await import('./auth.js');
-    await saveDataToServer('保存数据', getCategories());
+    await commit('保存数据');
 }
 
 async function updateCard(oldLink, categoryName) {
@@ -202,8 +202,7 @@ const categoryChanged = (categoryName || oldLink.category) !== newLink.category;
     }
     toggleOverlay('dialog-overlay', false);
 
-    const { saveDataToServer } = await import('./auth.js');
-    await saveDataToServer('保存数据', getCategories());
+    await commit('保存数据');
 }
 
 export async function removeCard(card) {
@@ -212,8 +211,7 @@ export async function removeCard(card) {
 
     const url = card.getAttribute('data-url');
     removeLink(url);
-    const { saveDataToServer } = await import('./auth.js');
-    await saveDataToServer('删除链接', getCategories());
+    await commit('删除链接');
 }
 
 export async function editCategoryName(oldName) {
@@ -233,8 +231,7 @@ export async function editCategoryName(oldName) {
     if (!renameCategory(oldName, newName)) return;
     const { renderAll, renderCategoryButtons } = await import('./render.js');
     renderAll();
-    const { saveDataToServer } = await import('./auth.js');
-    await saveDataToServer('重命名分类', getCategories());
+    await commit('重命名分类');
 }
 
 export async function addCategoryAction() {
@@ -252,8 +249,7 @@ export async function addCategoryAction() {
     const { renderAll } = await import('./render.js');
     renderAll();
     setTimeout(() => window.scrollTo(0, document.body.scrollHeight), 100);
-    const { saveDataToServer } = await import('./auth.js');
-    await saveDataToServer('新增分类', getCategories());
+    await commit('新增分类');
 }
 
 function showCategoryDialog(title, defaultVal = '') {

@@ -6,7 +6,8 @@ import {
     isCategoryAppLayout, setCategoryAppLayout
 } from './state.js';
 import { createCardElement, updateCardElement } from './card.js';
-import { getEl, clearElCache, debounce } from './utils.js';
+import { getEl, clearElCache } from './utils.js';
+import { commit, commitSoon } from './commit.js';
 
 const containerId = 'sections-container';
 const buttonsContainerId = 'category-buttons-container';
@@ -282,30 +283,21 @@ function createCategoryControls(categoryName, isHidden, isApp) {
         renderAll();
         renderCategoryButtons();
         setupScrollSpyNow();
-        import('./auth.js').then(m => m.validateTokenOrRedirect()).then(v => {
-            if (!v) return;
-            return import('./auth.js').then(a => a.saveDataToServer('保存排序', getCategories()));
-        });
+        commit('保存排序');
     });
     buttons[3].addEventListener('click', () => {
         moveCategory(categoryName, 1);
         renderAll();
         renderCategoryButtons();
         setupScrollSpyNow();
-        import('./auth.js').then(m => m.validateTokenOrRedirect()).then(v => {
-            if (!v) return;
-            return import('./auth.js').then(a => a.saveDataToServer('保存排序', getCategories()));
-        });
+        commit('保存排序');
     });
     buttons[4].addEventListener('click', () => {
         pinCategory(categoryName);
         renderAll();
         renderCategoryButtons();
         setupScrollSpyNow();
-        import('./auth.js').then(m => m.validateTokenOrRedirect()).then(v => {
-            if (!v) return;
-            return import('./auth.js').then(a => a.saveDataToServer('保存排序', getCategories()));
-        });
+        commit('保存排序');
     });
     buttons[5].addEventListener('click', async () => {
         const { validateTokenOrRedirect } = await import('./auth.js');
@@ -314,8 +306,7 @@ function createCategoryControls(categoryName, isHidden, isApp) {
         if (await customConfirm(`确定删除 "${categoryName}" 分类及其所有链接吗？`)) {
             deleteCategory(categoryName);
             renderCategoryButtons();
-            const { saveDataToServer } = await import('./auth.js');
-            await saveDataToServer('删除分类', getCategories());
+            await commit('删除分类');
         }
     });
 
@@ -325,10 +316,7 @@ function createCategoryControls(categoryName, isHidden, isApp) {
             const container = this.closest('.has-tooltip');
             if (container) container.setAttribute('data-tooltip', this.checked ? '显示分类' : '隐藏分类');
             setCategoryHidden(categoryName, this.checked);
-            const { validateTokenOrRedirect, saveDataToServer } = await import('./auth.js');
-            if (await validateTokenOrRedirect()) {
-                await saveDataToServer('切换隐藏', getCategories());
-            }
+            commitSoon('切换隐藏');
         });
     }
 
@@ -341,10 +329,7 @@ const appToggle = controls.querySelector('.category-app-toggle');
             setupScrollSpyNow();
             const container = this.closest('.has-tooltip');
             if (container) container.setAttribute('data-tooltip', this.checked ? '列表视图' : 'APP视图');
-            const { validateTokenOrRedirect, saveDataToServer } = await import('./auth.js');
-            if (await validateTokenOrRedirect()) {
-                await saveDataToServer('切换APP视图', getCategories());
-            }
+            commitSoon('切换APP视图');
         });
     }
 

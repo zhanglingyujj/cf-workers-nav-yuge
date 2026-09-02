@@ -58,30 +58,6 @@ export async function fetchWithAuth(url, options = {}) {
     return res;
 }
 
-export async function saveDataToServer(actionName, data) {
-    try {
-        const response = await fetchWithAuth('/api/saveData', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ categories: data }),
-        });
-
-        if (response.status === 401) {
-            localStorage.removeItem('authToken');
-            setLoggedIn(false);
-            await customAlert('登录凭证已过期，请重新登录');
-            throw new Error('Unauthorized');
-        }
-
-        const result = await response.json();
-        if (!result.success) throw new Error('Failed to save');
-    } catch (error) {
-        if (error.message !== 'Unauthorized') {
-            await customAlert(actionName + '失败，请重试');
-        }
-    }
-}
-
 export async function checkLoginStatusAndLoad() {
     const [isValid] = await Promise.all([
         validateToken(),

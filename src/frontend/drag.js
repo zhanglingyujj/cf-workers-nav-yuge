@@ -1,7 +1,7 @@
-// drag.js - 拖拽排序 (PC + 移动端) ★ 本地优先 + debounce 异步保存
+// drag.js - 拖拽排序 (PC + 移动端) ★ 本地优先 + 合并异步保存
 import { isEditMode, getCategories, reorderCards } from './state.js';
-import { debounce } from './utils.js';
 import { patchCategory, renderAll } from './render.js';
+import { commitSoon } from './commit.js';
 
 let draggedCard = null;
 let initialDragState = { category: null, index: -1 };
@@ -75,6 +75,11 @@ if (initialDragState.category !== newState.category) {
     draggedCard = null;
 }
 
+// 合并高频拖拽的落库（300ms 尾沿）
+function debouncedSaveOrder() {
+    commitSoon('保存排序');
+}
+
 function updateCardCategory(card, newCategory) {
     const url = card.getAttribute('data-url');
     let item = null;
@@ -101,15 +106,6 @@ const cards = section.querySelectorAll('.card:not(.add-card-placeholder)');
         return findLinkByUrl(url);
     }).filter(Boolean);
 }
-
-const debouncedSaveOrder = debounce(async () => {
-    buildLinkIndex();
-    const { saveDataToServer } = await import('./auth.js');
-    const { validateTokenOrRedirect } = await import('./auth.js');
-    if (await validateTokenOrRedirect()) {
-        await saveDataToServer('保存排序', getCategories());
-    }
-}, 300);
 
 // -------- 移动端拖拽 --------
 let mobileDragTimer = null;

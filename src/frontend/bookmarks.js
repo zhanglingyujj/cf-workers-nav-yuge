@@ -1,7 +1,8 @@
 // bookmarks.js - 浏览器书签导入 UI 入口
 import { parseNetscapeBookmark, parseSunPanelData } from './bookmark-parsers.js';
 import { getCategories } from './state.js';
-import { validateTokenOrRedirect, saveDataToServer, loadLinks } from './auth.js';
+import { validateTokenOrRedirect, loadLinks } from './auth.js';
+import { commit } from './commit.js';
 
 export function importBookmarks(fileInput) {
     if (!fileInput) return;
@@ -65,7 +66,7 @@ async function handleBookmarkFile(file) {
         }
     }
 
-    await saveDataToServer('导入书签', categories);
+    await commit('导入书签');
     await loadLinks();
     await customAlert(`导入完成：新增 ${added} 条，跳过重复 ${total - added} 条`);
 }
