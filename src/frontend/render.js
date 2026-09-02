@@ -192,8 +192,8 @@ const catData = getCategories()[categoryName];
     const catData = getCategories()[categoryName];
     const isApp = catData && catData.isAppLayout;
     const gridClasses = isApp
-        ? 'grid-cols-[repeat(auto-fill,minmax(64px,80px))] justify-start gap-x-4 gap-y-3'
-        : 'grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-[18px] sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))]';
+        ? 'grid-cols-[repeat(auto-fill,minmax(56px,68px))] justify-start gap-x-4 gap-y-3'
+        : 'grid-cols-[repeat(auto-fill,minmax(170px,1fr))] gap-[14px] sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))]';
 
     cardContainer.className = `grid ${gridClasses} card-container relative`;
     cardContainer.dataset.category = categoryName;

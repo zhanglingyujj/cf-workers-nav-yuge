@@ -8,7 +8,7 @@ const fallbackSrc = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg
 // Sun-Panel 默认详情卡底色 #2a2a2a6b；本项目调轻为 0.32 + 极弱亮边
 const DEFAULT_CARD_BG = 'rgba(42, 42, 42, 0.32)';
 // 极简卡（APP 布局）图标槽玻璃底：接近透明，仅作轻微衬托
-const APP_ICON_BG = 'rgba(42, 42, 42, 0.12)';
+const APP_ICON_BG = 'rgba(42, 42, 42, 0.14)';
 
 export function cardBackgroundColor(link) {
     if (isCategoryAppLayout(link.category)) {
@@ -44,7 +44,7 @@ export function createCardElement(link) {
     const card = document.createElement('div');
     card.className = isApp
         ? 'group relative h-full w-full flex flex-col items-center justify-start py-1 transition-all duration-200 cursor-pointer select-none card'
-        : 'group relative h-full w-full flex items-center px-2 py-2 rounded-2xl border border-white/[0.08] transition-all duration-200 cursor-pointer select-none card hover:shadow-[0_0_20px_10px_rgba(0,0,0,0.2)]';
+        : 'group relative h-full w-full flex items-center px-1.5 py-1 rounded-2xl border border-white/[0.08] transition-all duration-200 cursor-pointer select-none card hover:shadow-[0_0_20px_10px_rgba(0,0,0,0.2)]';
 
     if (isEditMode()) {
         card.setAttribute('draggable', 'true');
@@ -59,9 +59,9 @@ export function createCardElement(link) {
     if (isApp) {
         // 极简卡：70px 图标槽（极轻玻璃底，图标为主角）+ 下方居中标题，无描述
         const iconSlot = document.createElement('div');
-        iconSlot.className = 'w-[64px] h-[64px] rounded-2xl overflow-hidden flex items-center justify-center transition-all duration-200 hover:shadow-[0_0_20px_10px_rgba(0,0,0,0.2)]';
+        iconSlot.className = 'w-[56px] h-[56px] rounded-2xl overflow-hidden flex items-center justify-center transition-all duration-200 hover:shadow-[0_0_20px_10px_rgba(0,0,0,0.2)]';
         iconSlot.style.backgroundColor = bg;
-        iconSlot.appendChild(createIconImage(link, 'w-[56px] h-[56px] object-contain'));
+        iconSlot.appendChild(createIconImage(link, 'w-[52px] h-[52px] object-contain'));
         card.appendChild(iconSlot);
 
         const title = document.createElement('div');
@@ -74,12 +74,12 @@ export function createCardElement(link) {
         card.style.color = textColorForBackground(bg);
 
         const iconSlot = document.createElement('div');
-        iconSlot.className = 'w-[70px] h-[70px] flex-shrink-0 flex items-center justify-center';
-        iconSlot.appendChild(createIconImage(link, 'w-[50px] h-[50px] object-contain rounded-xl overflow-hidden pointer-events-none'));
+        iconSlot.className = 'w-[56px] h-[56px] flex-shrink-0 flex items-center justify-center';
+        iconSlot.appendChild(createIconImage(link, 'w-[44px] h-[44px] object-contain rounded-xl overflow-hidden pointer-events-none'));
         card.appendChild(iconSlot);
 
         const textBlock = document.createElement('div');
-        textBlock.className = 'flex-1 min-w-0 ml-2 flex flex-col justify-center';
+        textBlock.className = 'flex-1 min-w-0 ml-1.5 flex flex-col justify-center';
 
         const title = document.createElement('div');
         title.className = 'card-title pointer-events-none font-semibold text-sm truncate';
