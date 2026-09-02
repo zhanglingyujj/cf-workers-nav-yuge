@@ -121,7 +121,7 @@ function updateCategorySelectDropdown() {
     });
 }
 
-export function showEditDialog(link) {
+export function showEditDialog(link, categoryName) {
     toggleOverlay('dialog-overlay', true);
     const nameInput = getEl('name-input');
     const urlInput = getEl('url-input');
@@ -137,14 +137,14 @@ export function showEditDialog(link) {
     initBgColorPicker();
     setBgColorValue(link.backgroundColor || '');
     if (privateCheckbox) privateCheckbox.checked = link.isPrivate;
-    if (catValue) catValue.value = link.category;
-    if (catText) catText.textContent = link.category;
+    if (catValue) catValue.value = categoryName || link.category || '';
+    if (catText) catText.textContent = categoryName || link.category || '请选择分类';
 
     const confirmBtn = getEl('dialog-confirm-btn');
     if (confirmBtn) {
         const newBtn = confirmBtn.cloneNode(true);
         confirmBtn.parentNode.replaceChild(newBtn, confirmBtn);
-        newBtn.addEventListener('click', () => updateCard(link));
+        newBtn.addEventListener('click', () => updateCard(link, categoryName));
     }
 
     const cancelBtn = getEl('dialog-cancel-btn');
@@ -180,7 +180,7 @@ async function addCard() {
     await saveDataToServer('保存数据', getCategories());
 }
 
-async function updateCard(oldLink) {
+async function updateCard(oldLink, categoryName) {
     const { validateTokenOrRedirect } = await import('./auth.js');
     if (!(await validateTokenOrRedirect())) return;
 
@@ -194,7 +194,7 @@ async function updateCard(oldLink) {
         isPrivate: getEl('private-checkbox').checked
     };
 
-const categoryChanged = oldLink.category !== newLink.category;
+const categoryChanged = (categoryName || oldLink.category) !== newLink.category;
     updateLink(oldLink.url, newLink);
     if (categoryChanged) {
         renderAll();
@@ -396,22 +396,40 @@ if (data.valid) {
         backToTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
     }
 
-    // 导入导出
+    // 导入导出（单一导入入口，弹窗选择类型）
     const importFileInput = getEl('import-file-input');
     if (importFileInput) {
         document.getElementById('data-tools-menu')?.querySelector('[onclick="exportData()"]')?.addEventListener('click', async () => {
             const { exportData } = await import('./auth.js');
             await exportData();
         });
-        document.getElementById('data-tools-menu')?.querySelector('[onclick="importData()"]')?.addEventListener('click', async () => {
-            const { importData } = await import('./auth.js');
-            await importData(importFileInput);
-        });
-        const bookmarkFileInput = getEl('bookmark-file-input');
-        document.getElementById('data-tools-menu')?.querySelector('[onclick="importBookmarks()"]')?.addEventListener('click', async () => {
+
+        const importDataBtn = document.getElementById('import-data-btn');
+        if (importDataBtn) {
+            importDataBtn.addEventListener('click', () => showImportChooser(importFileInput));
+        }
+    }
+
+    function showImportChooser(importFileInput) {
+        toggleOverlay('import-chooser-overlay', true);
+
+        const close = () => toggleOverlay('import-chooser-overlay', false);
+
+        const bookmarkChoice = getEl('import-bookmark-choice');
+        const configChoice = getEl('import-config-choice');
+        const cancelBtn = getEl('import-chooser-cancel');
+        if (bookmarkChoice) bookmarkChoice.onclick = async () => {
+            close();
+            const bookmarkFileInput = getEl('bookmark-file-input');
             const { importBookmarks } = await import('./bookmarks.js');
             importBookmarks(bookmarkFileInput);
-        });
+        };
+        if (configChoice) configChoice.onclick = async () => {
+            close();
+            const { importData } = await import('./auth.js');
+            await importData(importFileInput);
+        };
+        if (cancelBtn) cancelBtn.onclick = close;
     }
 
     // 分类选择下拉 (在编辑弹窗中)

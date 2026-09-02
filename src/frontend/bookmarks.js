@@ -59,6 +59,7 @@ async function handleBookmarkFile(file) {
         for (const link of links) {
             if (existing.has(link.url)) continue;
             existing.add(link.url);
+            link.category = cat;
             categories[cat].links.push(link);
             added++;
         }

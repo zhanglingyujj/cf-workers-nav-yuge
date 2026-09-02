@@ -73,8 +73,14 @@ if (menuToggleBtn && dropdown) {
     }
 
     if (backToTopBtn) {
+        let backTopRaf = false;
         window.addEventListener('scroll', () => {
-            backToTopBtn.classList.toggle('hidden', window.scrollY <= 300);
+            if (backTopRaf) return;
+            backTopRaf = true;
+            requestAnimationFrame(() => {
+                backTopRaf = false;
+                backToTopBtn.classList.toggle('backtop-hidden', window.scrollY <= 300);
+            });
         }, { passive: true });
     }
 
@@ -105,45 +111,60 @@ if (menuToggleBtn && dropdown) {
         bgMask.style.backgroundColor = `rgba(13, 14, 16, ${val / 100})`;
     }
 
-// 从服务器加载设置 (公开接口, 无鉴权)
+// 从服务器加载设置 (公开接口, 无鉴权)；服务器无值时回退 localStorage 镜像
     async function loadBackgroundSettings() {
+        let settings = null;
         try {
             const res = await fetch('/api/settings');
             if (!res.ok) throw new Error('Not available');
-            const settings = await res.json();
-            const imgUrl = settings.backgroundImage || '';
-            const opacity = settings.backgroundOpacity || 20;
-            const blurVal = settings.backgroundBlur || 0;
-            if (bgImageInput) bgImageInput.value = imgUrl;
-            if (bgOpacitySlider && bgOpacityValue) {
-                bgOpacitySlider.value = opacity;
-                bgOpacityValue.textContent = opacity + '%';
-                applyBgOpacity(opacity);
-            }
-            if (bgBlurSlider && bgBlurValue) {
-                bgBlurSlider.value = blurVal;
-                bgBlurValue.textContent = blurVal + 'px';
-            }
-            applyBgImage(imgUrl);
+            settings = await res.json();
         } catch (e) {
-            // Fallback 到 localStorage
-            const imgUrl = localStorage.getItem('backgroundImage') || '';
-            const opacityVal = localStorage.getItem('backgroundOpacity');
-            const blurVal = localStorage.getItem('backgroundBlur');
-            if (bgImageInput) bgImageInput.value = imgUrl;
-            applyBgImage(imgUrl);
-            if (bgOpacitySlider && bgOpacityValue && opacityVal !== null) {
-                const opacity = parseInt(opacityVal) || 20;
-                bgOpacitySlider.value = opacity;
-                bgOpacityValue.textContent = opacity + '%';
-                applyBgOpacity(opacity);
-            }
-            if (bgBlurSlider && bgBlurValue && blurVal !== null) {
-                const blur = parseInt(blurVal) || 0;
-                bgBlurSlider.value = blur;
-                bgBlurValue.textContent = blur + 'px';
-            }
+            settings = null;
         }
+
+        const hasServerValue = settings && (
+            'backgroundImage' in settings || 'backgroundOpacity' in settings || 'backgroundBlur' in settings
+        );
+        if (!hasServerValue) {
+            settings = {
+                backgroundImage: localStorage.getItem('backgroundImage') || '',
+                backgroundOpacity: localStorage.getItem('backgroundOpacity') !== null
+                    ? parseInt(localStorage.getItem('backgroundOpacity')) : 20,
+                backgroundBlur: localStorage.getItem('backgroundBlur') !== null
+                    ? parseInt(localStorage.getItem('backgroundBlur')) : 0,
+            };
+        } else {
+            // 镜像到 localStorage，保证下次离线/降级时也有值
+            localStorage.setItem('backgroundImage', settings.backgroundImage || '');
+            if ('backgroundOpacity' in settings) localStorage.setItem('backgroundOpacity', String(settings.backgroundOpacity));
+            if ('backgroundBlur' in settings) localStorage.setItem('backgroundBlur', String(settings.backgroundBlur));
+        }
+
+        const imgUrl = settings.backgroundImage || '';
+        const opacity = Number.isFinite(+settings.backgroundOpacity) && settings.backgroundOpacity !== null
+            ? +settings.backgroundOpacity : 20;
+        const blurVal = Number.isFinite(+settings.backgroundBlur) && settings.backgroundBlur !== null
+            ? +settings.backgroundBlur : 0;
+
+        if (bgImageInput) bgImageInput.value = imgUrl;
+        if (bgOpacitySlider && bgOpacityValue) {
+            bgOpacitySlider.value = opacity;
+            bgOpacityValue.textContent = opacity + '%';
+            applyBgOpacity(opacity);
+        }
+        if (bgBlurSlider && bgBlurValue) {
+            bgBlurSlider.value = blurVal;
+            bgBlurValue.textContent = blurVal + 'px';
+        }
+        applyBgImage(imgUrl);
+    }
+
+    // 立即镜像到 localStorage，并 debounce 保存到服务器
+    function persistBgSettings() {
+        localStorage.setItem('backgroundImage', bgImageInput ? bgImageInput.value.trim() : '');
+        localStorage.setItem('backgroundOpacity', String(bgOpacitySlider ? parseInt(bgOpacitySlider.value) : 20));
+        localStorage.setItem('backgroundBlur', String(bgBlurSlider ? parseInt(bgBlurSlider.value) : 0));
+        scheduleSaveSettings();
     }
 
     // debounce 保存到服务器
@@ -169,7 +190,7 @@ if (menuToggleBtn && dropdown) {
         bgImageInput.addEventListener('input', () => {
             const url = bgImageInput.value.trim();
             applyBgImage(url);
-            scheduleSaveSettings();
+            persistBgSettings();
         });
     }
 
@@ -178,7 +199,7 @@ if (menuToggleBtn && dropdown) {
             const val = parseInt(bgOpacitySlider.value);
             bgOpacityValue.textContent = val + '%';
             applyBgOpacity(val);
-            scheduleSaveSettings();
+            persistBgSettings();
         });
     }
 
@@ -191,7 +212,7 @@ if (menuToggleBtn && dropdown) {
             if (customBgImage.style.backgroundImage) {
                 customBgImage.style.filter = `blur(${val}px)`;
             }
-            scheduleSaveSettings();
+            persistBgSettings();
         });
     }
 

@@ -19,8 +19,7 @@ export function initTooltip() {
                 if (activeTarget !== target) {
                     activeTarget = target;
                     tooltip.textContent = text;
-                    tooltip.classList.remove('hidden');
-                    tooltipVisible = true;
+                    showTooltip();
                 }
                 const offset = 12;
                 let left = e.clientX + offset;
@@ -41,15 +40,24 @@ export function initTooltip() {
             hideTooltipInternal();
         }
     };
+    const showTooltip = () => {
+        if (!tooltipVisible) {
+            tooltip.classList.remove('opacity-0');
+            tooltipVisible = true;
+        }
+    };
 
     const hideTooltipInternal = () => {
         if (tooltipVisible) {
-            tooltip.classList.add('hidden');
+            tooltip.classList.add('opacity-0');
             activeTarget = null;
             tooltipVisible = false;
         }
     };
 
     document.body.addEventListener('mousemove', updateTooltip, { passive: true });
+    document.body.addEventListener('mouseleave', hideTooltipInternal);
     window.addEventListener('scroll', hideTooltipInternal, { passive: true });
+    // 触摸设备：触摸开始即隐藏，长按不弹 tooltip
+    document.body.addEventListener('touchstart', hideTooltipInternal, { passive: true });
 }

@@ -110,7 +110,17 @@
 
         #custom-tooltip {
             z-index: 100;
-            transition: opacity 0.1s ease-in-out;
+            transition: opacity 0.15s ease-in-out;
+        }
+
+        /* 返回顶部按钮（Sun-Panel 风格：玻璃底 + 柔光） */
+        #back-to-top-btn {
+            transition: opacity 0.3s ease, transform 0.3s ease, background-color 0.2s ease;
+        }
+        #back-to-top-btn.backtop-hidden {
+            opacity: 0;
+            transform: translateY(10px);
+            pointer-events: none;
         }
     </style></head>
 
@@ -204,13 +214,9 @@
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                                             导出配置
                                         </button>
-                                        <button onclick="importData()" class="w-full text-left px-3 py-2 rounded-lg text-sm text-heritage-outline hover:bg-heritage-dark-700/50 hover:text-green-600 transition-colors flex items-center gap-3">
+                                        <button id="import-data-btn" class="w-full text-left px-3 py-2 rounded-lg text-sm text-heritage-outline hover:bg-heritage-dark-700/50 hover:text-green-600 transition-colors flex items-center gap-3">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4-4m0 0l-4 4m4-4v12"></path></svg>
-                                            导入配置
-                                        </button>
-                                        <button onclick="importBookmarks()" class="w-full text-left px-3 py-2 rounded-lg text-sm text-heritage-outline hover:bg-heritage-dark-700/50 hover:text-blue-600 transition-colors flex items-center gap-3">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h7l5 5v11a2 2 0 01-2 2H7a2 2 0 01-2-2V5zM14 3v6h6"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6M9 17h6"></path></svg>
-                                            导入书签
+                                            导入数据
                                         </button>
                                         <!-- 文件输入框 (隐藏) -->
                                         <input type="file" id="import-file-input" accept=".json" class="hidden">
@@ -271,10 +277,10 @@
         <!-- 内容渲染容器 -->
         <div id="sections-container" class="space-y-12"></div>
 
-        <!-- 返回顶部按钮独立放置 -->
-        <div class="fixed bottom-8 right-8 z-50">
-            <button id="back-to-top-btn" class="hidden w-12 h-12 rounded-2xl bg-heritage-dark-800/90 text-heritage-dark-300 border border-heritage-dark-700 shadow-lg backdrop-blur-sm flex items-center justify-center transition-all hover:scale-110 hover:bg-heritage-dark-700 has-tooltip group" data-tooltip="返回顶部">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
+        <!-- 返回顶部按钮独立放置（Sun-Panel 风格） -->
+        <div class="fixed bottom-3 right-3 z-50">
+            <button id="back-to-top-btn" aria-label="返回顶部" class="backtop-hidden w-9 h-9 rounded-lg bg-[#2a2a2a6b] text-white shadow-[0_0_10px_2px_rgba(0,0,0,0.2)] backdrop-blur-sm flex items-center justify-center hover:bg-[#2a2a2a8c] active:scale-95">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h14"></path><path d="M12 21V8"></path><path d="M6 13l6-6 6 6"></path></svg>
             </button>
         </div>
         
@@ -390,6 +396,33 @@
         </div>
     </div>
 
+    <!-- 导入类型选择弹窗 -->
+    <div id="import-chooser-overlay" class="fixed inset-0 z-[85] bg-heritage-dark-900/50 backdrop-blur-[2px] flex items-center justify-center p-4 transition-opacity duration-300 overlay-hidden">
+        <div id="import-chooser-box" class="bg-heritage-dark-800 rounded-2xl shadow-2xl p-6 w-full max-w-sm border border-heritage-dark-700 transform transition-all duration-300 dialog-scale-hidden">
+            <h3 class="text-lg font-bold mb-4 text-white">导入数据</h3>
+            <p class="text-heritage-dark-300 mb-4 text-sm">请选择导入类型：</p>
+            <div class="space-y-3 mb-6">
+                <button id="import-bookmark-choice" class="w-full px-4 py-3 rounded-xl border border-heritage-dark-600 hover:border-heritage-500/60 hover:bg-heritage-dark-700/50 text-left transition-colors">
+                    <div class="text-sm font-medium text-white flex items-center gap-2">
+                        <svg class="w-4 h-4 text-heritage-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h7l5 5v11a2 2 0 01-2 2H7a2 2 0 01-2-2V5zM14 3v6h6"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6M9 17h6"></path></svg>
+                        导入书签（追加合并）
+                    </div>
+                    <div class="text-xs text-heritage-dark-300 mt-1">支持浏览器书签 HTML、Sun-Panel JSON，按 URL 去重后追加</div>
+                </button>
+                <button id="import-config-choice" class="w-full px-4 py-3 rounded-xl border border-heritage-dark-600 hover:border-heritage-500/60 hover:bg-heritage-dark-700/50 text-left transition-colors">
+                    <div class="text-sm font-medium text-white flex items-center gap-2">
+                        <svg class="w-4 h-4 text-heritage-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        导入配置（覆盖现有）
+                    </div>
+                    <div class="text-xs text-heritage-dark-300 mt-1">本站导出的 JSON，导入后将替换全部现有数据</div>
+                </button>
+            </div>
+            <div class="flex justify-end">
+                <button id="import-chooser-cancel" class="px-4 py-2 text-sm rounded-xl text-heritage-dark-300 hover:bg-heritage-dark-700 transition-colors font-medium">取消</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Loading Mask (z-index 100) -->
     <div id="loading-mask" class="fixed inset-0 z-[100] bg-heritage-dark-900/90 backdrop-blur-sm hidden flex flex-col items-center justify-center transition-opacity">
         <div class="relative w-16 h-16">
@@ -400,7 +433,7 @@
     </div>
 
     <!-- Tooltip Container -->
-    <div id="custom-tooltip" class="fixed hidden pointer-events-none max-w-xs whitespace-pre-wrap border leading-relaxed tracking-wide backdrop-blur-md rounded-xl px-4 py-2 text-sm transition-opacity duration-150 bg-heritage-dark-800/90 text-heritage-outline border-heritage-dark-700/50">
+    <div id="custom-tooltip" class="fixed pointer-events-none max-w-xs whitespace-pre-wrap border leading-relaxed tracking-wide backdrop-blur-md rounded-xl px-4 py-2 text-sm transition-opacity duration-150 opacity-0 bg-heritage-dark-800/90 text-heritage-outline border-heritage-dark-700/50">
     </div>
 
 

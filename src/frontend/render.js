@@ -137,7 +137,7 @@ export function patchCategory(categoryName) {
     links.forEach((link, idx) => {
         const existingCard = existingCards.find(c => c.getAttribute('data-url') === link.url);
         if (existingCard) {
-            updateCardElement(existingCard, link);
+            updateCardElement(existingCard, link, categoryName);
             const currentIdx = Array.from(cardContainer.children).indexOf(existingCard);
             if (currentIdx !== -1 && currentIdx !== idx) {
                 const refNode = cardContainer.children[idx];
@@ -146,7 +146,7 @@ export function patchCategory(categoryName) {
                 }
             }
         } else {
-            const newCard = createCardElement(link);
+            const newCard = createCardElement(link, categoryName);
             if (!newCard) return;
             const refNode = cardContainer.children[idx];
             if (refNode) {
@@ -197,7 +197,7 @@ const catData = getCategories()[categoryName];
     section.appendChild(cardContainer);
 
     filteredLinks.forEach(link => {
-        const card = createCardElement(link);
+        const card = createCardElement(link, categoryName);
         if (card) cardContainer.appendChild(card);
     });
 

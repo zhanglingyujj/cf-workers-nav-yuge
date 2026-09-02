@@ -10,8 +10,8 @@ const DEFAULT_CARD_BG = 'rgba(42, 42, 42, 0.32)';
 // 极简卡（APP 布局）图标槽玻璃底：接近透明，仅作轻微衬托
 const APP_ICON_BG = 'rgba(42, 42, 42, 0.14)';
 
-export function cardBackgroundColor(link) {
-    if (isCategoryAppLayout(link.category)) {
+export function cardBackgroundColor(link, categoryName) {
+    if (isCategoryAppLayout(categoryName || link.category)) {
         return link.backgroundColor || APP_ICON_BG;
     }
     return link.backgroundColor || DEFAULT_CARD_BG;
@@ -37,10 +37,10 @@ function textColorForBackground(bg) {
     return luminance > 0.5 ? '#1A1C1E' : '#FFFFFF';
 }
 
-export function createCardElement(link) {
+export function createCardElement(link, categoryName) {
     if (!isEditMode() && link.isPrivate && !isLoggedIn()) return null;
 
-    const isApp = isCategoryAppLayout(link.category);
+    const isApp = isCategoryAppLayout(categoryName || link.category);
     const card = document.createElement('div');
     card.className = isApp
         ? 'group relative h-full w-full flex flex-col items-center justify-start py-1 transition-all duration-200 cursor-pointer select-none card'
@@ -54,7 +54,7 @@ export function createCardElement(link) {
     card.dataset.isPrivate = link.isPrivate;
     card.dataset.url = link.url;
 
-    const bg = cardBackgroundColor(link);
+    const bg = cardBackgroundColor(link, categoryName);
 
     if (isApp) {
         // 极简卡：70px 图标槽（极轻玻璃底，图标为主角）+ 下方居中标题，无描述
@@ -95,18 +95,15 @@ export function createCardElement(link) {
     }
 
     if (isEditMode()) {
-        card.appendChild(createEditControls(link, card));
+        card.appendChild(createEditControls(link, card, isApp, categoryName));
     }
 
-    if (!isEditMode() && link.tips) {
-        card.classList.add('has-tooltip');
-        card.setAttribute('data-tooltip', link.tips);
-    }
+    applyTooltip(card, link, isApp);
 
     return card;
 }
 
-export function updateCardElement(card, newLink) {
+export function updateCardElement(card, newLink, categoryName) {
     card.dataset.url = newLink.url;
     card.dataset.isPrivate = newLink.isPrivate;
     card.setAttribute('data-url', newLink.url);
@@ -127,8 +124,8 @@ export function updateCardElement(card, newLink) {
         }
     }
 
-    const bg = cardBackgroundColor(newLink);
-    if (isCategoryAppLayout(newLink.category)) {
+    const bg = cardBackgroundColor(newLink, categoryName);
+    if (isCategoryAppLayout(categoryName || newLink.category)) {
         const slot = card.querySelector(':scope > div');
         if (slot) slot.style.backgroundColor = bg;
     } else {
@@ -136,9 +133,21 @@ export function updateCardElement(card, newLink) {
         card.style.color = textColorForBackground(bg);
     }
 
-    if (!isEditMode() && newLink.tips) {
+    applyTooltip(card, newLink, isCategoryAppLayout(categoryName || newLink.category));
+}
+
+// 悬停提示：极简卡始终显示完整名称（截断兜底），有描述时附描述；详情卡仅在有描述时提示
+function applyTooltip(card, link, isApp) {
+    if (isEditMode()) return;
+    if (isApp) {
         card.classList.add('has-tooltip');
-        card.setAttribute('data-tooltip', newLink.tips);
+        card.setAttribute('data-tooltip', link.tips ? `${link.name}\n${link.tips}` : link.name);
+    } else if (link.tips) {
+        card.classList.add('has-tooltip');
+        card.setAttribute('data-tooltip', link.tips);
+    } else {
+        card.classList.remove('has-tooltip');
+        card.removeAttribute('data-tooltip');
     }
 }
 
@@ -162,14 +171,14 @@ function createIconImage(link, className) {
     return img;
 }
 
-function createEditControls(link, card) {
+function createEditControls(link, card, isApp, categoryName) {
     const actionWrapper = document.createElement('div');
-    actionWrapper.className = isCategoryAppLayout(link.category)
+    actionWrapper.className = isApp
         ? 'absolute top-[-4px] right-[-4px] z-50'
         : 'absolute top-2 right-2 z-50';
 
     const menuBtn = document.createElement('button');
-    const btnStyle = isCategoryAppLayout(link.category)
+    const btnStyle = isApp
         ? 'w-6 h-6 rounded-full bg-heritage-dark-700 text-heritage-dark-300 shadow-sm hover:bg-heritage-500 hover:text-white'
         : 'w-7 h-7 rounded-lg text-white/70 hover:text-white hover:bg-heritage-dark-700/80 backdrop-blur-sm';
 
@@ -209,7 +218,7 @@ function createEditControls(link, card) {
     dropdown.querySelector('.menu-edit').addEventListener('click', (e) => {
         e.stopPropagation();
         dropdown.classList.add('hidden');
-        import('./dialogs.js').then(m => m.showEditDialog(link));
+        import('./dialogs.js').then(m => m.showEditDialog(link, categoryName));
     });
 
     dropdown.querySelector('.menu-delete').addEventListener('click', (e) => {

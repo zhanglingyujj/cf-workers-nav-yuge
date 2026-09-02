@@ -102,7 +102,7 @@ export function doSearch(query) {
 
             import('./card.js').then(m => {
                 links.forEach(link => {
-                    const card = m.createCardElement(link);
+                    const card = m.createCardElement(link, cat);
                     if (card) cardContainer.appendChild(card);
                 });
             });
