@@ -9,10 +9,7 @@ const FRONTEND_DIR = 'src/frontend';
 // 源码中出现、但无需 CSS 定义的业务 class（JS 选择器钩子 / 历史遗留死类）
 // 若某工具类被误报缺失，先确认是否真的需要 safelist，而不是往这里塞
 const KNOWN_NON_CSS_CLASSES = new Set([
-    'mask-gradient', 'shadow-glass', 'animation-delay-2000', // Play CDN 时代就未定义的死类
-    'hover:border-heritage-300', // heritage-300 不在色板中，一直未生效
-    'custom-scrollbar',          // 无 CSS 定义且无 JS 引用的死类
-    'has-tooltip',               // JS 选择器钩子（tooltip.js 委托）
+    'has-tooltip', // JS 选择器钩子（tooltip.js 委托）
 ]);
 
 function compileTailwindCss() {

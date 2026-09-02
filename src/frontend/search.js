@@ -50,7 +50,7 @@ function renderEngineMenu(menu) {
 
     engineList.forEach(key => {
         const btn = document.createElement('button');
-        btn.className = "w-full text-left px-3 py-2.5 text-sm text-heritage-primary dark:text-heritage-outline hover:bg-heritage-50 dark:hover:bg-slate-700 hover:text-heritage-600 transition-colors flex items-center gap-3";
+        btn.className = "w-full text-left px-3 py-2.5 text-sm text-heritage-primary dark:text-heritage-outline hover:bg-heritage-50 dark:hover:bg-heritage-dark-700 hover:text-heritage-600 transition-colors flex items-center gap-3";
         btn.innerHTML = `${searchEngineIcons[key]}<span>${searchEngineLabels[key]}</span>`;
         btn.addEventListener('click', () => selectEngine(key));
         list.appendChild(btn);
@@ -88,9 +88,9 @@ export function doSearch(query) {
             section.id = cat;
 
             const titleContainer = document.createElement('div');
-            titleContainer.className = 'flex items-center gap-3 mb-5 pb-2 border-b border-heritage-outline/60 dark:border-slate-700/60';
+            titleContainer.className = 'flex items-center gap-3 mb-5 pb-2 border-b border-heritage-outline/60 dark:border-heritage-dark-700/60';
             const title = document.createElement('h2');
-            title.className = 'text-lg font-bold text-heritage-primary dark:text-slate-100 flex items-center gap-2';
+            title.className = 'text-lg font-bold text-heritage-primary dark:text-heritage-dark-100 flex items-center gap-2';
             title.innerHTML = `<span class="w-1.5 h-5 bg-heritage-500 rounded-full inline-block shadow-sm"></span> ${cat}`;
             titleContainer.appendChild(title);
             section.appendChild(titleContainer);

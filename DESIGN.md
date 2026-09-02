@@ -13,37 +13,37 @@ colors:
   outline: "#D1CDC5"
 typography:
   h1:
-    fontFamily: Public Sans
+    fontFamily: system-ui stack
     fontSize: 3rem
     fontWeight: 700
     lineHeight: 1.2
   h2:
-    fontFamily: Public Sans
+    fontFamily: system-ui stack
     fontSize: 2rem
     fontWeight: 600
     lineHeight: 1.3
   body-lg:
-    fontFamily: Public Sans
+    fontFamily: system-ui stack
     fontSize: 1.125rem
     fontWeight: 400
     lineHeight: 1.6
   body-md:
-    fontFamily: Public Sans
+    fontFamily: system-ui stack
     fontSize: 1rem
     fontWeight: 400
     lineHeight: 1.5
   body-sm:
-    fontFamily: Public Sans
+    fontFamily: system-ui stack
     fontSize: 0.875rem
     fontWeight: 400
     lineHeight: 1.5
   label-caps:
-    fontFamily: Space Grotesk
+    fontFamily: system-ui stack
     fontSize: 0.75rem
     fontWeight: 600
     letterSpacing: 0.05em
   mono:
-    fontFamily: JetBrains Mono
+    fontFamily: monospace stack
     fontSize: 0.875rem
     fontWeight: 400
 rounded:
@@ -103,10 +103,9 @@ The palette is rooted in high-contrast neutrals and a single warm accent color.
 
 ## Typography
 
-Two typefaces working in tandem: Public Sans for readability, Space Grotesk for punctuation.
+系统字体栈，零外部字体请求（无 Google Fonts 外链、无 font-display 闪烁）：
 
-- **Public Sans** drives body text and headlines with clean, open letterforms that read well at any size.
-- **Space Grotesk** is reserved for labels, badges, and UI microcopy — its distinctive character draws attention where needed.
+- 栈：`-apple-system, system-ui, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif`；代码等宽场景用 `ui-monospace, monospace`。
 - **Hierarchy:** Scale from h1 (3rem) down to body-sm (0.875rem). Maintain generous line-height (1.2–1.6) for readability.
 
 ## Layout & Spacing
@@ -147,7 +146,7 @@ Component tokens reference the primitives above, ensuring consistency and making
 
 - **Do** use generous whitespace. Content should float, not fill.
 - **Do** use tertiary as the sole accent. Avoid introducing new accent colors.
-- **Do** prefer Public Sans for body text. Reserve Space Grotesk for labels only.
+- **Do** use the system font stack everywhere. Avoid web-font external links.
 - **Don't** use pure black (#000) or pure white (#FFF) as neutrals — they feel harsh against the warm palette.
 - **Don't** add drop shadows on light backgrounds — use subtle borders instead.
 - **Don't** compress spacing below the 8px grid — the system depends on breathing room.

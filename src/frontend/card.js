@@ -12,8 +12,8 @@ export function createCardElement(link) {
 let cardBaseClass = isCategoryAppLayout(link.category)
         ? 'flex flex-col items-center justify-start py-2 px-2 gap-1.5 hover:z-10 bg-transparent transition-all duration-200 ease-[cubic-bezier(0.25,0.8,0.25,1)]'
         : (isEditMode()
-            ? 'flex items-center px-2.5 py-2 h-[62px] bg-white/30 dark:bg-[#1e293b]/30 backdrop-blur-md hover:bg-white/50 dark:hover:bg-[#1e293b]/40 shadow-sm hover:shadow-[0_0_20px_8px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_0_20px_10px_rgba(0,0,0,0.35)] transition-all duration-200 ease-[cubic-bezier(0.25,0.8,0.25,1)]'
-            : 'flex items-center px-2.5 py-2 min-h-[62px] bg-white/30 dark:bg-[#1e293b]/30 backdrop-blur-md hover:bg-white/50 dark:hover:bg-[#1e293b]/40 shadow-sm hover:shadow-[0_0_20px_8px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_0_20px_10px_rgba(0,0,0,0.35)] transition-all duration-200 ease-[cubic-bezier(0.25,0.8,0.25,1)]');
+            ? 'flex items-center px-2.5 py-2 h-[62px] bg-white/30 dark:bg-heritage-dark-800/30 backdrop-blur-md hover:bg-white/50 dark:hover:bg-heritage-dark-800/40 shadow-sm hover:shadow-[0_0_20px_8px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_0_20px_10px_rgba(0,0,0,0.35)] transition-all duration-200 ease-[cubic-bezier(0.25,0.8,0.25,1)]'
+            : 'flex items-center px-2.5 py-2 min-h-[62px] bg-white/30 dark:bg-heritage-dark-800/30 backdrop-blur-md hover:bg-white/50 dark:hover:bg-heritage-dark-800/40 shadow-sm hover:shadow-[0_0_20px_8px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_0_20px_10px_rgba(0,0,0,0.35)] transition-all duration-200 ease-[cubic-bezier(0.25,0.8,0.25,1)]');
 
     card.className = `group relative h-full w-full rounded-2xl overflow-visible transition-all duration-200 ease-[cubic-bezier(0.25,0.8,0.25,1)] cursor-pointer select-none card ${cardBaseClass}`;
 
@@ -54,8 +54,8 @@ textBlock.className = 'flex-1 min-w-0 ml-1.5 flex flex-col justify-center';
 
         const desc = document.createElement('div');
 desc.className = isEditMode()
-            ? 'text-xs text-heritage-secondary dark:text-slate-400 line-clamp-1 card-tip leading-relaxed pointer-events-none'
-            : 'text-xs text-heritage-secondary dark:text-slate-400 line-clamp-2 card-tip leading-relaxed pointer-events-none';
+            ? 'text-xs text-heritage-secondary dark:text-heritage-dark-400 line-clamp-1 card-tip leading-relaxed pointer-events-none'
+            : 'text-xs text-heritage-secondary dark:text-heritage-dark-400 line-clamp-2 card-tip leading-relaxed pointer-events-none';
         desc.textContent = link.tips || '';
         textBlock.appendChild(desc);
 
@@ -109,9 +109,9 @@ function createIconImage(link) {
 
     let iconClass = '';
 if (isCategoryAppLayout(link.category)) {
-        iconClass = 'w-[70px] h-[70px] rounded-2xl object-contain bg-white/30 dark:bg-[#1e293b]/30 backdrop-blur-md shadow-sm p-2 transition-all duration-200 ease-[cubic-bezier(0.25,0.8,0.25,1)] group-hover:bg-white/50 dark:group-hover:bg-[#1e293b]/40 group-hover:shadow-[0_0_20px_8px_rgba(0,0,0,0.12)] dark:group-hover:shadow-[0_0_20px_10px_rgba(0,0,0,0.35)] group-hover:scale-105 group-active:scale-95 z-10';
+        iconClass = 'w-[70px] h-[70px] rounded-2xl object-contain bg-white/30 dark:bg-heritage-dark-800/30 backdrop-blur-md shadow-sm p-2 transition-all duration-200 ease-[cubic-bezier(0.25,0.8,0.25,1)] group-hover:bg-white/50 dark:group-hover:bg-heritage-dark-800/40 group-hover:shadow-[0_0_20px_8px_rgba(0,0,0,0.12)] dark:group-hover:shadow-[0_0_20px_10px_rgba(0,0,0,0.35)] group-hover:scale-105 group-active:scale-95 z-10';
     } else {
-        iconClass = 'w-[50px] h-[50px] rounded-lg object-contain bg-heritage-variant/40 dark:bg-slate-900/30 backdrop-blur-sm p-0.5 transition-transform duration-200 group-hover:scale-105 pointer-events-none';
+        iconClass = 'w-[50px] h-[50px] rounded-lg object-contain bg-heritage-variant/40 dark:bg-heritage-dark-900/30 backdrop-blur-sm p-0.5 transition-transform duration-200 group-hover:scale-105 pointer-events-none';
     }
     img.className = iconClass;
 
@@ -136,22 +136,22 @@ actionWrapper.className = isCategoryAppLayout(link.category)
 
     const menuBtn = document.createElement('button');
     const btnStyle = isCategoryAppLayout(link.category)
-        ? 'w-6 h-6 rounded-full bg-heritage-outline dark:bg-slate-700 text-heritage-primary dark:text-slate-300 shadow-sm hover:bg-heritage-500 hover:text-white'
-        : 'w-7 h-7 rounded-lg text-slate-400 hover:text-heritage-primary hover:bg-heritage-variant/80 backdrop-blur-sm';
+        ? 'w-6 h-6 rounded-full bg-heritage-outline dark:bg-heritage-dark-700 text-heritage-primary dark:text-heritage-dark-300 shadow-sm hover:bg-heritage-500 hover:text-white'
+        : 'w-7 h-7 rounded-lg text-heritage-dark-400 hover:text-heritage-primary hover:bg-heritage-variant/80 backdrop-blur-sm';
 
     menuBtn.className = `${btnStyle} flex items-center justify-center transition-all duration-200`;
     menuBtn.innerHTML = '<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>';
 
     const dropdown = document.createElement('div');
-dropdown.className = 'hidden fixed w-28 bg-white dark:bg-[#1e293b] rounded-xl shadow-xl ring-1 ring-black/5 dark:ring-white/10 overflow-hidden transform origin-top-right transition-all z-[9999] flex flex-col p-1 card-menu-dropdown';
+dropdown.className = 'hidden fixed w-28 bg-white dark:bg-heritage-dark-800 rounded-xl shadow-xl ring-1 ring-black/5 dark:ring-white/10 overflow-hidden transform origin-top-right transition-all z-[9999] flex flex-col p-1 card-menu-dropdown';
     document.body.appendChild(dropdown);
 
     dropdown.innerHTML = `
-        <button class="menu-edit w-full text-left px-3 py-2 rounded-lg text-xs font-medium text-heritage-primary dark:text-heritage-outline hover:bg-heritage-50 dark:hover:bg-slate-700/50 hover:text-heritage-600 transition-colors flex items-center gap-2">
+        <button class="menu-edit w-full text-left px-3 py-2 rounded-lg text-xs font-medium text-heritage-primary dark:text-heritage-outline hover:bg-heritage-50 dark:hover:bg-heritage-dark-700/50 hover:text-heritage-600 transition-colors flex items-center gap-2">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
             编辑
         </button>
-        <button class="menu-delete w-full text-left px-3 py-2 rounded-lg text-xs font-medium heritage-primary dark:text-heritage-outline hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-500 transition-colors flex items-center gap-2">
+        <button class="menu-delete w-full text-left px-3 py-2 rounded-lg text-xs font-medium text-heritage-primary dark:text-heritage-outline hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-500 transition-colors flex items-center gap-2">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
             删除
         </button>
