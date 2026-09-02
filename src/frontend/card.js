@@ -8,7 +8,7 @@ const fallbackSrc = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg
 // Sun-Panel 默认详情卡底色 #2a2a2a6b；本项目调轻为 0.32 + 极弱亮边
 const DEFAULT_CARD_BG = 'rgba(42, 42, 42, 0.32)';
 // 极简卡（APP 布局）图标槽玻璃底：接近透明，仅作轻微衬托
-const APP_ICON_BG = 'rgba(42, 42, 42, 0.15)';
+const APP_ICON_BG = 'rgba(42, 42, 42, 0.12)';
 
 export function cardBackgroundColor(link) {
     if (isCategoryAppLayout(link.category)) {
@@ -59,9 +59,9 @@ export function createCardElement(link) {
     if (isApp) {
         // 极简卡：70px 图标槽（极轻玻璃底，图标为主角）+ 下方居中标题，无描述
         const iconSlot = document.createElement('div');
-        iconSlot.className = 'w-[70px] h-[70px] rounded-2xl overflow-hidden flex items-center justify-center transition-all duration-200 hover:shadow-[0_0_20px_10px_rgba(0,0,0,0.2)]';
+        iconSlot.className = 'w-[64px] h-[64px] rounded-2xl overflow-hidden flex items-center justify-center transition-all duration-200 hover:shadow-[0_0_20px_10px_rgba(0,0,0,0.2)]';
         iconSlot.style.backgroundColor = bg;
-        iconSlot.appendChild(createIconImage(link, 'w-[58px] h-[58px] object-contain'));
+        iconSlot.appendChild(createIconImage(link, 'w-[56px] h-[56px] object-contain'));
         card.appendChild(iconSlot);
 
         const title = document.createElement('div');
