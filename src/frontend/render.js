@@ -117,16 +117,16 @@ export function patchCategory(categoryName) {
     if (!cardContainer) return;
 
     const existingCards = Array.from(cardContainer.querySelectorAll('.card'));
-    const existingUrls = new Set(existingCards.map(c => c.getAttribute('data-url')));
-    const newUrls = new Set(links.map(l => l.url));
+    const existingIds = new Set(existingCards.map(c => c.getAttribute('data-card-id')));
+    const newIds = new Set(links.map(l => l.id));
 
     existingCards.forEach(card => {
-        const url = card.getAttribute('data-url');
-        if (!newUrls.has(url)) card.remove();
+        const id = card.getAttribute('data-card-id');
+        if (!newIds.has(id)) card.remove();
     });
 
     links.forEach((link, idx) => {
-        const existingCard = existingCards.find(c => c.getAttribute('data-url') === link.url);
+        const existingCard = existingCards.find(c => c.getAttribute('data-card-id') === link.id);
         if (existingCard) {
             updateCardElement(existingCard, link, categoryName);
             const currentIdx = Array.from(cardContainer.children).indexOf(existingCard);

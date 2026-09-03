@@ -53,6 +53,7 @@ export function createCardElement(link, categoryName) {
 
     card.dataset.isPrivate = link.isPrivate;
     card.dataset.url = link.url;
+    card.dataset.cardId = link.id;
 
     const bg = cardBackgroundColor(link, categoryName);
 
@@ -106,6 +107,7 @@ export function createCardElement(link, categoryName) {
 export function updateCardElement(card, newLink, categoryName) {
     card.dataset.url = newLink.url;
     card.dataset.isPrivate = newLink.isPrivate;
+    card.dataset.cardId = newLink.id;
     card.setAttribute('data-url', newLink.url);
 
     const titleEl = card.querySelector('.card-title');

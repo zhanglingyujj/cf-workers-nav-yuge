@@ -1,23 +1,10 @@
 // drag.js - 拖拽排序 (PC + 移动端) ★ 本地优先 + 合并异步保存
-import { isEditMode, getCategories, reorderCards } from './state.js';
+import { isEditMode, getCategories, reorderCards, findLinkById } from './state.js';
 import { patchCategory, renderAll } from './render.js';
 import { commitSoon } from './commit.js';
 
 let draggedCard = null;
 let initialDragState = { category: null, index: -1 };
-let _linkIndex = new Map();
-
-function buildLinkIndex() {
-    _linkIndex.clear();
-    const categories = getCategories();
-    for (const cat in categories) {
-        categories[cat].links.forEach(l => _linkIndex.set(l.url, l));
-    }
-}
-
-function findLinkByUrl(url) {
-    return _linkIndex.get(url);
-}
 
 function getCardState(card) {
     if (!card) return { category: null, index: -1 };
@@ -58,7 +45,6 @@ async function drop(e) {
     e.preventDefault();
     if (!draggedCard) return;
 
-buildLinkIndex();
     const newState = getCardState(draggedCard);
     const changed = newState.category !== initialDragState.category || newState.index !== initialDragState.index;
     if (changed) {
@@ -81,11 +67,11 @@ function debouncedSaveOrder() {
 }
 
 function updateCardCategory(card, newCategory) {
-    const url = card.getAttribute('data-url');
+    const id = card.getAttribute('data-card-id');
     let item = null;
     const categories = getCategories();
     for (const cat in categories) {
-        const idx = categories[cat].links.findIndex(l => l.url === url);
+        const idx = categories[cat].links.findIndex(l => l.id === id);
         if (idx !== -1) {
             item = categories[cat].links.splice(idx, 1)[0];
             break;
@@ -101,10 +87,7 @@ function readLinksFromDOM(categoryName) {
     const section = document.getElementById(categoryName);
     if (!section) return [];
 const cards = section.querySelectorAll('.card:not(.add-card-placeholder)');
-    return Array.from(cards).map(c => {
-        const url = c.getAttribute('data-url');
-        return findLinkByUrl(url);
-    }).filter(Boolean);
+    return Array.from(cards).map(c => findLinkById(c.getAttribute('data-card-id'))).filter(Boolean);
 }
 
 // -------- 移动端拖拽 --------
@@ -308,7 +291,6 @@ function handleTouchEnd() {
                         const newState = getCardState(mobilePlaceholder);
                         const changed = newState.category !== initialDragState.category || newState.index !== initialDragState.index;
                         if (changed) {
-                            buildLinkIndex();
                             updateCardCategory(mobilePlaceholder, newState.category);
                             const newLinks = readLinksFromDOM(newState.category);
                             reorderCards(newState.category, newLinks);

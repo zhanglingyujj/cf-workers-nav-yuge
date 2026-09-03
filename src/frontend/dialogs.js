@@ -1,5 +1,5 @@
 // dialogs.js - 弹窗管理 (添加/编辑卡片, 密码登录)
-import { addLink, updateLink, removeLink, getCategories, addCategory, setEditMode } from './state.js';
+import { addLink, updateLink, removeLink, getCategories, findLinkById, addCategory, setEditMode } from './state.js';
 import { updateUIState, renderAll } from './render.js';
 import { commit } from './commit.js';
 import { getEl } from './utils.js';
@@ -199,7 +199,7 @@ async function updateCard(oldLink, categoryName) {
     };
 
 const categoryChanged = (categoryName || oldLink.category) !== newLink.category;
-    updateLink(oldLink.url, newLink);
+    updateLink(oldLink, newLink);
     if (categoryChanged) {
         renderAll();
     }
@@ -212,8 +212,8 @@ export async function removeCard(card) {
     const { validateTokenOrRedirect } = await import('./auth.js');
     if (!(await validateTokenOrRedirect())) return;
 
-    const url = card.getAttribute('data-url');
-    removeLink(url);
+    const link = findLinkById(card.getAttribute('data-card-id'));
+    if (link) removeLink(link);
     await commit('删除链接');
 }
 
