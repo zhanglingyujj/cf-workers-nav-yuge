@@ -105,7 +105,7 @@ function showFilterChip(query) {
     if (!chip) {
         chip = document.createElement('button');
         chip.id = 'filter-chip';
-        chip.className = 'fixed top-5 right-20 z-40 flex items-center gap-2 h-11 px-4 rounded-2xl border border-zinc-300 bg-white/95 backdrop-blur-xl shadow-lg shadow-black/20 text-sm text-zinc-700 hover:bg-zinc-100 transition-colors';
+        chip.className = 'fixed top-20 right-4 sm:right-8 lg:right-10 z-40 flex items-center gap-2 h-11 px-4 rounded-2xl border border-zinc-300 bg-white/95 backdrop-blur-xl shadow-lg shadow-black/20 text-sm text-zinc-700 hover:bg-zinc-100 transition-colors';
         chip.innerHTML = '<span class="font-medium truncate"></span><svg class="w-3.5 h-3.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"></path></svg>';
         chip.addEventListener('click', async () => {
             hideFilterChip();

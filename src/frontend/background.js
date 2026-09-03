@@ -1,7 +1,7 @@
 // background.js - 壁纸/遮罩/模糊设置：加载（服务器优先 + localStorage 回退镜像）、实时预览、防抖持久化
 import { getEl } from './utils.js';
 
-const DEFAULTS = { backgroundImage: '', backgroundOpacity: 20, backgroundBlur: 0 };
+const DEFAULTS = { backgroundImage: '', backgroundOpacity: 20, backgroundBlur: 0, siteTitle: '我的导航' };
 
 // 纯函数：合并服务器设置与 localStorage 回退（服务器无值时降级，有值时镜像回写由调用方处理）
 export function resolveSettings(serverSettings, storage = localStorage) {
@@ -9,6 +9,7 @@ export function resolveSettings(serverSettings, storage = localStorage) {
         'backgroundImage' in serverSettings
         || 'backgroundOpacity' in serverSettings
         || 'backgroundBlur' in serverSettings
+        || 'siteTitle' in serverSettings
     );
 
     if (!hasServerValue) {
@@ -18,12 +19,14 @@ export function resolveSettings(serverSettings, storage = localStorage) {
             backgroundImage: storage.getItem('backgroundImage') || '',
             backgroundOpacity: storedOpacity !== null ? parseInt(storedOpacity) : DEFAULTS.backgroundOpacity,
             backgroundBlur: storedBlur !== null ? parseInt(storedBlur) : DEFAULTS.backgroundBlur,
+            siteTitle: storage.getItem('siteTitle') || DEFAULTS.siteTitle,
         };
     }
     return {
         backgroundImage: serverSettings.backgroundImage || '',
         backgroundOpacity: pickNumber(serverSettings.backgroundOpacity, DEFAULTS.backgroundOpacity),
         backgroundBlur: pickNumber(serverSettings.backgroundBlur, DEFAULTS.backgroundBlur),
+        siteTitle: serverSettings.siteTitle || storage.getItem('siteTitle') || DEFAULTS.siteTitle,
     };
 }
 
@@ -33,12 +36,19 @@ function pickNumber(v, fallback) {
 
 export function initBackground() {
     const bgImageInput = getEl('bg-image-input');
+    const siteTitleInput = getEl('site-title-input');
     const bgOpacitySlider = getEl('bg-opacity-slider');
     const bgOpacityValue = getEl('bg-opacity-value');
     const bgBlurSlider = getEl('bg-blur-slider');
     const bgBlurValue = getEl('bg-blur-value');
     const customBgImage = document.getElementById('custom-bg-image');
     const bgMask = document.getElementById('bg-mask');
+
+    function applySiteTitle(title) {
+        const el = document.getElementById('site-title');
+        if (el && title) el.textContent = title;
+        if (title) document.title = title;
+    }
 
     function applyBgImage(url) {
         if (url && customBgImage) {
@@ -81,9 +91,12 @@ export function initBackground() {
             localStorage.setItem('backgroundImage', settings.backgroundImage || '');
             localStorage.setItem('backgroundOpacity', String(settings.backgroundOpacity));
             localStorage.setItem('backgroundBlur', String(settings.backgroundBlur));
+            localStorage.setItem('siteTitle', settings.siteTitle);
         }
 
         if (bgImageInput) bgImageInput.value = settings.backgroundImage;
+        if (siteTitleInput) siteTitleInput.value = settings.siteTitle;
+        applySiteTitle(settings.siteTitle);
         if (bgOpacitySlider && bgOpacityValue) {
             bgOpacitySlider.value = settings.backgroundOpacity;
             bgOpacityValue.textContent = settings.backgroundOpacity + '%';
@@ -101,6 +114,7 @@ export function initBackground() {
         localStorage.setItem('backgroundImage', bgImageInput ? bgImageInput.value.trim() : '');
         localStorage.setItem('backgroundOpacity', String(bgOpacitySlider ? parseInt(bgOpacitySlider.value) : DEFAULTS.backgroundOpacity));
         localStorage.setItem('backgroundBlur', String(bgBlurSlider ? parseInt(bgBlurSlider.value) : DEFAULTS.backgroundBlur));
+        localStorage.setItem('siteTitle', siteTitleInput ? siteTitleInput.value.trim() : '');
         scheduleSaveSettings();
     }
 
@@ -117,6 +131,7 @@ export function initBackground() {
                     backgroundImage: bgImageInput ? bgImageInput.value.trim() : '',
                     backgroundOpacity: bgOpacitySlider ? parseInt(bgOpacitySlider.value) : DEFAULTS.backgroundOpacity,
                     backgroundBlur: bgBlurSlider ? parseInt(bgBlurSlider.value) : DEFAULTS.backgroundBlur,
+                    siteTitle: siteTitleInput ? siteTitleInput.value.trim() : '',
                 }),
             });
         }, 500);
@@ -125,6 +140,13 @@ export function initBackground() {
     if (bgImageInput) {
         bgImageInput.addEventListener('input', () => {
             applyBgImage(bgImageInput.value.trim());
+            persistBgSettings();
+        });
+    }
+
+    if (siteTitleInput) {
+        siteTitleInput.addEventListener('input', () => {
+            applySiteTitle(siteTitleInput.value.trim() || DEFAULTS.siteTitle);
             persistBgSettings();
         });
     }

@@ -135,45 +135,40 @@
         <div id="bg-mask" class="absolute inset-0 transition-colors duration-300"></div>
     </div>
 
-    <!-- 浮岛：标题 + 命令条（Command Bar 与浮岛结合） -->
-    <div class="fixed top-5 left-1/2 -translate-x-1/2 z-50 flex items-center gap-1 h-12 pl-4 pr-2 rounded-2xl border border-heritage-dark-600/70 bg-heritage-dark-800/50 backdrop-blur-2xl shadow-xl shadow-black/40 max-w-[calc(100vw-2.5rem)]">
+    <!-- 浮岛：标题 + 命令条 + 设置（宽度与内容区卡片边界对齐） -->
+    <div class="fixed top-5 left-1/2 -translate-x-1/2 z-50 flex items-center gap-1 h-12 pl-4 pr-2 w-[calc(100vw-2rem)] sm:w-[calc(100vw-4rem)] lg:w-[calc(100vw-5rem)] max-w-[1200px] rounded-2xl border border-white/10 bg-[#2a2a2a8c] backdrop-blur-2xl shadow-[0_0_15px_2px_rgba(0,0,0,0.25)]">
         <a class="flex items-center gap-2.5 pr-2 flex-shrink-0 group cursor-pointer" href="#" onclick="location.reload()">
             <div class="w-7 h-7 flex items-center justify-center bg-gradient-to-tr from-heritage-400 to-heritage-600 rounded-lg text-heritage-dark-900 shadow-md shadow-black/30 group-hover:scale-105 transition-transform">
                 <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
             </div>
-            <span class="font-bold text-base tracking-wide text-heritage-variant hidden sm:block">我的导航</span>
+            <span id="site-title" class="font-bold text-base tracking-wide text-heritage-variant hidden sm:block truncate">我的导航</span>
         </a>
-        <div class="w-px h-5 bg-heritage-dark-600/70 flex-shrink-0"></div>
-        <button id="cmd-trigger" class="flex items-center gap-2.5 h-9 pl-3 pr-2 rounded-xl text-heritage-dark-300 hover:text-heritage-outline hover:bg-heritage-dark-700/50 transition-all text-sm min-w-0">
+        <div class="w-px h-5 bg-white/10 flex-shrink-0"></div>
+        <button id="cmd-trigger" class="flex-1 flex items-center gap-2.5 h-9 pl-3 pr-2 rounded-xl text-heritage-dark-300 hover:text-heritage-outline hover:bg-white/10 transition-all text-sm min-w-0">
             <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-            <span class="hidden md:block truncate">搜索站点、跳转分类…</span>
-            <kbd class="hidden lg:block text-xs border border-heritage-dark-600 rounded-md px-1.5 py-0.5 bg-heritage-dark-700/50 font-sans text-heritage-dark-400">Ctrl K</kbd>
+            <span class="flex-1 text-left truncate">搜索站点、跳转分类…</span>
+            <kbd class="hidden lg:block text-xs border border-white/10 rounded-md px-1.5 py-0.5 bg-white/5 font-sans text-heritage-dark-400 flex-shrink-0">Ctrl K</kbd>
         </button>
-    </div>
-
-    <!-- 设置（右上角玻璃按钮 + 下拉菜单） -->
-    <div class="fixed top-5 right-4 z-50">
-        <div id="profile-dropdown-wrapper" class="relative">
-            <button id="profile-menu-toggle" aria-label="设置" class="w-11 h-11 rounded-2xl border border-heritage-dark-600/70 bg-heritage-dark-800/50 backdrop-blur-2xl shadow-lg shadow-black/40 flex items-center justify-center text-heritage-dark-300 hover:border-white/40 hover:text-heritage-outline transition-all">
+        <div id="profile-dropdown-wrapper" class="relative flex-shrink-0">
+            <button id="profile-menu-toggle" aria-label="设置" class="w-9 h-9 rounded-xl flex items-center justify-center text-heritage-dark-300 hover:bg-white/10 hover:text-white transition-all">
                 <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09A1.65 1.65 0 008 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H2a2 2 0 110-4h.09A1.65 1.65 0 004.6 8a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V2a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"></path></svg>
             </button>
-
             <!-- Dropdown Menu（亮色） -->
             <div id="profile-dropdown" class="hidden absolute right-0 mt-2 w-60 bg-white/95 backdrop-blur-xl rounded-xl shadow-xl shadow-black/20 ring-1 ring-zinc-200 overflow-hidden transform origin-top-right transition-all z-50 dropdown-enter">
                 <div class="p-2 space-y-1">
                     <!-- Edit Mode -->
-                    <button id="edit-mode-btn" class="w-full text-left px-3 py-2.5 rounded-lg text-sm text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900 transition-colors flex items-center gap-3 font-medium">
+                    <button id="edit-mode-btn" class="w-full text-left px-3 py-2.5 rounded-lg text-sm text-zinc-700 hover:bg-zinc-200 hover:text-zinc-900 transition-colors flex items-center gap-3 font-medium">
                         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                         编辑模式
                     </button>
 
                     <!-- 导入导出 (仅登录显示) -->
                     <div id="data-tools-menu" class="hidden border-t border-zinc-200/80 my-1 pt-1">
-                        <button onclick="exportData()" class="w-full text-left px-3 py-2.5 rounded-lg text-sm text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900 transition-colors flex items-center gap-3">
+                        <button onclick="exportData()" class="w-full text-left px-3 py-2.5 rounded-lg text-sm text-zinc-700 hover:bg-zinc-200 hover:text-zinc-900 transition-colors flex items-center gap-3">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                             导出配置
                         </button>
-                        <button id="import-data-btn" class="w-full text-left px-3 py-2.5 rounded-lg text-sm text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900 transition-colors flex items-center gap-3">
+                        <button id="import-data-btn" class="w-full text-left px-3 py-2.5 rounded-lg text-sm text-zinc-700 hover:bg-zinc-200 hover:text-zinc-900 transition-colors flex items-center gap-3">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4-4m0 0l-4 4m4-4v12"></path></svg>
                             导入数据
                         </button>
@@ -187,7 +182,13 @@
                     <!-- 自定义背景 -->
                     <div id="bg-controls-section" class="hidden">
                         <div class="px-3 py-2 text-xs space-y-2">
-                            <span class="font-semibold text-zinc-500 uppercase tracking-wider">自定义背景</span>
+                            <div class="space-y-1.5">
+                                        <span class="font-semibold text-zinc-500 uppercase tracking-wider">站点标题</span>
+                                        <input type="text" id="site-title-input" placeholder="我的导航" class="w-full px-3 py-1.5 rounded-lg bg-zinc-50 border border-zinc-200 text-zinc-800 text-xs outline-none focus:ring-1 focus:ring-zinc-400 focus:border-zinc-400">
+                                    </div>
+                                    <div class="space-y-1.5">
+                                        <span class="font-semibold text-zinc-500 uppercase tracking-wider">自定义背景</span>
+                                    </div>
                             <input type="text" id="bg-image-input" placeholder="背景图 URL" class="w-full px-3 py-1.5 rounded-lg bg-zinc-50 border border-zinc-200 text-zinc-800 text-xs outline-none focus:ring-1 focus:ring-zinc-400 focus:border-zinc-400">
                             <div class="flex items-center justify-between pt-1">
                                 <span class="text-zinc-500">遮罩强度</span>

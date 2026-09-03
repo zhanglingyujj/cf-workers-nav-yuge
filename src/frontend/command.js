@@ -112,9 +112,9 @@ function renderList(query) {
     const fragment = document.createDocumentFragment();
     items.forEach((it, i) => {
         const row = document.createElement('div');
-        row.className = `cmd-row flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer text-sm transition-colors ${i === selectedIndex ? 'bg-zinc-900 text-white' : 'text-zinc-600 hover:bg-zinc-100'}`;
+        row.className = `cmd-row flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer text-sm transition-colors ${i === selectedIndex ? 'bg-zinc-900 text-white' : 'text-zinc-700 hover:bg-zinc-200'}`;
         const icon = it.type === 'cat' ? '🗂' : it.type === 'link' ? '🔗' : '🌐';
-        row.innerHTML = `<span class="w-6 h-6 rounded-lg flex items-center justify-center text-xs flex-shrink-0 ${i === selectedIndex ? 'bg-white/25' : 'bg-zinc-100'}">${icon}</span>
+        row.innerHTML = `<span class="w-6 h-6 rounded-lg flex items-center justify-center text-xs flex-shrink-0 ${i === selectedIndex ? 'bg-white/25' : 'bg-zinc-200/70'}">${icon}</span>
             <span class="truncate font-medium">${it.name}</span>
             <span class="ml-auto text-xs opacity-60 flex-shrink-0">${it.meta || ''}</span>`;
         row.addEventListener('click', () => activate(it, query));
@@ -159,7 +159,7 @@ function renderEngines() {
 
     getEngineList().forEach((eng, i) => {
         const btn = document.createElement('button');
-        btn.className = `px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${eng.key === getEngine() ? 'bg-zinc-900 text-white' : 'text-zinc-600 hover:bg-zinc-100'}`;
+        btn.className = `px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${eng.key === getEngine() ? 'bg-zinc-900 text-white' : 'text-zinc-700 hover:bg-zinc-200'}`;
         btn.textContent = eng.label;
         btn.addEventListener('click', () => {
             setEngineByIndex(i);
