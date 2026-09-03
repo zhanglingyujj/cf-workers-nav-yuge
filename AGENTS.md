@@ -31,9 +31,9 @@ node build.js --check-classes   # 校验源码 class 全部命中生成的 CSS�
 
 ### 持久化：commit 是唯一通道
 
-- 除壁纸设置外，所有数据落库走 `src/frontend/commit.js`：显式提交用 `commit(actionName)`，高频操作（拖拽、开关连拨）用 `commitSoon(actionName)`（300ms 尾沿合并）。
+- 除站点设置（标题/壁纸/遮罩）外，所有数据落库走 `src/frontend/commit.js`：显式提交用 `commit(actionName)`，高频操作（拖拽、开关连拨）用 `commitSoon(actionName)`（300ms 尾沿合并）。
 - 弹窗类编辑（增删改卡片）提交前保留一次 `validateTokenOrRedirect()`；热路径不前置验证（`fetchWithAuth` 自带 401 自动刷新）。
-- 壁纸/遮罩走 `background.js` 自有的 `/api/settings` 通道，与 commit 无关。
+- 站点标题/壁纸/遮罩走 `background.js` 自有的 `/api/settings` 通道，与 commit 无关。
 
 ### 其他
 

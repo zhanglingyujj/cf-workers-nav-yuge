@@ -17,12 +17,12 @@
 
 - ⚡ Serverless 架构 — Cloudflare Workers 全球边缘部署
 - 💾 KV 存储 — 数据持久化 + 10 分钟间隔智能自动备份
-- 🎨 深色玻璃单主题（壁纸为底）/ 按分类 APP 视图 / 响应式设计
+- 🎨 深色内容 + 亮色浮层双层玻璃（壁纸为底，黑白灰配色）/ 按分类 APP 视图 / 响应式设计
 - 🖱️ PC 拖拽 + 移动端长按拖拽排序（本地优先，300ms 合并保存）
 - 🔒 JWT 双 Token 认证（access 2h + refresh 30d）+ 私密链接
-- 🔍 多引擎聚合搜索（百度/必应/谷歌/站内筛选）+ 全局快捷键
+- 🔍 命令面板（`Alt C` / `/` 唤起）：分类跳转、站点直达 + 多引擎搜索（百度/必应/谷歌/站内筛选）+ 数字键快捷打开
 - 📂 数据 JSON 导入/导出；浏览器书签导入（Netscape HTML / Sun-Panel JSON）
-- 🖼️ 自定义背景图片 + 遮罩透明度 + 模糊程度（登录后可用，KV 持久化）
+- 📝 站点标题、壁纸/遮罩/模糊可自定义（登录后可用，KV 持久化）
 - 📱 PWA 离线可用（manifest + service worker）
 - 🚀 单请求渲染 — 一次 getLinks 获取数据 + 认证状态，刷新即显
 - 🧩 模块化架构 — 26 个源文件，esbuild 构建为单文件部署，node:test 46 组回归
@@ -49,7 +49,7 @@ npx wrangler secret put JWT_SECRET
 npm run deploy
 ```
 
-部署后访问终端输出的 URL，首次为空白页：点击右上角菜单 → 登录 → 进入编辑模式 → 新建分类 → 添加链接。
+部署后访问终端输出的 URL，首次为空白页：点击顶部浮岛右端的设置按钮 → 登录 → 进入编辑模式 → 新建分类 → 添加链接。
 
 ## 本地开发
 
@@ -89,19 +89,19 @@ npm test   # node --test test/**/*.js
 │   │   ├── index.html        # HTML 骨架（构建期内联 Tailwind CSS）
 │   │   ├── app.js            # 入口：纯装配职责
 │   │   ├── state.js          # 集中状态 + 脏标记 + 订阅系统（RAF 可回退）
-│   │   ├── render.js         # 增量 DOM 渲染（对账 + patchCategory + scrollspy）
+│   │   ├── render.js         # 增量 DOM 渲染（对账 + patchCategory）
 │   │   ├── commit.js         # 提交模块：数据落库唯一通道（commit / commitSoon）
 │   │   ├── card.js           # 卡片元素创建/更新 + 共享单例编辑菜单
 │   │   ├── drag.js           # PC 拖拽 + 移动端长按拖拽 + 合并保存
-│   │   ├── background.js     # 壁纸/遮罩/模糊设置（服务器 + localStorage 回退）
-│   │   ├── search.js         # 多引擎搜索 + 站内筛选
+│   │   ├── command.js        # 命令面板（浮岛搜索触发 / Alt C / / 唤起）
+│   │   ├── background.js     # 站点标题/壁纸/遮罩/模糊设置（服务器 + localStorage 回退）
+│   │   ├── search.js         # 多引擎搜索 + 站内筛选 + 清除筛选浮标
 │   │   ├── auth.js           # 客户端认证（fetchWithAuth + 自动 refresh）
 │   │   ├── dialogs.js        # 弹窗管理（添加/编辑/分类/确认/登录/导入选择）
 │   │   ├── bookmarks.js      # 书签导入入口
 │   │   ├── bookmark-parsers.js # Netscape HTML / Sun-Panel JSON 解析
-│   │   ├── shortcuts.js      # 全局快捷键
+│   │   ├── shortcuts.js      # 全局快捷键（/ 唤起面板、数字键开卡）
 │   │   ├── tooltip.js        # 鼠标跟随 tooltip
-│   │   ├── scrollspy.js      # IntersectionObserver 滚动高亮
 │   │   ├── utils.js          # debounce / throttle / rafThrottle / getEl
 │   │   └── input.css         # Tailwind 入口（三条 @tailwind 指令）
 │   └── build/                # 构建中间产物（自动生成 + 清理）
@@ -110,7 +110,7 @@ npm test   # node --test test/**/*.js
 ├── build.js                  # 构建脚本（Tailwind 编译 + esbuild + --check-classes）
 ├── tailwind.config.js        # Tailwind v3 配置（heritage/glass 色板）
 ├── CONTEXT.md                # 域术语表
-├── DESIGN.md                 # 视觉设计系统（深色玻璃单主题）
+├── DESIGN.md                 # 视觉设计系统（深色内容 + 亮色浮层，黑白灰）
 └── AGENTS.md                 # 项目约定（数据流 / commit 通道 / 测试形态）
 ```
 
