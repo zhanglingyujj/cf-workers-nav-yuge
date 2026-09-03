@@ -125,3 +125,79 @@ test('同一帧内多次变更合并为一次 flush', async () => {
     await flushNow();
     assert.equal(flushCount, 1);
 });
+
+import {
+    getVisibleCategories, searchCategories,
+} from '../src/frontend/state.js';
+
+function resetState({ loggedIn = false, editMode = false } = {}) {
+    setLoggedIn(loggedIn);
+    setEditMode(editMode);
+    setCategories({});
+}
+
+test('getVisibleCategories 未登录：隐藏分组与私密卡均不可见', () => {
+    resetState({ loggedIn: false });
+    setCategories({
+        普通分组: { isHidden: false, links: [link('a.com', '普通分组'), { ...link('p.com', '普通分组'), isPrivate: true }] },
+        隐藏分组: { isHidden: true, links: [link('h.com', '隐藏分组')] },
+        纯私密: { isHidden: false, links: [{ ...link('only.com', '纯私密'), isPrivate: true }] },
+    });
+    const v = getVisibleCategories();
+    assert.deepEqual(Object.keys(v), ['普通分组']);
+    assert.equal(v.普通分组.links.length, 1);
+    assert.equal(v.普通分组.links[0].url, 'a.com');
+});
+
+test('getVisibleCategories 登录后：隐藏分组与私密卡均可见', () => {
+    resetState({ loggedIn: true });
+    setCategories({
+        隐藏分组: { isHidden: true, links: [link('h.com', '隐藏分组')] },
+        纯私密: { isHidden: false, links: [{ ...link('only.com', '纯私密'), isPrivate: true }] },
+    });
+    const v = getVisibleCategories();
+    assert.deepEqual(Object.keys(v), ['隐藏分组', '纯私密']);
+    assert.equal(v.纯私密.links.length, 1);
+});
+
+test('getVisibleCategories 编辑模式：未登录也可见隐藏分组与空分组', () => {
+    resetState({ loggedIn: false, editMode: true });
+    setCategories({
+        隐藏分组: { isHidden: true, links: [link('h.com', '隐藏分组')] },
+        空分组: { isHidden: false, links: [] },
+    });
+    const v = getVisibleCategories();
+    assert.deepEqual(Object.keys(v), ['隐藏分组', '空分组']);
+});
+
+test('getVisibleCategories 非编辑空分组被略去（未登录）', () => {
+    resetState({ loggedIn: false });
+    setCategories({ 空分组: { isHidden: false, links: [] } });
+    assert.deepEqual(getVisibleCategories(), {});
+});
+
+test('searchCategories 只在可见集内做 name/tips/url 匹配', () => {
+    resetState({ loggedIn: false });
+    setCategories({
+        工具: { isHidden: false, links: [
+            link('github.com', '工具', { tips: '代码托管' }),
+            link('news.com', '新闻站', {}),
+        ] },
+        隐藏分组: { isHidden: true, links: [link('gitlab.com', 'GitLab')] },
+    });
+    const r = searchCategories('git');
+    assert.deepEqual(Object.keys(r), ['工具']);
+    assert.deepEqual(r.工具.links.map(l => l.url), ['github.com']);
+
+    const r2 = searchCategories('代码');
+    assert.deepEqual(Object.keys(r2), ['工具']);
+    assert.equal(r2.工具.links.length, 1);
+});
+
+test('searchCategories 空查询返回全量可见集', () => {
+    resetState({ loggedIn: false });
+    setCategories({ 工具: { isHidden: false, links: [link('a.com', '工具')] } });
+    const r = searchCategories('');
+    assert.deepEqual(Object.keys(r), ['工具']);
+    assert.equal(r.工具.links.length, 1);
+});

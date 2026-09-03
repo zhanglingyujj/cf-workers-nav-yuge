@@ -183,6 +183,36 @@ export function setCategoryAppLayout(categoryName, v) {
     emit('categoriesChanged', { action: 'appLayout', category: categoryName, value: v });
 }
 
+// 可见性规则唯一出处：隐藏分组在登录/编辑态豁免，私密卡仅登录可见；非编辑态空分组略去
+export function getVisibleCategories() {
+    const result = {};
+    for (const name of Object.keys(_categories)) {
+        const data = _categories[name];
+        if (data.isHidden && !_isEditMode && !_isLoggedIn) continue;
+        const links = (data.links || []).filter(l => !l.isPrivate || _isLoggedIn);
+        if (links.length === 0 && !_isEditMode) continue;
+        result[name] = { ...data, links };
+    }
+    return result;
+}
+
+export function searchCategories(query) {
+    const lowerQuery = query.toLowerCase();
+    const result = {};
+    for (const [cat, catData] of Object.entries(getVisibleCategories())) {
+        const matchedLinks = (catData.links || []).filter(link => {
+            const nameMatch = link.name && link.name.toLowerCase().includes(lowerQuery);
+            const tipsMatch = link.tips && link.tips.toLowerCase().includes(lowerQuery);
+            const urlMatch = link.url && link.url.toLowerCase().includes(lowerQuery);
+            return nameMatch || tipsMatch || urlMatch;
+        });
+        if (matchedLinks.length > 0) {
+            result[cat] = { ...catData, links: matchedLinks };
+        }
+    }
+    return result;
+}
+
 export function markDirty(categoryName) {
     _dirtyCategories.add(categoryName);
     scheduleFlush();

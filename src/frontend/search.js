@@ -1,6 +1,6 @@
 // search.js - 搜索引擎 + 站内筛选
-import { renderAll, getFilteredCategoriesByKeyword } from './render.js';
-import { getCategories } from './state.js';
+import { renderAll } from './render.js';
+import { searchCategories } from './state.js';
 import { getEl } from './utils.js';
 
 const searchEngines = {
@@ -53,7 +53,7 @@ localStorage.setItem('searchEngine', value);
 
 export function doSearch(query) {
     if (currentEngine === 'site') {
-        const filtered = getFilteredCategoriesByKeyword(query);
+        const filtered = searchCategories(query);
         const hasResults = Object.values(filtered).some(c => c.links.length > 0);
         if (!hasResults) {
             import('./overlay.js').then(m => m.openAlert('没有找到相关站点。'));

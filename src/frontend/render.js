@@ -1,6 +1,6 @@
 // render.js - 增量 DOM 渲染引擎
 import {
-    getCategories, isEditMode, isLoggedIn,
+    getCategories, isEditMode, isLoggedIn, getVisibleCategories,
     setFlushHandler, subscribe,
     addCategory, renameCategory, deleteCategory, moveCategory, pinCategory, setCategoryHidden,
     isCategoryAppLayout, setCategoryAppLayout
@@ -13,26 +13,6 @@ const containerId = 'sections-container';
 const addCategoryContainerId = 'add-category-container';
 
 let _renderedCategories = new Set();
-
-// 站内搜索过滤
-export function getFilteredCategoriesByKeyword(query) {
-    const lowerQuery = query.toLowerCase();
-    const result = {};
-    const categories = getCategories();
-    Object.keys(categories).forEach(cat => {
-        const catData = categories[cat];
-        const matchedLinks = (catData.links || []).filter(link => {
-            const nameMatch = link.name && link.name.toLowerCase().includes(lowerQuery);
-            const tipsMatch = link.tips && link.tips.toLowerCase().includes(lowerQuery);
-            const urlMatch = link.url && link.url.toLowerCase().includes(lowerQuery);
-            return nameMatch || tipsMatch || urlMatch;
-        });
-        if (matchedLinks.length > 0) {
-            result[cat] = { ...catData, links: matchedLinks };
-        }
-    });
-    return result;
-}
 
 export function initRender() {
     setFlushHandler((dirtyCategories) => {
@@ -55,11 +35,10 @@ export function initRender() {
 function reconcileSections() {
     const container = getEl(containerId);
     if (!container) return;
-    const categories = getCategories();
+    const visible = getVisibleCategories();
 
     for (const name of _renderedCategories) {
-        const data = categories[name];
-        if (!data || (!isEditMode() && !isLoggedIn() && data.isHidden)) {
+        if (!visible[name]) {
             const section = document.getElementById(name);
             if (section) section.remove();
             _renderedCategories.delete(name);
@@ -67,7 +46,7 @@ function reconcileSections() {
     }
 
     let ref = null;
-    for (const key of Object.keys(categories)) {
+    for (const key of Object.keys(visible)) {
         const section = document.getElementById(key);
         if (!section) continue;
         if (ref) {
@@ -85,10 +64,10 @@ export function renderAll() {
     if (!container) return;
 
     container.innerHTML = '';
-    const categories = getCategories();
+    const visible = getVisibleCategories();
     const fragment = document.createDocumentFragment();
 
-    for (const [catName, { links, isHidden }] of Object.entries(categories)) {
+    for (const [catName, { links, isHidden }] of Object.entries(visible)) {
         const section = createCategorySection(catName, links, isHidden);
         if (section) {
             fragment.appendChild(section);
@@ -101,8 +80,8 @@ export function renderAll() {
 }
 
 export function patchCategory(categoryName) {
-    const categories = getCategories();
-    const catData = categories[categoryName];
+    const visible = getVisibleCategories();
+    const catData = visible[categoryName];
 
     if (!catData) {
         const oldSection = document.getElementById(categoryName);
@@ -112,13 +91,6 @@ export function patchCategory(categoryName) {
     }
 
     const { links, isHidden } = catData;
-    if (!isEditMode() && !isLoggedIn() && isHidden) {
-        const oldSection = document.getElementById(categoryName);
-        if (oldSection) oldSection.remove();
-        _renderedCategories.delete(categoryName);
-        return;
-    }
-
     const existingSection = document.getElementById(categoryName);
 
     if (!existingSection) {
@@ -126,7 +98,7 @@ export function patchCategory(categoryName) {
         if (newSection) {
             const container = getEl(containerId);
             if (!container) return;
-            const keys = Object.keys(categories);
+            const keys = Object.keys(visible);
             const idx = keys.indexOf(categoryName);
             const afterSection = idx > 0 ? document.getElementById(keys[idx - 1]) : null;
             if (afterSection && afterSection.nextSibling) {
@@ -179,11 +151,6 @@ export function patchCategory(categoryName) {
 }
 
 function createCategorySection(categoryName, links, isHidden) {
-    if (!isEditMode() && !isLoggedIn() && isHidden) return null;
-
-    const filteredLinks = links.filter(l => !l.isPrivate || isLoggedIn());
-    if (filteredLinks.length === 0 && !isEditMode()) return null;
-
     const section = document.createElement('div');
     section.className = 'section section-anchor';
     section.id = categoryName;
@@ -215,7 +182,7 @@ const catData = getCategories()[categoryName];
     section.appendChild(titleContainer);
     section.appendChild(cardContainer);
 
-    filteredLinks.forEach(link => {
+    links.forEach(link => {
         const card = createCardElement(link, categoryName);
         if (card) cardContainer.appendChild(card);
     });
