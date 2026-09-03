@@ -38,12 +38,12 @@ function initBgColorPicker() {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.title = color;
-        btn.className = 'w-7 h-7 rounded-lg border border-white/20 transition-transform hover:scale-110';
+        btn.className = 'w-7 h-7 rounded-lg border border-zinc-300 transition-transform hover:scale-110';
         btn.style.backgroundColor = color;
         btn.addEventListener('click', () => {
             input.value = color;
             swatches.querySelectorAll('button').forEach(b => b.style.outline = '');
-            btn.style.outline = '2px solid #B8422E';
+            btn.style.outline = '2px solid #27272A';
         });
         swatches.appendChild(btn);
     });
@@ -107,9 +107,12 @@ function updateCategorySelectDropdown() {
     if (!menu) return;
     menu.innerHTML = '';
     const categories = getCategories();
+    const currentVal = (getEl('category-select-value') || {}).value || '';
     Object.keys(categories).forEach(cat => {
         const item = document.createElement('div');
-        item.className = 'px-3 py-2.5 text-sm text-heritage-outline hover:bg-heritage-dark-700/50 hover:text-white cursor-pointer transition-colors';
+        item.className = cat === currentVal
+            ? 'px-3 py-2.5 text-sm bg-zinc-800 text-white cursor-pointer transition-colors'
+            : 'px-3 py-2.5 text-sm text-zinc-700 hover:bg-zinc-200 hover:text-zinc-900 cursor-pointer transition-colors';
         item.textContent = cat;
         item.addEventListener('click', () => {
             const catVal = getEl('category-select-value');
