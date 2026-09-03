@@ -41,9 +41,38 @@ export function setLoggedIn(v) {
 
 export function setAppLayout(v) {}
 
+let _linkIdCounter = 0;
+
+function newLinkId() {
+    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+        return crypto.randomUUID();
+    }
+    return 'link-' + Date.now().toString(36) + '-' + (++_linkIdCounter);
+}
+
+// 惰性迁移：为缺失 id 的卡片补齐身份（旧数据零迁移，随下一次 commit 落库）
+export function ensureLinkIds(categories) {
+    for (const cat in categories) {
+        const links = categories[cat] && categories[cat].links;
+        if (!Array.isArray(links)) continue;
+        links.forEach(l => { if (!l.id) l.id = newLinkId(); });
+    }
+    return categories;
+}
+
+export function findLinkById(id) {
+    if (!id) return null;
+    for (const cat in _categories) {
+        const link = (_categories[cat].links || []).find(l => l.id === id);
+        if (link) return link;
+    }
+    return null;
+}
+
 export function setCategories(data) {
     const oldKeys = Object.keys(_categories);
     oldKeys.forEach(k => delete _categories[k]);
+    ensureLinkIds(data || {});
     Object.assign(_categories, data);
     markAllDirty();
     flushNow();
@@ -54,42 +83,50 @@ export function addLink(category, link) {
     if (!_categories[category]) {
         _categories[category] = { isHidden: false, links: [] };
     }
+    if (!link.id) link.id = newLinkId();
     _categories[category].links.push(link);
     markDirty(category);
     emit('linksChanged', { action: 'add', category, link });
 }
 
-export function updateLink(oldUrl, newLink) {
+// 按对象引用定位（兜底按 id，覆盖弹窗打开期间 state 被 load() 整体替换的陈旧引用）
+function locateLink(linkRef) {
     for (const cat in _categories) {
-        const idx = _categories[cat].links.findIndex(l => l.url === oldUrl);
-        if (idx !== -1) {
-            if (cat === newLink.category) {
-                _categories[cat].links[idx] = newLink;
-                markDirty(cat);
-            } else {
-                _categories[cat].links.splice(idx, 1);
-                if (!_categories[newLink.category]) {
-                    _categories[newLink.category] = { isHidden: false, links: [] };
-                }
-                _categories[newLink.category].links.push(newLink);
-                markDirty(cat);
-                markDirty(newLink.category);
+        const idx = _categories[cat].links.findIndex(l => l === linkRef || (linkRef && linkRef.id && l.id === linkRef.id));
+        if (idx !== -1) return { cat, idx };
+    }
+    return null;
+}
+
+export function updateLink(oldLink, newLink) {
+    const found = locateLink(oldLink);
+    if (found) {
+        const { cat, idx } = found;
+        newLink.id = _categories[cat].links[idx].id;
+        if (cat === newLink.category) {
+            _categories[cat].links[idx] = newLink;
+            markDirty(cat);
+        } else {
+            _categories[cat].links.splice(idx, 1);
+            if (!_categories[newLink.category]) {
+                _categories[newLink.category] = { isHidden: false, links: [] };
             }
-            emit('linksChanged', { action: 'update', oldUrl, newLink });
-            return;
+            _categories[newLink.category].links.push(newLink);
+            markDirty(cat);
+            markDirty(newLink.category);
         }
+        emit('linksChanged', { action: 'update', oldLink, newLink });
     }
 }
 
-export function removeLink(url) {
-    for (const cat in _categories) {
-        const idx = _categories[cat].links.findIndex(l => l.url === url);
-        if (idx !== -1) {
-            _categories[cat].links.splice(idx, 1);
-            markDirty(cat);
-            emit('linksChanged', { action: 'remove', category: cat, url });
-            return;
-        }
+export function removeLink(linkRef) {
+    const found = locateLink(linkRef);
+    if (found) {
+        const { cat, idx } = found;
+        const link = _categories[cat].links[idx];
+        _categories[cat].links.splice(idx, 1);
+        markDirty(cat);
+        emit('linksChanged', { action: 'remove', category: cat, link });
     }
 }
 

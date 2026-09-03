@@ -48,6 +48,16 @@ test('normalizeCategories：对象补缺失字段并布尔化', () => {
     assert.equal(cats.b.links.length, 1);
 });
 
+test('normalizeCategories：为缺失 id 的卡片补齐，已有 id 保留', () => {
+    const cats = normalizeCategories({
+        a: { links: [{ url: 'u' }, { url: 'v', id: 'keep' }] },
+        b: [{ url: 'w' }],
+    });
+    assert.ok(cats.a.links[0].id);
+    assert.equal(cats.a.links[1].id, 'keep');
+    assert.ok(cats.b.links[0].id);
+});
+
 test('timingSafeEqual：相等/不等/长度不同', async () => {
     assert.equal(await timingSafeEqual('secret', 'secret'), true);
     assert.equal(await timingSafeEqual('secret', 'secreT'), false);

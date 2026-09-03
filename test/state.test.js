@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {
     getCategories, isEditMode, isLoggedIn,
     setEditMode, setLoggedIn, setCategories,
-    addLink, updateLink, removeLink,
+    addLink, updateLink, removeLink, findLinkById,
     addCategory, renameCategory, deleteCategory,
     moveCategory, pinCategory, setCategoryHidden,
     reorderCards, isCategoryAppLayout, setCategoryAppLayout,
@@ -18,6 +18,21 @@ function flushNow() {
 function link(url, category, extra = {}) {
     return { name: url, url, category, isPrivate: false, ...extra };
 }
+
+test('setCategories 为缺失 id 的卡片补齐身份，已有 id 保留', () => {
+    setCategories({ A: { isHidden: false, links: [link('x.com', 'A'), { ...link('y.com', 'A'), id: 'keep-me' }] } });
+    const links = getCategories().A.links;
+    assert.ok(links[0].id);
+    assert.notEqual(links[0].id, 'keep-me');
+    assert.equal(links[1].id, 'keep-me');
+    assert.equal(findLinkById('keep-me'), links[1]);
+});
+
+test('addLink 为新卡生成 id', () => {
+    setCategories({ A: { isHidden: false, links: [] } });
+    addLink('A', link('x.com', 'A'));
+    assert.ok(getCategories().A.links[0].id);
+});
 
 test('setCategories 装载数据并触发 categoriesLoaded', () => {
     let loaded = null;
@@ -37,25 +52,51 @@ test('addLink 标记所在分类为脏', async () => {
     assert.deepEqual([...dirty], ['A']);
 });
 
-test('updateLink 跨分类移动时两个分类都标记脏', async () => {
+test('updateLink 按引用定位，跨分类移动时保留 id 且两个分类都标脏', async () => {
     const dirty = new Set();
     setFlushHandler(d => d.forEach(c => dirty.add(c)));
     setCategories({
         A: { isHidden: false, links: [link('x.com', 'A')] },
         B: { isHidden: false, links: [] },
     });
-    updateLink('x.com', link('x.com', 'B'));
+    const old = getCategories().A.links[0];
+    updateLink(old, link('x.com', 'B'));
     await flushNow();
     assert.deepEqual([...dirty].sort(), ['A', 'B']);
     assert.equal(getCategories().A.links.length, 0);
     assert.equal(getCategories().B.links.length, 1);
+    assert.equal(getCategories().B.links[0].id, old.id); // 身份随卡片迁移保留
 });
 
-test('removeLink 按原 URL 定位并删除', () => {
+test('updateLink 兼容陈旧引用：按 id 兑底命中', () => {
     setCategories({ A: { isHidden: false, links: [link('x.com', 'A')] } });
-    removeLink('x.com');
+    const stale = { ...getCategories().A.links[0] }; // 引用已不在 state 中，但 id 相同
+    updateLink(stale, { ...link('x2.com', 'A'), category: 'A' });
+    assert.equal(getCategories().A.links.length, 1);
+    assert.equal(getCategories().A.links[0].url, 'x2.com');
+    assert.equal(getCategories().A.links[0].id, stale.id);
+});
+
+test('同 URL 双卡各自更新/删除命中正确目标', () => {
+    setCategories({
+        A: { isHidden: false, links: [link('dup.com', 'A')] },
+        B: { isHidden: false, links: [{ ...link('dup.com', 'B'), name: 'B侧' }] },
+    });
+    const aRef = getCategories().A.links[0];
+    const bRef = getCategories().B.links[0];
+    updateLink(bRef, { ...bRef, name: '改名后' });
+    assert.equal(getCategories().A.links[0].name, 'dup.com');
+    assert.equal(getCategories().B.links[0].name, '改名后');
+    removeLink(aRef);
     assert.equal(getCategories().A.links.length, 0);
-    removeLink('不存在.com'); // 不抛错
+    assert.equal(getCategories().B.links.length, 1);
+});
+
+test('removeLink 按引用定位并删除，未命中不抛错', () => {
+    setCategories({ A: { isHidden: false, links: [link('x.com', 'A')] } });
+    removeLink(getCategories().A.links[0]);
+    assert.equal(getCategories().A.links.length, 0);
+    removeLink({ url: '不存在.com' }); // 不抛错
 });
 
 test('reorderCards 覆盖分类链接顺序', () => {

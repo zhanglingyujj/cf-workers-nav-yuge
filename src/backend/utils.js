@@ -94,6 +94,15 @@ export function parseCookie(cookieHeader) {
     return cookies;
 }
 
+let _linkIdCounter = 0;
+
+function newLinkId() {
+    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+        return crypto.randomUUID();
+    }
+    return 'link-' + Date.now().toString(36) + '-' + (++_linkIdCounter);
+}
+
 export function normalizeCategories(categories) {
     for (const key in categories) {
         if (Array.isArray(categories[key])) {
@@ -102,6 +111,10 @@ categories[key] = { isHidden: false, isAppLayout: false, links: categories[key] 
             categories[key].isHidden = Boolean(categories[key].isHidden);
             categories[key].isAppLayout = Boolean(categories[key].isAppLayout);
             categories[key].links = categories[key].links || [];
+        }
+        const links = categories[key] && categories[key].links;
+        if (Array.isArray(links)) {
+            links.forEach(l => { if (l && !l.id) l.id = newLinkId(); });
         }
     }
     return categories;
