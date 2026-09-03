@@ -1,6 +1,6 @@
 // auth.js - 客户端认证 + API 通信
 import { setLoggedIn, getCategories, setCategories } from './state.js';
-import { customAlert } from './dialogs.js';
+import { openAlert, openConfirm } from './overlay.js';
 
 export async function validateToken() {
     const t = localStorage.getItem('authToken');
@@ -16,7 +16,7 @@ export async function validateTokenOrRedirect() {
     if (!valid) {
         localStorage.removeItem('authToken');
         setLoggedIn(false);
-        await customAlert('登录凭证已过期，请重新登录');
+        await openAlert('登录凭证已过期，请重新登录');
         return false;
     }
     return true;
@@ -51,7 +51,7 @@ export async function fetchWithAuth(url, options = {}) {
         } catch (refreshError) {
             localStorage.removeItem('authToken');
             setLoggedIn(false);
-            await customAlert('登录已过期，请重新登录');
+            await openAlert('登录已过期，请重新登录');
             throw new Error('Unauthorized');
         }
     }
@@ -84,7 +84,7 @@ export async function loadLinks() {
         updateCategorySelectDropdown?.();
     } catch (error) {
         console.error('Error loading links:', error);
-        await customAlert('加载链接时出错，请刷新页面重试');
+        await openAlert('加载链接时出错，请刷新页面重试');
     }
 }
 
@@ -105,7 +105,7 @@ export async function reloadLinksAfterLogin(token) {
 
 export async function exportData() {
     if (!(await validateTokenOrRedirect())) return;
-    if (!(await customConfirm('确定要导出数据吗？'))) return;
+    if (!(await openConfirm('确定要导出数据吗？'))) return;
     try {
         const res = await fetchWithAuth("/api/exportData", { method: "POST" });
         if (!res.ok) throw new Error("Export failed");
@@ -119,14 +119,13 @@ export async function exportData() {
         a.click();
         document.body.removeChild(a);
     } catch (e) {
-        if (e.message !== 'Unauthorized') await customAlert("导出失败");
+        if (e.message !== 'Unauthorized') await openAlert("导出失败");
     }
 }
 
 export async function importData(fileInput) {
     if (!(await validateTokenOrRedirect())) return;
-    const { customConfirm } = await import('./dialogs.js');
-    if (!(await customConfirm("确定要导入数据吗？导入将覆盖现有数据！"))) return;
+    if (!(await openConfirm("确定要导入数据吗？导入将覆盖现有数据！"))) return;
 
     fileInput.value = '';
     fileInput.onchange = async (e) => {
@@ -143,20 +142,16 @@ export async function importData(fileInput) {
                         body: JSON.stringify(data)
                     });
                     if (!res.ok) throw new Error("Import failed");
-                    await customAlert('数据导入成功！');
+                    await openAlert('数据导入成功！');
                     location.reload();
                 } catch (error) {
-                    await customAlert('文件格式错误，请检查文件内容！');
+                    await openAlert('文件格式错误，请检查文件内容！');
                 }
             };
             reader.readAsText(file);
         } catch (error) {
-            await customAlert('数据导入失败，请重试！');
+            await openAlert('数据导入失败，请重试！');
         }
     };
     fileInput.click();
-}
-
-function customConfirm(msg) {
-    return import('./dialogs.js').then(m => m.customConfirm(msg));
 }

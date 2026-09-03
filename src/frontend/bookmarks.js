@@ -15,7 +15,7 @@ export function importBookmarks(fileInput) {
 }
 
 async function handleBookmarkFile(file) {
-    const { customAlert, customConfirm } = await import('./dialogs.js');
+    const { openAlert, openConfirm } = await import('./overlay.js');
     if (!(await validateTokenOrRedirect())) return;
 
     const text = await file.text();
@@ -41,14 +41,14 @@ async function handleBookmarkFile(file) {
         ? Object.values(imported).reduce((n, links) => n + links.length, 0)
         : 0;
     if (!imported || !total) {
-        await customAlert('无法识别的文件或没有可导入的书签（支持：浏览器导出的书签 HTML、Sun-Panel 导出 JSON）');
+        await openAlert('无法识别的文件或没有可导入的书签（支持：浏览器导出的书签 HTML、Sun-Panel 导出 JSON）');
         return;
     }
 
     const summary = Object.entries(imported)
         .map(([cat, links]) => `${cat}(${links.length}条)`)
         .join('、');
-    if (!(await customConfirm(`解析成功：${summary}，共 ${total} 条。将按 URL 去重后追加到现有数据，确定导入吗？`))) return;
+    if (!(await openConfirm(`解析成功：${summary}，共 ${total} 条。将按 URL 去重后追加到现有数据，确定导入吗？`))) return;
 
     const categories = getCategories();
     const existing = new Set(
@@ -68,5 +68,5 @@ async function handleBookmarkFile(file) {
 
     await commit('导入书签');
     await loadLinks();
-    await customAlert(`导入完成：新增 ${added} 条，跳过重复 ${total - added} 条`);
+    await openAlert(`导入完成：新增 ${added} 条，跳过重复 ${total - added} 条`);
 }

@@ -56,7 +56,7 @@ export function doSearch(query) {
         const filtered = getFilteredCategoriesByKeyword(query);
         const hasResults = Object.values(filtered).some(c => c.links.length > 0);
         if (!hasResults) {
-            import('./dialogs.js').then(m => m.customAlert('没有找到相关站点。'));
+            import('./overlay.js').then(m => m.openAlert('没有找到相关站点。'));
             return;
         }
         // 搜索模式: 全量重建过滤后的视图

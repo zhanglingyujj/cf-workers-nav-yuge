@@ -53,8 +53,8 @@ async function saveToServer(data) {
     if (response.status === 401) {
         localStorage.removeItem('authToken');
         setLoggedIn(false);
-        const { customAlert } = await import('./dialogs.js');
-        await customAlert('登录凭证已过期，请重新登录');
+        const { openAlert } = await import('./overlay.js');
+        await openAlert('登录凭证已过期，请重新登录');
         throw new Error('Unauthorized');
     }
 
@@ -63,8 +63,8 @@ async function saveToServer(data) {
 }
 
 async function notifyFailure(msg) {
-    const { customAlert } = await import('./dialogs.js');
-    await customAlert(msg);
+    const { openAlert } = await import('./overlay.js');
+    await openAlert(msg);
 }
 
 const defaultCommit = createCommit({

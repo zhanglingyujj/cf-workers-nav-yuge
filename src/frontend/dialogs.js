@@ -1,8 +1,9 @@
-// dialogs.js - 弹窗管理 (添加/编辑卡片, 分类命名, confirm, alert, 密码登录)
+// dialogs.js - 弹窗管理 (添加/编辑卡片, 密码登录)
 import { addLink, updateLink, removeLink, getCategories, addCategory, setLoggedIn, setEditMode } from './state.js';
 import { updateUIState, renderAll } from './render.js';
 import { commit } from './commit.js';
 import { getEl } from './utils.js';
+import { openAlert, openConfirm, openPrompt, runDialog } from './overlay.js';
 
 function toggleOverlay(id, show) {
     const overlay = document.getElementById(id);
@@ -165,7 +166,7 @@ async function addCard() {
     const url = getEl('url-input').value.trim();
     const category = getEl('category-select-value').value;
     if (!name || !url || !category) {
-        await customAlert('请填写必要信息 (名称, URL, 分类)');
+        await openAlert('请填写必要信息 (名称, URL, 分类)');
         return;
     }
 
@@ -220,12 +221,12 @@ export async function editCategoryName(oldName) {
     const { validateTokenOrRedirect } = await import('./auth.js');
     if (!(await validateTokenOrRedirect())) return;
 
-    const newName = await showCategoryDialog('请输入新的分类名称', oldName);
+    const newName = await openPrompt('请输入新的分类名称', oldName);
     if (!newName || newName === oldName) return;
 
     const categories = getCategories();
     if (categories[newName]) {
-        await customAlert('该名称已存在');
+        await openAlert('该名称已存在');
         return;
     }
 
@@ -240,11 +241,11 @@ export async function addCategoryAction() {
     const { validateTokenOrRedirect } = await import('./auth.js');
     if (!(await validateTokenOrRedirect())) return;
 
-    const name = await showCategoryDialog('请输入新分类名称');
+    const name = await openPrompt('请输入新分类名称');
     if (!name) return;
     const categories = getCategories();
     if (categories[name]) {
-        await customAlert('该分类已存在');
+        await openAlert('该分类已存在');
         return;
     }
     addCategory(name);
@@ -252,61 +253,6 @@ export async function addCategoryAction() {
     renderAll();
     setTimeout(() => window.scrollTo(0, document.body.scrollHeight), 100);
     await commit('新增分类');
-}
-
-function showCategoryDialog(title, defaultVal = '') {
-    return new Promise(resolve => {
-        toggleOverlay('category-dialog', true);
-        const titleEl = getEl('category-dialog-title');
-        const input = getEl('category-name-input');
-        if (titleEl) titleEl.innerText = title;
-        if (input) { input.value = defaultVal; input.focus(); }
-
-        const confirmBtn = getEl('category-confirm-btn');
-        const cancelBtn = getEl('category-cancel-btn');
-
-        const close = (val) => {
-            toggleOverlay('category-dialog', false);
-            if (confirmBtn) confirmBtn.onclick = null;
-            if (cancelBtn) cancelBtn.onclick = null;
-            resolve(val);
-        };
-
-        if (confirmBtn) confirmBtn.onclick = () => close(input ? input.value.trim() : null);
-        if (cancelBtn) cancelBtn.onclick = () => close(null);
-    });
-}
-
-export function customConfirm(msg) {
-    return new Promise(resolve => {
-        toggleOverlay('custom-confirm-overlay', true);
-        const msgEl = getEl('custom-confirm-message');
-        if (msgEl) msgEl.innerText = msg;
-
-        const okBtn = getEl('custom-confirm-ok');
-        const cancelBtn = getEl('custom-confirm-cancel');
-        const close = (val) => {
-            toggleOverlay('custom-confirm-overlay', false);
-            if (okBtn) okBtn.onclick = null;
-            if (cancelBtn) cancelBtn.onclick = null;
-            resolve(val);
-        };
-        if (okBtn) okBtn.onclick = () => close(true);
-        if (cancelBtn) cancelBtn.onclick = () => close(false);
-    });
-}
-
-export function customAlert(msg) {
-    return new Promise(resolve => {
-        toggleOverlay('custom-alert-overlay', true);
-        const contentEl = getEl('custom-alert-content');
-        if (contentEl) contentEl.innerText = msg;
-        const confirmBtn = getEl('custom-alert-confirm');
-        if (confirmBtn) confirmBtn.onclick = () => {
-            toggleOverlay('custom-alert-overlay', false);
-            resolve();
-        };
-    });
 }
 
 export function initDialogs() {
@@ -334,7 +280,7 @@ if (data.valid) {
                         await reloadLinksAfterLogin(data.token);
                         if (loadingMask) loadingMask.classList.add('hidden');
                     }
-            } catch (e) { await customAlert('Login Error'); }
+            } catch (e) { await openAlert('Login Error'); }
         });
     }
     if (passwordCancelBtn) {
@@ -372,7 +318,7 @@ if (data.valid) {
                 const pwdInput = getEl('password-input');
                 if (pwdInput) pwdInput.focus();
             } else {
-                if (await customConfirm('确定退出登录吗？')) {
+                if (await openConfirm('确定退出登录吗？')) {
                     localStorage.removeItem('authToken');
                     setLoggedIn(false);
                     const { checkLoginStatusAndLoad } = await import('./auth.js');
@@ -409,25 +355,26 @@ if (data.valid) {
     }
 
     function showImportChooser(importFileInput) {
-        toggleOverlay('import-chooser-overlay', true);
+        const overlay = document.getElementById('import-chooser-overlay');
+        if (!overlay) return;
 
-        const close = () => toggleOverlay('import-chooser-overlay', false);
-
-        const bookmarkChoice = getEl('import-bookmark-choice');
-        const configChoice = getEl('import-config-choice');
-        const cancelBtn = getEl('import-chooser-cancel');
-        if (bookmarkChoice) bookmarkChoice.onclick = async () => {
-            close();
-            const bookmarkFileInput = getEl('bookmark-file-input');
-            const { importBookmarks } = await import('./bookmarks.js');
-            importBookmarks(bookmarkFileInput);
-        };
-        if (configChoice) configChoice.onclick = async () => {
-            close();
-            const { importData } = await import('./auth.js');
-            await importData(importFileInput);
-        };
-        if (cancelBtn) cancelBtn.onclick = close;
+        runDialog(overlay, close => {
+            const bookmarkChoice = getEl('import-bookmark-choice');
+            const configChoice = getEl('import-config-choice');
+            const cancelBtn = getEl('import-chooser-cancel');
+            if (bookmarkChoice) bookmarkChoice.onclick = async () => {
+                close();
+                const bookmarkFileInput = getEl('bookmark-file-input');
+                const { importBookmarks } = await import('./bookmarks.js');
+                importBookmarks(bookmarkFileInput);
+            };
+            if (configChoice) configChoice.onclick = async () => {
+                close();
+                const { importData } = await import('./auth.js');
+                await importData(importFileInput);
+            };
+            if (cancelBtn) cancelBtn.onclick = () => close();
+        });
     }
 
     // 分类选择下拉 (在编辑弹窗中)

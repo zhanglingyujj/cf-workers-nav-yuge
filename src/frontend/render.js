@@ -308,8 +308,8 @@ function createCategoryControls(categoryName, isHidden, isApp) {
     buttons[5].addEventListener('click', async () => {
         const { validateTokenOrRedirect } = await import('./auth.js');
         if (!await validateTokenOrRedirect()) return;
-        const { customConfirm } = await import('./dialogs.js');
-        if (await customConfirm(`确定删除 "${categoryName}" 分类及其所有链接吗？`)) {
+        const { openConfirm } = await import('./overlay.js');
+        if (await openConfirm(`确定删除 "${categoryName}" 分类及其所有链接吗？`)) {
             deleteCategory(categoryName);
             await commit('删除分类');
         }
