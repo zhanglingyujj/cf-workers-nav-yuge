@@ -201,3 +201,18 @@ test('searchCategories 空查询返回全量可见集', () => {
     assert.deepEqual(Object.keys(r), ['工具']);
     assert.equal(r.工具.links.length, 1);
 });
+
+import {
+    linkMatches,
+} from '../src/frontend/state.js';
+
+test('linkMatches 匹配 name/tips/url 且不区分大小写', () => {
+    const link0 = { name: 'GitHub', url: 'github.com', tips: '代码托管' };
+    assert.equal(linkMatches(link0, 'git'), true);       // url + name
+    assert.equal(linkMatches(link0, '代码'), true);      // tips
+    assert.equal(linkMatches(link0, 'github'), true);   // 输入约定为已小写的 query，链接字段自身大小写不敏感
+    assert.equal(linkMatches(link0, '不存在的词'), false);
+    const bare = { name: '站', url: 'a.com' };           // 无 tips 字段不误匹配
+    assert.equal(linkMatches(bare, ''), true);
+    assert.equal(linkMatches(bare, 'x'), false);
+});

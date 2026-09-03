@@ -1,5 +1,5 @@
 // command.js - 命令条 + 命令面板（Command Bar 范式，替代原顶部搜索栏 + 快捷分类栏）
-import { getCategories, isLoggedIn, isEditMode } from './state.js';
+import { getVisibleCategories, linkMatches } from './state.js';
 import { getEl } from './utils.js';
 import { getEngine, getEngineList, setEngineByIndex, doSearch } from './search.js';
 
@@ -68,27 +68,18 @@ function closePalette() {
     palette.classList.remove('flex');
 }
 
-function visibleCategories() {
-    const categories = getCategories();
-    return Object.keys(categories).filter(c =>
-        (categories[c].links || []).some(l => !l.isPrivate || isLoggedIn()) &&
-        (!categories[c].isHidden || isEditMode() || isLoggedIn())
-    );
-}
-
 function buildItems(query) {
     const q = (query || '').toLowerCase();
-    const categories = getCategories();
     items = [];
 
-    visibleCategories().forEach(cat => {
-        const links = (categories[cat].links || []).filter(l => !l.isPrivate || isLoggedIn());
+    Object.entries(getVisibleCategories()).forEach(([cat, catData]) => {
+        const links = catData.links || [];
         if (!q || cat.toLowerCase().includes(q)) {
             items.push({ type: 'cat', name: cat, meta: `${links.length} 个站点` });
         }
         if (q) {
             links
-                .filter(l => (l.name || '').toLowerCase().includes(q) || (l.url || '').toLowerCase().includes(q))
+                .filter(l => linkMatches(l, q))
                 .forEach(l => items.push({ type: 'link', name: l.name, url: l.url, meta: cat }));
         }
     });

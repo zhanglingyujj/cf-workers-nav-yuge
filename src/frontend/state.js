@@ -196,16 +196,19 @@ export function getVisibleCategories() {
     return result;
 }
 
+// 卡片关键词匹配唯一出处（name/tips/url，不区分大小写），站内搜索与命令面板共用
+export function linkMatches(link, lowerQuery) {
+    const nameMatch = link.name && link.name.toLowerCase().includes(lowerQuery);
+    const tipsMatch = link.tips && link.tips.toLowerCase().includes(lowerQuery);
+    const urlMatch = link.url && link.url.toLowerCase().includes(lowerQuery);
+    return !!(nameMatch || tipsMatch || urlMatch);
+}
+
 export function searchCategories(query) {
     const lowerQuery = query.toLowerCase();
     const result = {};
     for (const [cat, catData] of Object.entries(getVisibleCategories())) {
-        const matchedLinks = (catData.links || []).filter(link => {
-            const nameMatch = link.name && link.name.toLowerCase().includes(lowerQuery);
-            const tipsMatch = link.tips && link.tips.toLowerCase().includes(lowerQuery);
-            const urlMatch = link.url && link.url.toLowerCase().includes(lowerQuery);
-            return nameMatch || tipsMatch || urlMatch;
-        });
+        const matchedLinks = (catData.links || []).filter(link => linkMatches(link, lowerQuery));
         if (matchedLinks.length > 0) {
             result[cat] = { ...catData, links: matchedLinks };
         }
