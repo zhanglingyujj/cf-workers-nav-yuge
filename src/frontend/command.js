@@ -18,7 +18,7 @@ export function initCommandBar() {
     });
 
     document.addEventListener('keydown', (e) => {
-        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') {
+        if (e.altKey && !e.ctrlKey && !e.metaKey && e.key.toLowerCase() === 'c') {
             e.preventDefault();
             palette.classList.contains('hidden') ? openPalette() : closePalette();
         }
@@ -112,6 +112,7 @@ function renderList(query) {
     const fragment = document.createDocumentFragment();
     const rowBase = 'cmd-row flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer text-sm transition-colors';
     const rowSelected = `${rowBase} bg-zinc-800 text-white`;
+    const rowHover = `${rowBase} bg-zinc-200 text-zinc-900`;
     const rowNormal = `${rowBase} text-zinc-700 hover:bg-zinc-200 hover:text-zinc-900`;
     const icons = {
         cat: '<svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 002-2V8a2 2 0 00-2-2h-7.9a2 2 0 01-1.69-.9L9.6 3.9A2 2 0 007.93 3H4a2 2 0 00-2 2v13a2 2 0 002 2z"></path></svg>',
@@ -120,17 +121,21 @@ function renderList(query) {
     };
     items.forEach((it, i) => {
         const row = document.createElement('div');
-        const selected = i === selectedIndex;
-        row.className = selected ? rowSelected : rowNormal;
-        row.innerHTML = `<span class="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 ${selected ? 'bg-white/25 text-white' : 'bg-zinc-200/70 text-zinc-600'}">${icons[it.type]}</span>
+        const state = i === selectedIndex ? 'selected' : 'normal';
+        row.className = state === 'selected' ? rowSelected : rowNormal;
+        row.innerHTML = `<span class="cmd-icon w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 ${state === 'selected' ? 'bg-zinc-600 text-white' : 'bg-zinc-200/70 text-zinc-600'}">${icons[it.type]}</span>
             <span class="truncate font-medium">${it.name}</span>
             <span class="ml-auto text-xs opacity-60 flex-shrink-0">${it.meta || ''}</span>`;
         row.addEventListener('click', () => activate(it, query));
         row.addEventListener('mouseenter', () => {
             if (selectedIndex === i) return;
             selectedIndex = i;
+            // 悬停与其它菜单同规格（灰底深字），黑色仅留给键盘选中态
             list.querySelectorAll('.cmd-row').forEach((r, j) => {
-                r.className = j === i ? rowSelected : rowNormal;
+                const s = j === i ? 'hover' : 'normal';
+                r.className = s === 'hover' ? rowHover : rowNormal;
+                const chip = r.querySelector('.cmd-icon');
+                if (chip) chip.className = `cmd-icon w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 ${s === 'hover' ? 'bg-zinc-300 text-zinc-700' : 'bg-zinc-200/70 text-zinc-600'}`;
             });
         });
         fragment.appendChild(row);
