@@ -25,7 +25,7 @@
 - 📝 站点标题、壁纸/遮罩/模糊可自定义（登录后可用，KV 持久化）
 - 📱 PWA 离线可用（manifest + service worker）
 - 🚀 单请求渲染 — 一次 getLinks 获取数据 + 认证状态，刷新即显
-- 🧩 模块化架构 — 26 个源文件，esbuild 构建为单文件部署，node:test 46 组回归
+- 🧩 模块化架构 — 27 个源文件，esbuild 构建为单文件部署，node:test 59 组回归
 
 ## 快速部署
 
@@ -88,7 +88,7 @@ npm test   # node --test test/**/*.js
 │   ├── frontend/             # 前端模块
 │   │   ├── index.html        # HTML 骨架（构建期内联 Tailwind CSS）
 │   │   ├── app.js            # 入口：纯装配职责
-│   │   ├── state.js          # 集中状态 + 脏标记 + 订阅系统（RAF 可回退）
+│   │   ├── state.js          # 集中状态 + 脏标记 + 订阅系统 + 可见性/搜索选择器（RAF 可回退）
 │   │   ├── render.js         # 增量 DOM 渲染（对账 + patchCategory）
 │   │   ├── commit.js         # 提交模块：数据落库唯一通道（commit / commitSoon）
 │   │   ├── card.js           # 卡片元素创建/更新 + 共享单例编辑菜单
@@ -96,8 +96,9 @@ npm test   # node --test test/**/*.js
 │   │   ├── command.js        # 命令面板（浮岛搜索触发 / Alt C / / 唤起）
 │   │   ├── background.js     # 站点标题/壁纸/遮罩/模糊设置（服务器 + localStorage 回退）
 │   │   ├── search.js         # 多引擎搜索 + 站内筛选 + 清除筛选浮标
-│   │   ├── auth.js           # 客户端认证（fetchWithAuth + 自动 refresh）
-│   │   ├── dialogs.js        # 弹窗管理（添加/编辑/分类/确认/登录/导入选择）
+│   │   ├── auth.js           # 客户端认证 + 会话（login/logout/load；fetchWithAuth 自动 refresh）
+│   │   ├── dialogs.js        # 弹窗管理（添加/编辑卡片表单、密码登录、导入选择）
+│   │   ├── overlay.js         # 浮层弹窗三原语（openAlert/openConfirm/openPrompt，动态 DOM）
 │   │   ├── bookmarks.js      # 书签导入入口
 │   │   ├── bookmark-parsers.js # Netscape HTML / Sun-Panel JSON 解析
 │   │   ├── shortcuts.js      # 全局快捷键（/ 唤起面板、数字键开卡）
@@ -127,7 +128,7 @@ npm test   # node --test test/**/*.js
 ### 单请求认证流
 
 ```
-loadLinks() → /api/getLinks
+load() → /api/getLinks
   ├─ JWT 验证（后端）
   └─ 返回 { categories, isAuthenticated }
 

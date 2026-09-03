@@ -6,7 +6,7 @@
 
 ```bash
 npm run build     # Tailwind 编译 + esbuild 打包 → dist/workers.js
-npm test          # node --test test/**/*.js（当前 46 组）
+npm test          # node --test test/**/*.js（当前 59 组）
 npm run dev       # wrangler dev 本地开发（默认 8787）
 npm run deploy    # 构建后 wrangler deploy
 npx wrangler login / kv:namespace create "CARD_ORDER" / secret put <NAME>
@@ -27,6 +27,7 @@ node build.js --check-classes   # 校验源码 class 全部命中生成的 CSS�
 
 - `src/frontend/state.js` 是唯一数据源。UI 事件处理器只调 mutator + commit，**不手动 renderAll**（管线会自动渲染；例外：切换分类 APP 布局涉及整块卡片形态重建，才手动 renderAll）。
 - 删除/改名分组靠 `reconcileSections` 对账（脏集合无法表达"键消失"），勿绕过。
+- 可见性规则（隐藏分组、私密卡、空分组）唯一出处是 `state.getVisibleCategories()`；渲染、站内搜索、命令面板统一消费它，勿在各处重写布尔判断。
 - `requestAnimationFrame` 在 state.js 中有 node 回退（`setTimeout(0)`），别在模块顶层直接引用浏览器全局。
 
 ### 持久化：commit 是唯一通道
@@ -42,7 +43,7 @@ node build.js --check-classes   # 校验源码 class 全部命中生成的 CSS�
 
 ## 测试约定
 
-`test/` 下 node:test 纯 Node 环境，无 DOM/fetch/localStorage。可测的形态看现有先例：纯函数（`bookmark-parsers`、`background.resolveSettings`）、依赖注入（`commit.createCommit`）、RAF 回退（`state.js`）。后端 handler 直接测（mock env/request）。
+`test/` 下 node:test 纯 Node 环境，无 DOM/fetch/localStorage。可测的形态看现有先例：纯函数（`bookmark-parsers`、`background.resolveSettings`）、依赖注入（`commit.createCommit`、`auth.createSession`）、RAF 回退（`state.js`）。后端 handler 直接测（mock env/request）。
 
 ## 文档指针
 
