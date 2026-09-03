@@ -18,7 +18,7 @@ export function initCommandBar() {
     });
 
     document.addEventListener('keydown', (e) => {
-        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') {
             e.preventDefault();
             palette.classList.contains('hidden') ? openPalette() : closePalette();
         }
@@ -110,19 +110,27 @@ function renderList(query) {
     }
 
     const fragment = document.createDocumentFragment();
+    const rowBase = 'cmd-row flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer text-sm transition-colors';
+    const rowSelected = `${rowBase} bg-zinc-800 text-white`;
+    const rowNormal = `${rowBase} text-zinc-700 hover:bg-zinc-200 hover:text-zinc-900`;
+    const icons = {
+        cat: '<svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 002-2V8a2 2 0 00-2-2h-7.9a2 2 0 01-1.69-.9L9.6 3.9A2 2 0 007.93 3H4a2 2 0 00-2 2v13a2 2 0 002 2z"></path></svg>',
+        link: '<svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"></path></svg>',
+        search: '<svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="M21 21l-4.35-4.35"></path></svg>',
+    };
     items.forEach((it, i) => {
         const row = document.createElement('div');
-        row.className = `cmd-row flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer text-sm transition-colors ${i === selectedIndex ? 'bg-zinc-800 text-white' : 'text-zinc-700 hover:bg-zinc-200'}`;
-        const icon = it.type === 'cat' ? '🗂' : it.type === 'link' ? '🔗' : '🌐';
-        row.innerHTML = `<span class="w-6 h-6 rounded-lg flex items-center justify-center text-xs flex-shrink-0 ${i === selectedIndex ? 'bg-white/25' : 'bg-zinc-200/70'}">${icon}</span>
+        const selected = i === selectedIndex;
+        row.className = selected ? rowSelected : rowNormal;
+        row.innerHTML = `<span class="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 ${selected ? 'bg-white/25 text-white' : 'bg-zinc-200/70 text-zinc-600'}">${icons[it.type]}</span>
             <span class="truncate font-medium">${it.name}</span>
             <span class="ml-auto text-xs opacity-60 flex-shrink-0">${it.meta || ''}</span>`;
         row.addEventListener('click', () => activate(it, query));
         row.addEventListener('mouseenter', () => {
+            if (selectedIndex === i) return;
             selectedIndex = i;
             list.querySelectorAll('.cmd-row').forEach((r, j) => {
-                r.classList.toggle('bg-zinc-800', j === i);
-                r.classList.toggle('text-white', j === i);
+                r.className = j === i ? rowSelected : rowNormal;
             });
         });
         fragment.appendChild(row);

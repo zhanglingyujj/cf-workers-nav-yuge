@@ -1,7 +1,7 @@
 // PWA 静态资源：manifest、应用图标、service worker（均由 Worker 直接返回）
 
 export const MANIFEST = JSON.stringify({
-    name: 'Card Tab - 我的导航',
+    name: '珊岛听海',
     short_name: 'Card Tab',
     start_url: '/',
     display: 'standalone',

@@ -52,7 +52,7 @@ test('PWA 资源：manifest / icon.svg / sw.js 均可访问', async () => {
     const manifest = await worker.fetch(new Request('https://example.com/manifest.webmanifest'), env, ctx);
     assert.equal(manifest.status, 200);
     assert.match(manifest.headers.get('Content-Type'), /manifest\+json/);
-    assert.equal(JSON.parse(await manifest.text()).name, 'Card Tab - 我的导航');
+    assert.equal(JSON.parse(await manifest.text()).name, '珊岛听海');
 
     const icon = await worker.fetch(new Request('https://example.com/icon.svg'), env, ctx);
     assert.equal(icon.status, 200);

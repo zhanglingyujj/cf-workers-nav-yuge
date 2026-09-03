@@ -1,7 +1,7 @@
 // background.js - 壁纸/遮罩/模糊设置：加载（服务器优先 + localStorage 回退镜像）、实时预览、防抖持久化
 import { getEl } from './utils.js';
 
-const DEFAULTS = { backgroundImage: '', backgroundOpacity: 20, backgroundBlur: 0, siteTitle: '我的导航' };
+const DEFAULTS = { backgroundImage: '', backgroundOpacity: 20, backgroundBlur: 0, siteTitle: '珊岛听海' };
 
 // 纯函数：合并服务器设置与 localStorage 回退（服务器无值时降级，有值时镜像回写由调用方处理）
 export function resolveSettings(serverSettings, storage = localStorage) {
