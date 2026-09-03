@@ -1,5 +1,5 @@
 // search.js - 搜索引擎 + 站内筛选
-import { renderAll, getFilteredCategoriesByKeyword, renderCategoryButtons } from './render.js';
+import { renderAll, getFilteredCategoriesByKeyword } from './render.js';
 import { getCategories } from './state.js';
 import { getEl } from './utils.js';
 
@@ -93,11 +93,32 @@ export function doSearch(query) {
         }
         container.innerHTML = '';
         container.appendChild(fragment);
-        renderCategoryButtons();
-
-        const clearBtn = getEl('clear-search-button');
-        if (clearBtn) clearBtn.classList.remove('hidden');
+        showFilterChip(query);
     } else {
         window.open(searchEngines[currentEngine] + encodeURIComponent(query), '_blank');
     }
+}
+
+// 搜索态浮标：提示当前筛选并提供一键清除
+function showFilterChip(query) {
+    let chip = getEl('filter-chip');
+    if (!chip) {
+        chip = document.createElement('button');
+        chip.id = 'filter-chip';
+        chip.className = 'fixed top-5 right-20 z-40 flex items-center gap-2 h-11 px-4 rounded-2xl border border-zinc-300 bg-white/95 backdrop-blur-xl shadow-lg shadow-black/20 text-sm text-zinc-700 hover:bg-zinc-100 transition-colors';
+        chip.innerHTML = '<span class="font-medium truncate"></span><svg class="w-3.5 h-3.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"></path></svg>';
+        chip.addEventListener('click', async () => {
+            hideFilterChip();
+            const { renderAll } = await import('./render.js');
+            renderAll();
+        });
+        document.body.appendChild(chip);
+    }
+    chip.querySelector('span').textContent = `筛选：${query}`;
+    chip.classList.remove('hidden');
+}
+
+export function hideFilterChip() {
+    const chip = getEl('filter-chip');
+    if (chip) chip.classList.add('hidden');
 }

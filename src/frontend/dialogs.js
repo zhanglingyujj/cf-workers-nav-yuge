@@ -1,6 +1,6 @@
 // dialogs.js - 弹窗管理 (添加/编辑卡片, 分类命名, confirm, alert, 密码登录)
 import { addLink, updateLink, removeLink, getCategories, addCategory, setLoggedIn, setEditMode } from './state.js';
-import { updateUIState, renderAll, renderCategoryButtons } from './render.js';
+import { updateUIState, renderAll } from './render.js';
 import { commit } from './commit.js';
 import { getEl } from './utils.js';
 
@@ -109,7 +109,7 @@ function updateCategorySelectDropdown() {
     const categories = getCategories();
     Object.keys(categories).forEach(cat => {
         const item = document.createElement('div');
-        item.className = 'px-3 py-2.5 text-sm text-heritage-outline hover:bg-heritage-dark-700/50 hover:text-heritage-500 cursor-pointer transition-colors';
+        item.className = 'px-3 py-2.5 text-sm text-heritage-outline hover:bg-heritage-dark-700/50 hover:text-white cursor-pointer transition-colors';
         item.textContent = cat;
         item.addEventListener('click', () => {
             const catVal = getEl('category-select-value');
@@ -198,7 +198,6 @@ const categoryChanged = (categoryName || oldLink.category) !== newLink.category;
     updateLink(oldLink.url, newLink);
     if (categoryChanged) {
         renderAll();
-        renderCategoryButtons();
     }
     toggleOverlay('dialog-overlay', false);
 
@@ -229,7 +228,7 @@ export async function editCategoryName(oldName) {
 
     const { renameCategory } = await import('./state.js');
     if (!renameCategory(oldName, newName)) return;
-    const { renderAll, renderCategoryButtons } = await import('./render.js');
+    const { renderAll } = await import('./render.js');
     renderAll();
     await commit('重命名分类');
 }

@@ -105,23 +105,23 @@ function renderList(query) {
     buildItems(query);
 
     if (items.length === 0) {
-        list.innerHTML = '<div class="px-4 py-6 text-sm text-heritage-dark-400 text-center">输入关键词开始搜索</div>';
+        list.innerHTML = '<div class="px-4 py-6 text-sm text-zinc-400 text-center">输入关键词开始搜索</div>';
         return;
     }
 
     const fragment = document.createDocumentFragment();
     items.forEach((it, i) => {
         const row = document.createElement('div');
-        row.className = `cmd-row flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer text-sm transition-colors ${i === selectedIndex ? 'bg-heritage-500 text-white' : 'text-heritage-dark-300 hover:bg-heritage-dark-700/50'}`;
+        row.className = `cmd-row flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer text-sm transition-colors ${i === selectedIndex ? 'bg-zinc-900 text-white' : 'text-zinc-600 hover:bg-zinc-100'}`;
         const icon = it.type === 'cat' ? '🗂' : it.type === 'link' ? '🔗' : '🌐';
-        row.innerHTML = `<span class="w-6 h-6 rounded-lg flex items-center justify-center text-xs flex-shrink-0 ${i === selectedIndex ? 'bg-white/20' : 'bg-heritage-dark-700'}">${icon}</span>
+        row.innerHTML = `<span class="w-6 h-6 rounded-lg flex items-center justify-center text-xs flex-shrink-0 ${i === selectedIndex ? 'bg-white/25' : 'bg-zinc-100'}">${icon}</span>
             <span class="truncate font-medium">${it.name}</span>
             <span class="ml-auto text-xs opacity-60 flex-shrink-0">${it.meta || ''}</span>`;
         row.addEventListener('click', () => activate(it, query));
         row.addEventListener('mouseenter', () => {
             selectedIndex = i;
             list.querySelectorAll('.cmd-row').forEach((r, j) => {
-                r.classList.toggle('bg-heritage-500', j === i);
+                r.classList.toggle('bg-zinc-900', j === i);
                 r.classList.toggle('text-white', j === i);
             });
         });
@@ -155,11 +155,11 @@ function activate(item, query) {
 function renderEngines() {
     const container = getEl('cmd-engines');
     if (!container) return;
-    container.innerHTML = '<span class="text-xs text-heritage-dark-400 mr-2">搜索引擎</span>';
+    container.innerHTML = '<span class="text-xs text-zinc-400 mr-2">搜索引擎</span>';
 
     getEngineList().forEach((eng, i) => {
         const btn = document.createElement('button');
-        btn.className = `px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${eng.key === getEngine() ? 'bg-heritage-500 text-white' : 'text-heritage-dark-300 hover:bg-heritage-dark-700/50'}`;
+        btn.className = `px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${eng.key === getEngine() ? 'bg-zinc-900 text-white' : 'text-zinc-600 hover:bg-zinc-100'}`;
         btn.textContent = eng.label;
         btn.addEventListener('click', () => {
             setEngineByIndex(i);

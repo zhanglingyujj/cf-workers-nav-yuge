@@ -10,7 +10,6 @@ import { getEl } from './utils.js';
 import { commit, commitSoon } from './commit.js';
 
 const containerId = 'sections-container';
-const buttonsContainerId = 'category-buttons-container';
 const addCategoryContainerId = 'add-category-container';
 
 let _renderedCategories = new Set();
@@ -39,8 +38,6 @@ export function initRender() {
     setFlushHandler((dirtyCategories) => {
         reconcileSections();
         dirtyCategories.forEach(cat => patchCategory(cat));
-        renderCategoryButtons();
-        setupScrollSpyNow();
     });
 
     subscribe('editMode', () => {
@@ -100,9 +97,7 @@ export function renderAll() {
     }
 
     container.appendChild(fragment);
-    renderCategoryButtons();
     updateUIState();
-    setupScrollSpyNow();
 }
 
 export function patchCategory(categoryName) {
@@ -113,7 +108,6 @@ export function patchCategory(categoryName) {
         const oldSection = document.getElementById(categoryName);
         if (oldSection) oldSection.remove();
         _renderedCategories.delete(categoryName);
-        renderCategoryButtons();
         return;
     }
 
@@ -122,7 +116,6 @@ export function patchCategory(categoryName) {
         const oldSection = document.getElementById(categoryName);
         if (oldSection) oldSection.remove();
         _renderedCategories.delete(categoryName);
-        renderCategoryButtons();
         return;
     }
 
@@ -274,14 +267,14 @@ function createCategoryControls(categoryName, isHidden, isApp) {
         <div class="flex items-center justify-center w-8 h-8 has-tooltip cursor-pointer" aria-label="切换分组可见性" data-tooltip="${isHidden ? '显示分类' : '隐藏分类'}">
             <label class="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" ${isHidden ? 'checked' : ''} class="sr-only peer category-hide-toggle">
-                <div class="w-3.5 h-3.5 rounded-full border-2 peer-focus:outline-none peer-focus-visible:ring-1 peer-focus-visible:ring-white/60 border-white/60 peer-checked:bg-heritage-500 peer-checked:border-heritage-500 transition-colors"></div>
+                <div class="w-3.5 h-3.5 rounded-full border-2 peer-focus:outline-none peer-focus-visible:ring-1 peer-focus-visible:ring-white/60 border-white/60 peer-checked:bg-white peer-checked:border-white transition-colors"></div>
             </label>
         </div>
         ${divider}
 <div class="flex items-center justify-center w-8 h-8 has-tooltip cursor-pointer" aria-label="切换APP视图" data-tooltip="${isApp ? '列表视图' : 'APP视图'}">
             <label class="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" ${isApp ? 'checked' : ''} class="sr-only peer category-app-toggle">
-                <div class="w-3.5 h-3.5 rounded-full border-2 peer-focus:outline-none peer-focus-visible:ring-1 peer-focus-visible:ring-white/60 border-white/60 peer-checked:bg-heritage-500 peer-checked:border-heritage-500 transition-colors"></div>
+                <div class="w-3.5 h-3.5 rounded-full border-2 peer-focus:outline-none peer-focus-visible:ring-1 peer-focus-visible:ring-white/60 border-white/60 peer-checked:bg-white peer-checked:border-white transition-colors"></div>
             </label>
         </div>
         ${divider}
@@ -337,8 +330,6 @@ const appToggle = controls.querySelector('.category-app-toggle');
         appToggle.addEventListener('change', async function () {
             setCategoryAppLayout(categoryName, this.checked);
             renderAll();
-            renderCategoryButtons();
-            setupScrollSpyNow();
             const container = this.closest('.has-tooltip');
             if (container) container.setAttribute('data-tooltip', this.checked ? '列表视图' : 'APP视图');
             commitSoon('切换APP视图');
@@ -348,110 +339,6 @@ const appToggle = controls.querySelector('.category-app-toggle');
     return controls;
 }
 
-
-export function renderCategoryButtons() {
-    const container = getEl(buttonsContainerId) || document.getElementById('category-buttons-container');
-    if (!container) return;
-    container.innerHTML = '';
-
-    const categories = getCategories();
-    const visibleCategories = Object.keys(categories).filter(c =>
-        (categories[c].links || []).some(l => !l.isPrivate || isLoggedIn()) &&
-        (!categories[c].isHidden || isEditMode() || isLoggedIn())
-    );
-
-    if (visibleCategories.length === 0) return;
-
-    visibleCategories.forEach(cat => {
-        const btn = document.createElement('button');
-        btn.className = 'category-button whitespace-nowrap px-4 py-1.5 text-xs font-medium rounded-xl border border-heritage-dark-600 transition-all active:scale-95 shadow-sm scroll-snap-align-start bg-heritage-dark-800 text-heritage-outline hover:text-heritage-400 hover:bg-heritage-dark-700 hover:border-heritage-500/50';
-        btn.textContent = cat;
-        btn.dataset.target = cat;
-        btn.addEventListener('click', () => {
-_manualScrollTarget = cat;
-            highlightButton(cat);
-            clearTimeout(_manualScrollTimer);
-            _manualScrollTimer = setTimeout(() => { _manualScrollTarget = null; }, 1000);
-            const section = document.getElementById(cat);
-            if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        });
-        container.appendChild(btn);
-    });
-}
-
-let _scrollObserver = null;
-let _animationFrameId = null;
-let _manualScrollTarget = null;
-let _manualScrollTimer = null;
-
-function setupScrollSpyNow() {
-    if (_scrollObserver) _scrollObserver.disconnect();
-    if (_animationFrameId) cancelAnimationFrame(_animationFrameId);
-
-    const sections = document.querySelectorAll('.section');
-    const buttons = document.querySelectorAll('.category-button');
-    if (!sections.length || !buttons.length) return;
-
-    let lastHighlightedId = null;
-
-    _scrollObserver = new IntersectionObserver((entries) => {
-if (_manualScrollTarget) return;
-        const visibleSections = [];
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                visibleSections.push({
-                    id: entry.target.id,
-                    top: entry.target.getBoundingClientRect().top
-                });
-            }
-        });
-
-        visibleSections.sort((a, b) => a.top - b.top);
-
-        let targetId = null;
-        if (visibleSections.length > 0) {
-            targetId = visibleSections[0].id;
-        } else {
-            if (window.scrollY <= 50 && sections.length > 0) {
-                targetId = sections[0].id;
-            } else {
-                const isAtBottom = (window.innerHeight + window.scrollY) >= document.body.scrollHeight - 50;
-                if (isAtBottom && sections.length > 0) {
-                    targetId = sections[sections.length - 1].id;
-                }
-            }
-        }
-
-        if (targetId && targetId !== lastHighlightedId) {
-            lastHighlightedId = targetId;
-            if (_animationFrameId) cancelAnimationFrame(_animationFrameId);
-            _animationFrameId = requestAnimationFrame(() => highlightButton(targetId));
-        }
-    }, { root: null, rootMargin: '-80px 0px -60% 0px', threshold: 0 });
-
-    sections.forEach(section => _scrollObserver.observe(section));
-}
-
-function highlightButton(id) {
-    const buttons = document.querySelectorAll('.category-button');
-    const activeClass = 'text-white shadow-md bg-heritage-600';
-    const inactiveClass = 'bg-heritage-dark-800 text-heritage-outline hover:text-heritage-400 hover:bg-heritage-dark-700';
-
-    buttons.forEach(btn => {
-        if (btn.dataset.target === id) {
-            if (!btn.classList.contains('bg-heritage-600')) {
-                btn.classList.remove(...inactiveClass.split(' '));
-                btn.classList.add(...activeClass.split(' '));
-                btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-            }
-        } else {
-            if (btn.classList.contains('bg-heritage-600')) {
-                btn.classList.remove(...activeClass.split(' '));
-                btn.classList.add(...inactiveClass.split(' '));
-            }
-        }
-    });
-}
 
 export function updateUIState() {
     const editModeBtn = document.getElementById('edit-mode-btn');
