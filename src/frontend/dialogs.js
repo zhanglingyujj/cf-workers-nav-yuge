@@ -1,5 +1,5 @@
 // dialogs.js - 弹窗管理 (添加/编辑卡片, 密码登录)
-import { addLink, updateLink, removeLink, getCategories, addCategory, setLoggedIn, setEditMode } from './state.js';
+import { addLink, updateLink, removeLink, getCategories, addCategory, setEditMode } from './state.js';
 import { updateUIState, renderAll } from './render.js';
 import { commit } from './commit.js';
 import { getEl } from './utils.js';
@@ -263,24 +263,8 @@ export function initDialogs() {
         passwordConfirmBtn.addEventListener('click', async () => {
             const pwd = getEl('password-input').value;
             if (!pwd) return;
-            try {
-                const res = await fetch('/api/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ password: pwd })
-                });
-                const data = await res.json();
-if (data.valid) {
-                        localStorage.setItem('authToken', data.token);
-                        setLoggedIn(true);
-                        toggleOverlay('password-dialog-overlay', false);
-                        const loadingMask = document.getElementById('loading-mask');
-                        if (loadingMask) loadingMask.classList.remove('hidden');
-                        const { reloadLinksAfterLogin } = await import('./auth.js');
-                        await reloadLinksAfterLogin(data.token);
-                        if (loadingMask) loadingMask.classList.add('hidden');
-                    }
-            } catch (e) { await openAlert('Login Error'); }
+            const { login } = await import('./auth.js');
+            if (await login(pwd)) toggleOverlay('password-dialog-overlay', false);
         });
     }
     if (passwordCancelBtn) {
@@ -294,7 +278,7 @@ if (data.valid) {
             const dropdown = getEl('profile-dropdown');
             if (dropdown) dropdown.classList.add('hidden');
 
-            const { isLoggedIn, setEditMode, setLoggedIn } = await import('./state.js');
+            const { isLoggedIn, setEditMode } = await import('./state.js');
             if (!isLoggedIn()) {
                 toggleOverlay('password-dialog-overlay', true);
                 const pwdInput = getEl('password-input');
@@ -312,17 +296,15 @@ if (data.valid) {
     const loginBtn = getEl('login-Btn');
     if (loginBtn) {
         loginBtn.addEventListener('click', async () => {
-            const { isLoggedIn, setLoggedIn } = await import('./state.js');
+            const { isLoggedIn } = await import('./state.js');
             if (!isLoggedIn()) {
                 toggleOverlay('password-dialog-overlay', true);
                 const pwdInput = getEl('password-input');
                 if (pwdInput) pwdInput.focus();
             } else {
                 if (await openConfirm('确定退出登录吗？')) {
-                    localStorage.removeItem('authToken');
-                    setLoggedIn(false);
-                    const { checkLoginStatusAndLoad } = await import('./auth.js');
-                    await checkLoginStatusAndLoad();
+                    const { logout } = await import('./auth.js');
+                    await logout();
                 }
             }
         });

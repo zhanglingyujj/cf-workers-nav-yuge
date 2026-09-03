@@ -10,8 +10,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     initRender();
 
     // 立即加载链接数据（一次请求获取数据 + auth 状态）
-    const { loadLinks } = await import('./auth.js');
-    loadLinks();
+    const { load } = await import('./auth.js');
+    load();
 
     // 壁纸/遮罩/模糊设置（独立模块）
     initBackground();

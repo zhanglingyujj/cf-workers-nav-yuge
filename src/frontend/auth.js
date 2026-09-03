@@ -1,8 +1,8 @@
-// auth.js - 客户端认证 + API 通信
-import { setLoggedIn, getCategories, setCategories } from './state.js';
+// auth.js - 客户端认证 + 会话（login/logout/load）+ API 通信
+import { setLoggedIn, setCategories } from './state.js';
 import { openAlert, openConfirm } from './overlay.js';
 
-export async function validateToken() {
+async function validateToken() {
     const t = localStorage.getItem('authToken');
     if (!t) return false;
     try {
@@ -58,50 +58,79 @@ export async function fetchWithAuth(url, options = {}) {
     return res;
 }
 
-export async function checkLoginStatusAndLoad() {
-    const [isValid] = await Promise.all([
-        validateToken(),
-        loadLinks()
-    ]);
-    if (isValid) {
-        setLoggedIn(true);
-    } else {
-        setLoggedIn(false);
-    }
+function defaultRunWithMask(fn) {
+    const mask = document.getElementById('loading-mask');
+    if (mask) mask.classList.remove('hidden');
+    return fn().finally(() => { if (mask) mask.classList.add('hidden'); });
 }
 
-export async function loadLinks() {
-    try {
-        const response = await fetchWithAuth('/api/getLinks');
-        if (!response.ok) throw new Error("HTTP error! status: " + response.status);
+async function defaultOnCategoriesLoaded() {
+    const { updateCategorySelectDropdown } = await import('./dialogs.js');
+    updateCategorySelectDropdown?.();
+}
 
-        const data = await response.json();
-        if (data.categories) {
-            setLoggedIn(data.isAuthenticated);
-            setCategories(data.categories);
+// 会话深模块：登录态生命周期（login/logout/load），token 存取与数据加载联动藏在实现内
+export function createSession({
+    fetchJson = fetchWithAuth,
+    storage = localStorage,
+    setLoggedInImpl = setLoggedIn,
+    setCategoriesImpl = setCategories,
+    notify = openAlert,
+    runWithMask = defaultRunWithMask,
+    onCategoriesLoaded = defaultOnCategoriesLoaded,
+} = {}) {
+    async function load() {
+        try {
+            const response = await fetchJson('/api/getLinks');
+            if (!response.ok) throw new Error("HTTP error! status: " + response.status);
+
+            const data = await response.json();
+            if (data.categories) {
+                setLoggedInImpl(data.isAuthenticated);
+                setCategoriesImpl(data.categories);
+            }
+            await onCategoriesLoaded();
+        } catch (error) {
+            console.error('Error loading links:', error);
+            await notify('加载链接时出错，请刷新页面重试');
         }
-        const { updateCategorySelectDropdown } = await import('./dialogs.js');
-        updateCategorySelectDropdown?.();
-    } catch (error) {
-        console.error('Error loading links:', error);
-        await openAlert('加载链接时出错，请刷新页面重试');
     }
+
+    return {
+        load,
+        async login(password) {
+            let data;
+            try {
+                const res = await fetchJson('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password })
+                });
+                data = await res.json();
+            } catch (e) {
+                await notify('Login Error');
+                return false;
+            }
+            if (!data.valid) return false;
+
+            storage.setItem('authToken', data.token);
+            setLoggedInImpl(true);
+            await runWithMask(load);
+            return true;
+        },
+        async logout() {
+            storage.removeItem('authToken');
+            setLoggedInImpl(false);
+            await load();
+        },
+    };
 }
 
-export async function reloadLinksAfterLogin(token) {
-    try {
-        const response = await fetch('/api/getLinks', {
-            headers: { Authorization: `Bearer ${token}` }
-        });
-        if (!response.ok) throw new Error("HTTP error! status: " + response.status);
-        const data = await response.json();
-        if (data.categories) {
-            setCategories(data.categories);
-        }
-    } catch (error) {
-        console.error('Error reloading links after login:', error);
-    }
-}
+const session = createSession();
+
+export function login(password) { return session.login(password); }
+export function logout() { return session.logout(); }
+export function load() { return session.load(); }
 
 export async function exportData() {
     if (!(await validateTokenOrRedirect())) return;
