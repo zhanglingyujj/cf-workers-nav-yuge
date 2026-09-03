@@ -17,16 +17,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     initBackground();
 
     // 初始化 UI 组件
-    const searchInput = getEl('search-input');
-    const clearSearchBtn = getEl('clear-search-button');
-    const searchBtn = getEl('search-button');
     const backToTopBtn = getEl('back-to-top-btn');
     const menuToggleBtn = getEl('profile-menu-toggle');
     const dropdown = getEl('profile-dropdown');
     const dropdownWrapper = getEl('profile-dropdown-wrapper');
-    const searchEngineBtn = getEl('search-engine-btn');
-    const searchEngineMenu = getEl('search-engine-menu');
-    const searchWrapper = getEl('search-engine-wrapper');
+
+    // 命令条 + 命令面板
+    const { initCommandBar } = await import('./command.js');
+    initCommandBar();
 
 if (menuToggleBtn && dropdown) {
         menuToggleBtn.addEventListener('click', (e) => {
@@ -39,39 +37,10 @@ if (menuToggleBtn && dropdown) {
         if (dropdownWrapper && !dropdownWrapper.contains(e.target)) {
             dropdown.classList.add('hidden');
         }
-        if (searchWrapper && !searchWrapper.contains(e.target)) {
-            searchEngineMenu.classList.add('hidden');
-        }
     });
 
     if (dropdown) {
         dropdown.addEventListener('click', (e) => e.stopPropagation());
-    }
-
-    if (searchBtn && searchInput) {
-        searchBtn.addEventListener('click', async () => {
-            const query = searchInput.value.trim();
-            if (!query) return;
-            const { doSearch } = await import('./search.js');
-            doSearch(query);
-        });
-
-        searchInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') searchBtn.click();
-        });
-
-        searchInput.addEventListener('input', (e) => {
-            if (clearSearchBtn) clearSearchBtn.classList.toggle('hidden', !e.target.value);
-        });
-    }
-
-    if (clearSearchBtn) {
-        clearSearchBtn.addEventListener('click', async () => {
-            searchInput.value = '';
-            clearSearchBtn.classList.add('hidden');
-            const { renderAll } = await import('./render.js');
-            renderAll();
-        });
     }
 
     if (backToTopBtn) {
@@ -85,10 +54,6 @@ if (menuToggleBtn && dropdown) {
             });
         }, { passive: true });
     }
-
-    // 搜索引擎初始化
-    const { initSearchEngines } = await import('./search.js');
-initSearchEngines(searchEngineBtn, searchEngineMenu, searchInput);
 
     // 工具提示
     const { initTooltip } = await import('./tooltip.js');
