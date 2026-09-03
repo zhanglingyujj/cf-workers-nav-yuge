@@ -1,5 +1,5 @@
 // card.js - 卡片 DOM 元素创建/更新（Sun-Panel 对齐：详情卡 / 极简卡）
-import { isEditMode, isLoggedIn, isCategoryAppLayout, removeLink, updateLink } from './state.js';
+import { isEditMode, isLoggedIn, isCategoryAppLayout, removeLink, updateLink, findLinkById } from './state.js';
 import { getEl } from './utils.js';
 
 const imgApi = '/api/icon?url=';
@@ -96,7 +96,7 @@ export function createCardElement(link, categoryName) {
     }
 
     if (isEditMode()) {
-        card.appendChild(createEditControls(link, card, isApp, categoryName));
+        card.appendChild(createEditControls(card, isApp, categoryName));
     }
 
     applyTooltip(card, link, isApp);
@@ -197,7 +197,7 @@ function getSharedMenu() {
     return dropdown;
 }
 
-function openCardMenu(menuBtn, card, link, categoryName) {
+function openCardMenu(menuBtn, card, categoryName) {
     const dropdown = getSharedMenu();
     const btnRect = menuBtn.getBoundingClientRect();
     let top = btnRect.top + btnRect.height + 4;
@@ -211,7 +211,11 @@ function openCardMenu(menuBtn, card, link, categoryName) {
         e.stopPropagation();
         dropdown.classList.add('hidden');
         _sharedMenuBtn = null;
-        import('./dialogs.js').then(m => m.showEditDialog(link, categoryName));
+        // 点击时按卡片 id 现查：闭包捕获的 link 是创建卡片时的旧对象，编辑确认后 state 已替换为新对象
+        const current = findLinkById(card.getAttribute('data-card-id'));
+        if (current) {
+            import('./dialogs.js').then(m => m.showEditDialog(current, categoryName));
+        }
     };
     dropdown.querySelector('.menu-delete').onclick = (e) => {
         e.stopPropagation();
@@ -229,7 +233,7 @@ function openCardMenu(menuBtn, card, link, categoryName) {
     }
 }
 
-function createEditControls(link, card, isApp, categoryName) {
+function createEditControls(card, isApp, categoryName) {
     const actionWrapper = document.createElement('div');
     actionWrapper.className = isApp
         ? 'absolute top-[-4px] right-[-4px] z-50'
@@ -243,7 +247,7 @@ function createEditControls(link, card, isApp, categoryName) {
 
     menuBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        openCardMenu(menuBtn, card, link, categoryName);
+        openCardMenu(menuBtn, card, categoryName);
     });
 
     actionWrapper.appendChild(menuBtn);
