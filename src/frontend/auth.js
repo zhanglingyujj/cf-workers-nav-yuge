@@ -22,6 +22,22 @@ export async function validateTokenOrRedirect() {
     return true;
 }
 
+export async function refreshAccessToken() {
+    try {
+        const refreshRes = await fetch('/api/refreshToken', {
+            method: 'POST',
+            credentials: 'include'
+        });
+        if (!refreshRes.ok) return null;
+        const refreshData = await refreshRes.json();
+        if (!refreshData.accessToken) return null;
+        localStorage.setItem('authToken', refreshData.accessToken);
+        return refreshData.accessToken;
+    } catch (e) {
+        return null;
+    }
+}
+
 export async function fetchWithAuth(url, options = {}) {
     const token = localStorage.getItem('authToken');
     const headers = options.headers || {};
@@ -35,14 +51,9 @@ export async function fetchWithAuth(url, options = {}) {
 
     if (res.status === 401) {
         try {
-            const refreshRes = await fetch('/api/refreshToken', {
-                method: 'POST',
-                credentials: 'include'
-            });
-            if (refreshRes.ok) {
-                const refreshData = await refreshRes.json();
-                localStorage.setItem('authToken', refreshData.accessToken);
-                headers.Authorization = `Bearer ${refreshData.accessToken}`;
+            const newToken = await refreshAccessToken();
+            if (newToken) {
+                headers.Authorization = `Bearer ${newToken}`;
                 options.headers = headers;
                 res = await fetch(url, options);
             } else {
@@ -78,13 +89,26 @@ export function createSession({
     notify = openAlert,
     runWithMask = defaultRunWithMask,
     onCategoriesLoaded = defaultOnCategoriesLoaded,
+    refresh = refreshAccessToken,
 } = {}) {
     async function load() {
         try {
-            const response = await fetchJson('/api/getLinks');
+            let response = await fetchJson('/api/getLinks');
             if (!response.ok) throw new Error("HTTP error! status: " + response.status);
+            let data = await response.json();
 
-            const data = await response.json();
+            // getLinks 对无效 token 静默降级为未登录（不返 401），
+            // 本地仍有 token 时先尝试 refresh，成功后重拉恢复登录态
+            if (!data.isAuthenticated && storage.getItem('authToken')) {
+                if (await refresh()) {
+                    response = await fetchJson('/api/getLinks');
+                    if (!response.ok) throw new Error("HTTP error! status: " + response.status);
+                    data = await response.json();
+                } else {
+                    storage.removeItem('authToken');
+                }
+            }
+
             if (data.categories) {
                 setLoggedInImpl(data.isAuthenticated);
                 setCategoriesImpl(data.categories);
