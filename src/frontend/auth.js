@@ -150,11 +150,16 @@ export function createSession({
     };
 }
 
-const session = createSession();
+// 单例惰性创建：模块加载时不触碰 localStorage，保证纯 Node 环境可导入测试
+let session = null;
+function getSession() {
+    if (!session) session = createSession();
+    return session;
+}
 
-export function login(password) { return session.login(password); }
-export function logout() { return session.logout(); }
-export function load() { return session.load(); }
+export function login(password) { return getSession().login(password); }
+export function logout() { return getSession().logout(); }
+export function load() { return getSession().load(); }
 
 export async function exportData() {
     if (!(await validateTokenOrRedirect())) return;
