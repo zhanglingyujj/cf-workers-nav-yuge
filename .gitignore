@@ -3,3 +3,7 @@ dist/
 src/build/
 .dev.vars
 .wrangler/
+
+# 设计评审产物（含个人 URL 的导出与截图）
+nav_export_*.json
+screenshots/
