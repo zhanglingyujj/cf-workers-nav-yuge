@@ -2,8 +2,7 @@
 // 前置：
 //   1. wrangler dev --port 8787 已运行
 //   2. node scripts/seed-dev.mjs 已播种（导航数据 + 壁纸设置）
-//   3. 本机 chromium 缺系统库时：export LD_LIBRARY_PATH=/tmp/chrome-libs/ext/usr/lib/x86_64-linux-gnu
-//      （解包自 Debian .deb，过程见 docs/research/frontend-design-review-*.md）
+//   3. chromium 系统库已用 `sudo npx playwright install-deps chromium` 根治（历史 hack 见 docs/research/frontend-design-review-2026-11-10.md）
 import { chromium } from 'playwright';
 import { readFileSync, mkdirSync } from 'fs';
 
