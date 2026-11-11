@@ -7,7 +7,8 @@
     "build": "node build.js",
     "deploy": "npm run build && wrangler deploy",
     "dev": "wrangler dev",
-    "test": "node --test 'test/**/*.js'"
+    "test": "node --test 'test/**/*.js'",
+    "prepare": "git config core.hooksPath .githooks"
   },
   "devDependencies": {
     "esbuild": "^0.24.0",

@@ -52,24 +52,19 @@ kv_namespaces = [
 # ============================================
 # 部署步骤:
 # ============================================
-# 1. 安装 Wrangler CLI:
-#    npm install -g wrangler
+# 1. 安装依赖（wrangler 已是 devDependency，无需全局安装）:
+#    npm install
 #
-# 2. 登录 Cloudflare:
-#    wrangler login
+# 2. 登录 Cloudflare（首次或 token 过期时）:
+#    npx wrangler login
 #
-# 3. 创建 KV 命名空间:
-#    wrangler kv:namespace create "CARD_ORDER"
-#    # 复制返回的 id 到上方 kv_namespaces
+# 3. 修改上方配置:
+#    - 填入 KV namespace id（npx wrangler kv:namespace create "CARD_ORDER"）
+#    - 生产密钥用 npx wrangler secret put（ADMIN_PASSWORD / JWT_SECRET）
 #
-# 4. 修改上方配置:
-#    - 填入 KV namespace id
-#    - 设置 ADMIN_PASSWORD
-#    - 设置 JWT_SECRET
+# 4. 部署:
+#    npm run deploy
 #
-# 5. 部署:
-#    wrangler deploy
-#
-# 6. (可选) 绑定自定义域名:
+# 5. (可选) 绑定自定义域名:
 #    在 Cloudflare Dashboard > Workers > 你的 Worker > Settings > Domains & Routes
 # ============================================

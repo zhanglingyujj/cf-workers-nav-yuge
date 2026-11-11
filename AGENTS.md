@@ -40,6 +40,8 @@ node build.js --check-classes   # 校验源码 class 全部命中生成的 CSS�
 
 - 跨模块引用 dialogs/auth/render 时沿用现有动态 `import()` 风格，避免静态循环依赖。
 - 卡片编辑菜单是全局单例（`card.js` 的 `_sharedMenu`），勿再按卡创建。
+- code-review 发 sub-agent 时把 git diff 内容内联进任务文本（内置 reviewer 无 shell，无法自行执行 diff）。
+- 视觉横向对比用 describe_image 时先拼图再单次调用（批量模式逐图孤立分析，拼图先例 `scripts/proto-compose.mjs`）。
 
 ## 测试约定
 

@@ -1,0 +1,11 @@
+#!/bin/sh
+# pre-commit：隐私防泄漏（硬拦）+ 测试与 CSS 完整性（回归闸）
+leaked=$(git diff --cached --name-only | grep -E '^screenshots[^/]*/|^nav_export.*\.json$|^\.dev\.vars$')
+if [ -n "$leaked" ]; then
+    echo "✖ pre-commit：检测到含个人数据的文件被暂存，禁止提交：" >&2
+    echo "$leaked" >&2
+    exit 1
+fi
+
+npm test --silent || exit 1
+node build.js --check-classes || exit 1
