@@ -5,7 +5,7 @@ import { getEl } from './utils.js';
 const imgApi = '/api/icon?url=';
 const fallbackSrc = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'%3E%3C/circle%3E%3Cline x1='12' y1='8' x2='12' y2='12'%3E%3C/line%3E%3Cline x1='12' y1='16' x2='12.01' y2='16'%3E%3C/line%3E%3C/svg%3E";
 
-// Sun-Panel 默认详情卡底色 #2a2a2a6b；Q7 定为 0.40（可读性兑底，见 DESIGN.md）
+// Sun-Panel 默认详情卡底色 #2a2a2a6b；Q7 定为 0.40（可读性兜底，见 DESIGN.md）
 const DEFAULT_CARD_BG = 'rgba(42, 42, 42, 0.40)';
 // 图标投影兜底：透明/白色线条图标无衬底时靠它压住亮壁纸（Q10 取消了默认槽底）
 const ICON_SHADOW = 'drop-shadow-[0_1px_3px_rgba(0,0,0,0.6)]';
