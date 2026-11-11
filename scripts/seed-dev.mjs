@@ -30,7 +30,7 @@ const settingsRes = await fetch(`${BASE}/api/settings`, {
     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
     body: JSON.stringify({
         backgroundImage: 'https://bingapi.yuge.qzz.io',
-        backgroundOpacity: 20,
+        backgroundOpacity: 30,
         backgroundBlur: 0,
         siteTitle: ''
     })

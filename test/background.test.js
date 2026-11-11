@@ -18,7 +18,7 @@ test('服务器无值时回退 localStorage 镜像', () => {
 
 test('localStorage 也无值时用默认值', () => {
     assert.deepEqual(resolveSettings(null, makeStorage()), {
-        backgroundImage: '', backgroundOpacity: 20, backgroundBlur: 0, siteTitle: '珊岛听海',
+        backgroundImage: '', backgroundOpacity: 30, backgroundBlur: 0, siteTitle: '珊岛听海',
     });
 });
 
@@ -29,11 +29,11 @@ test('服务器空对象视为无值，走回退', () => {
 
 test('服务器有值时取服务器值并补全缺省字段', () => {
     const s = resolveSettings({ backgroundImage: 'https://example.com/b.jpg' }, makeStorage({ backgroundImage: 'stale' }));
-    assert.deepEqual(s, { backgroundImage: 'https://example.com/b.jpg', backgroundOpacity: 20, backgroundBlur: 0, siteTitle: '珊岛听海' });
+    assert.deepEqual(s, { backgroundImage: 'https://example.com/b.jpg', backgroundOpacity: 30, backgroundBlur: 0, siteTitle: '珊岛听海' });
 });
 
 test('服务器值为 null/非法时回退默认', () => {
     const s = resolveSettings({ backgroundOpacity: null, backgroundBlur: 'abc' }, makeStorage());
-    assert.equal(s.backgroundOpacity, 20);
+    assert.equal(s.backgroundOpacity, 30);
     assert.equal(s.backgroundBlur, 0);
 });

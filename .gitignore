@@ -6,7 +6,7 @@ src/build/
 
 # 设计评审产物（含个人 URL 的导出与截图）
 nav_export_*.json
-screenshots/
+screenshots*/
 
 # 实施工单等本地工作产物
 .scratch/

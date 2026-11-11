@@ -5,14 +5,16 @@ import { getEl } from './utils.js';
 const imgApi = '/api/icon?url=';
 const fallbackSrc = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'%3E%3C/circle%3E%3Cline x1='12' y1='8' x2='12' y2='12'%3E%3C/line%3E%3Cline x1='12' y1='16' x2='12.01' y2='16'%3E%3C/line%3E%3C/svg%3E";
 
-// Sun-Panel 默认详情卡底色 #2a2a2a6b；本项目调轻为 0.32 + 极弱亮边
-const DEFAULT_CARD_BG = 'rgba(42, 42, 42, 0.32)';
-// 极简卡（APP 布局）图标槽玻璃底：接近透明，仅作轻微衬托
-const APP_ICON_BG = 'rgba(42, 42, 42, 0.14)';
+// Sun-Panel 默认详情卡底色 #2a2a2a6b；Q7 定为 0.40（可读性兑底，见 DESIGN.md）
+const DEFAULT_CARD_BG = 'rgba(42, 42, 42, 0.40)';
+// 图标投影兜底：透明/白色线条图标无衬底时靠它压住亮壁纸（Q10 取消了默认槽底）
+const ICON_SHADOW = 'drop-shadow-[0_1px_3px_rgba(0,0,0,0.6)]';
+const ICON_HOVER_SHADOW = 'hover:drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)]';
 
 export function cardBackgroundColor(link, categoryName) {
+    // 极简卡默认无底（Q10：图标原样呈现，仅自定义色时渲染）；详情卡默认玻璃底
     if (isCategoryAppLayout(categoryName || link.category)) {
-        return link.backgroundColor || APP_ICON_BG;
+        return link.backgroundColor || '';
     }
     return link.backgroundColor || DEFAULT_CARD_BG;
 }
@@ -58,32 +60,32 @@ export function createCardElement(link, categoryName) {
     const bg = cardBackgroundColor(link, categoryName);
 
     if (isApp) {
-        // 极简卡：70px 图标槽（极轻玻璃底，图标为主角）+ 下方居中标题，无描述
+        // 极简卡：图标原样呈现（Q10 无默认槽底，仅自定义色时渲染），下方居中标题
         const iconSlot = document.createElement('div');
-        iconSlot.className = 'w-[56px] h-[56px] rounded-2xl overflow-hidden flex items-center justify-center transition-all duration-200 hover:shadow-[0_0_20px_10px_rgba(0,0,0,0.2)]';
-        iconSlot.style.backgroundColor = bg;
-        iconSlot.appendChild(createIconImage(link, 'w-[52px] h-[52px] object-contain'));
+        iconSlot.className = 'w-[56px] h-[56px] rounded-2xl overflow-hidden flex items-center justify-center transition-all duration-200';
+        if (bg) iconSlot.style.backgroundColor = bg;
+        iconSlot.appendChild(createIconImage(link, `w-[52px] h-[52px] object-contain p-[3px] ${ICON_SHADOW} ${ICON_HOVER_SHADOW}`));
         card.appendChild(iconSlot);
 
         const title = document.createElement('div');
-        title.className = 'card-title pointer-events-none text-center text-sm font-medium mt-[2px] w-full truncate px-1 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.45)]';
+        title.className = 'card-title pointer-events-none text-center text-xs sm:text-sm font-medium mt-[2px] w-full truncate px-1 text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.7)]';
         title.textContent = link.name;
         card.appendChild(title);
     } else {
-        // 详情卡：70px 图标槽居左 + 右侧名称/描述，玻璃底在整卡，文字按背景亮度黑白
-        card.style.backgroundColor = bg;
-        card.style.color = textColorForBackground(bg);
+        // 详情卡：图标槽居左（透明，图标原样不裁剪）+ 右侧名称/描述，玻璃底在整卡，文字按背景亮度黑白
+        card.style.backgroundColor = bg || DEFAULT_CARD_BG;
+        card.style.color = textColorForBackground(bg || DEFAULT_CARD_BG);
 
         const iconSlot = document.createElement('div');
         iconSlot.className = 'w-[56px] h-[56px] flex-shrink-0 flex items-center justify-center';
-        iconSlot.appendChild(createIconImage(link, 'w-[44px] h-[44px] object-contain rounded-xl overflow-hidden pointer-events-none'));
+        iconSlot.appendChild(createIconImage(link, `w-[44px] h-[44px] object-contain p-[3px] ${ICON_SHADOW} pointer-events-none`));
         card.appendChild(iconSlot);
 
         const textBlock = document.createElement('div');
         textBlock.className = 'flex-1 min-w-0 ml-1.5 flex flex-col justify-center';
 
         const title = document.createElement('div');
-        title.className = 'card-title pointer-events-none font-semibold text-sm truncate';
+        title.className = 'card-title pointer-events-none font-semibold text-xs sm:text-sm truncate';
         title.textContent = link.name;
         textBlock.appendChild(title);
 
@@ -187,7 +189,7 @@ function getSharedMenu() {
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
             编辑
         </button>
-        <button class="menu-delete w-full text-left px-3 py-2 rounded-lg text-xs font-medium text-zinc-700 hover:bg-red-50 hover:text-red-600 transition-colors flex items-center gap-2">
+        <button class="menu-delete w-full text-left px-3 py-2 rounded-lg text-xs font-medium text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
             删除
         </button>
@@ -200,10 +202,12 @@ function getSharedMenu() {
 function openCardMenu(menuBtn, card, categoryName) {
     const dropdown = getSharedMenu();
     const btnRect = menuBtn.getBoundingClientRect();
-    let top = btnRect.top + btnRect.height + 4;
+    // 锚到卡片整体下方而非按钮下方，避免菜单盖住触发卡本身（Q6）
+    const cardRect = card.getBoundingClientRect();
+    let top = cardRect.bottom + 4;
     let left = btnRect.right - 112;
     if (left < 0) left = btnRect.left;
-    if (top + 100 > window.innerHeight) top = btnRect.top - 100;
+    if (top + 100 > window.innerHeight) top = cardRect.top - 104;
     dropdown.style.top = top + 'px';
     dropdown.style.left = left + 'px';
 

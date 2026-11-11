@@ -18,6 +18,10 @@ export function initCommandBar() {
         if (e.target === palette) closePalette();
     });
 
+    // 移动端顶栏的“取消”按钮（替代无意义的 Esc 徽标）
+    const cancelBtn = getEl('cmd-cancel-btn');
+    if (cancelBtn) cancelBtn.addEventListener('click', closePalette);
+
     document.addEventListener('keydown', (e) => {
         if (e.altKey && !e.ctrlKey && !e.metaKey && e.key.toLowerCase() === 'c') {
             e.preventDefault();
@@ -121,7 +125,7 @@ function renderList(query) {
         row.className = state === 'selected' ? rowSelected : rowNormal;
         row.innerHTML = `<span class="cmd-icon w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 ${state === 'selected' ? 'bg-zinc-600 text-white' : 'bg-zinc-200/70 text-zinc-600'}">${icons[it.type]}</span>
             <span class="truncate font-medium">${it.name}</span>
-            <span class="ml-auto text-xs opacity-60 flex-shrink-0">${it.meta || ''}</span>`;
+            <span class="ml-auto text-xs text-zinc-500 flex-shrink-0">${it.meta || ''}</span>`;
         row.addEventListener('click', () => activate(it, query));
         row.addEventListener('mouseenter', () => {
             if (selectedIndex === i) return;
@@ -164,11 +168,12 @@ function activate(item, query) {
 function renderEngines() {
     const container = getEl('cmd-engines');
     if (!container) return;
-    container.innerHTML = '<span class="text-xs text-zinc-400 mr-2">搜索引擎</span>';
+    container.innerHTML = '';
 
+    // 分段控件：等宽均分、44px 行高，无文字标签（Q4）
     getEngineList().forEach((eng, i) => {
         const btn = document.createElement('button');
-        btn.className = `px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${eng.key === getEngine() ? 'bg-zinc-800 text-white' : 'text-zinc-700 hover:bg-zinc-200'}`;
+        btn.className = `flex-1 min-w-0 h-11 px-1 rounded-lg text-xs font-medium truncate transition-colors ${eng.key === getEngine() ? 'bg-zinc-800 text-white' : 'text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900'}`;
         btn.textContent = eng.label;
         btn.addEventListener('click', () => {
             setEngineByIndex(i);

@@ -209,7 +209,9 @@ function createCategoryControls(categoryName, isHidden, isApp) {
     controls.setAttribute('role', 'toolbar');
     controls.setAttribute('aria-label', `${categoryName}分组操作`);
     controls.className = 'flex flex-wrap items-center gap-0.5 category-controls';
-    const btnBase = "w-8 h-8 flex items-center justify-center rounded-lg transition-all duration-200 text-white/80 hover:text-white hover:bg-white/10 active:scale-95 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/60";
+    const btnBase = "w-11 h-11 sm:w-9 sm:h-9 flex items-center justify-center rounded-lg transition-all duration-200 text-white/80 hover:text-white hover:bg-white/10 active:scale-95 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/60";
+    const toggleBase = 'flex items-center justify-center w-11 h-11 sm:w-9 sm:h-9 has-tooltip cursor-pointer';
+    const iconBase = 'w-4 h-4 text-white/80';
     const divider = '<div class="w-px h-4 bg-white/15 mx-0.5" aria-hidden="true"></div>';
 
     controls.innerHTML = `
@@ -231,21 +233,23 @@ function createCategoryControls(categoryName, isHidden, isApp) {
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3h14M18 13l-6-6l-6 6M12 7v14"></path></svg>
         </button>
         ${divider}
-        <div class="flex items-center justify-center w-8 h-8 has-tooltip cursor-pointer" aria-label="切换分组可见性" data-tooltip="${isHidden ? '显示分类' : '隐藏分类'}">
+        <div class="${toggleBase}" aria-label="切换分组可见性" data-tooltip="${isHidden ? '显示分类' : '隐藏分类'}">
             <label class="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" ${isHidden ? 'checked' : ''} class="sr-only peer category-hide-toggle">
-                <div class="w-3.5 h-3.5 rounded-full border-2 peer-focus:outline-none peer-focus-visible:ring-1 peer-focus-visible:ring-white/60 border-white/60 peer-checked:bg-white peer-checked:border-white transition-colors"></div>
+                <svg class="${iconBase} block peer-checked:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                <svg class="${iconBase} hidden peer-checked:block" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
             </label>
         </div>
         ${divider}
-<div class="flex items-center justify-center w-8 h-8 has-tooltip cursor-pointer" aria-label="切换APP视图" data-tooltip="${isApp ? '列表视图' : 'APP视图'}">
+        <div class="${toggleBase}" aria-label="切换APP视图" data-tooltip="${isApp ? '列表视图' : 'APP视图'}">
             <label class="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" ${isApp ? 'checked' : ''} class="sr-only peer category-app-toggle">
-                <div class="w-3.5 h-3.5 rounded-full border-2 peer-focus:outline-none peer-focus-visible:ring-1 peer-focus-visible:ring-white/60 border-white/60 peer-checked:bg-white peer-checked:border-white transition-colors"></div>
+                <svg class="${iconBase} block peer-checked:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                <svg class="${iconBase} hidden peer-checked:block" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
             </label>
         </div>
         ${divider}
-        <button class="${btnBase} hover:text-red-400 hover:bg-red-900/30 has-tooltip" aria-label="删除分组" data-tooltip="删除分类">
+        <button class="${btnBase} ml-1.5 hover:text-red-400 hover:bg-red-900/30 has-tooltip" aria-label="删除分组" data-tooltip="删除分类">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
         </button>
     `;
