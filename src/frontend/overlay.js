@@ -1,5 +1,6 @@
 // overlay.js - 浮层弹窗三原语（alert / confirm / prompt），DOM 惰性创建并复用
 // 动画规格与原静态 HTML 逐字一致：overlay-hidden/visible + dialog-scale-*，300ms
+import { registerCloser, unregisterCloser } from './overlay-layers.js';
 
 const OVERLAY_BASE = 'fixed inset-0 flex items-center justify-center p-4 transition-opacity duration-300 overlay-hidden';
 const BOX_BASE = 'bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl p-6 max-w-sm w-full border border-zinc-200 transform transition-all duration-300 dialog-scale-hidden';
@@ -83,9 +84,11 @@ function toggle(overlay, show) {
 export function runDialog(overlay, wire) {
     return new Promise(resolve => {
         const close = (val) => {
+            unregisterCloser(overlay.id);
             toggle(overlay, false);
             resolve(val);
         };
+        registerCloser(overlay.id, close);
         wire(close);
         toggle(overlay, true);
     });

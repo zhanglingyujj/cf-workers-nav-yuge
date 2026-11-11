@@ -1,10 +1,13 @@
 // shortcuts.js - 全局快捷键
 // '/' 打开命令面板、非编辑模式数字键 1-9 打开对应卡片
 import { isEditMode } from './state.js';
+import { isAnyOverlayOpen } from './overlay-layers.js';
 
 export function initShortcuts() {
     document.addEventListener('keydown', (e) => {
         if (e.target.closest('input, textarea, select, [contenteditable="true"]')) return;
+        // 任一浮层开着时不响应快捷键，避免叠开（B3）
+        if (isAnyOverlayOpen()) return;
 
         if (e.key === '/') {
             e.preventDefault();

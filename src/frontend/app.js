@@ -93,6 +93,10 @@ if (menuToggleBtn && dropdown) {
     const { initShortcuts } = await import('./shortcuts.js');
     initShortcuts();
 
+    // 浮层统一 Esc 关闭（B2）
+    const { initOverlayLayers } = await import('./overlay-layers.js');
+    initOverlayLayers();
+
     // PWA：注册 service worker
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {

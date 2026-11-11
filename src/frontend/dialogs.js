@@ -4,18 +4,21 @@ import { updateUIState, renderAll } from './render.js';
 import { commit } from './commit.js';
 import { getEl } from './utils.js';
 import { openAlert, openConfirm, openPrompt, runDialog } from './overlay.js';
+import { registerCloser, unregisterCloser } from './overlay-layers.js';
 
 function toggleOverlay(id, show) {
     const overlay = document.getElementById(id);
     if (!overlay) return;
     const box = overlay.querySelector('div[id$="-box"]');
     if (show) {
+        registerCloser(id, () => toggleOverlay(id, false));
         overlay.classList.remove('hidden');
         void overlay.offsetWidth;
         overlay.classList.remove('overlay-hidden');
         overlay.classList.add('overlay-visible');
         if (box) { box.classList.remove('dialog-scale-hidden'); box.classList.add('dialog-scale-visible'); }
     } else {
+        unregisterCloser(id);
         overlay.classList.remove('overlay-visible');
         overlay.classList.add('overlay-hidden');
         if (box) { box.classList.remove('dialog-scale-visible'); box.classList.add('dialog-scale-hidden'); }
@@ -71,8 +74,14 @@ function getBgColorValue() {
     return /^#([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(v) ? v : '';
 }
 
+function setCardDialogTitle(text) {
+    const title = getEl('card-dialog-title');
+    if (title) title.textContent = text;
+}
+
 export function showAddDialog() {
     toggleOverlay('dialog-overlay', true);
+    setCardDialogTitle('新增链接');
     const nameInput = getEl('name-input');
     const urlInput = getEl('url-input');
     const tipsInput = getEl('tips-input');
@@ -128,6 +137,7 @@ function updateCategorySelectDropdown() {
 
 export function showEditDialog(link, categoryName) {
     toggleOverlay('dialog-overlay', true);
+    setCardDialogTitle('编辑链接');
     const nameInput = getEl('name-input');
     const urlInput = getEl('url-input');
     const tipsInput = getEl('tips-input');

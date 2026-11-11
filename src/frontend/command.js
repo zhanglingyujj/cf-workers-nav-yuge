@@ -2,6 +2,7 @@
 import { getVisibleCategories, linkMatches } from './state.js';
 import { getEl } from './utils.js';
 import { getEngine, getEngineList, setEngineByIndex, doSearch } from './search.js';
+import { registerCloser, unregisterCloser, isAnyOverlayOpen } from './overlay-layers.js';
 
 let selectedIndex = 0;
 let items = [];
@@ -20,6 +21,8 @@ export function initCommandBar() {
     document.addEventListener('keydown', (e) => {
         if (e.altKey && !e.ctrlKey && !e.metaKey && e.key.toLowerCase() === 'c') {
             e.preventDefault();
+            // 已有其它浮层开着时不叠开（面板自身开着则允许 Alt C 关闭）
+            if (palette.classList.contains('hidden') && isAnyOverlayOpen()) return;
             palette.classList.contains('hidden') ? openPalette() : closePalette();
         }
     });
@@ -53,6 +56,7 @@ export function openPalette() {
     const palette = getEl('cmd-palette');
     const input = getEl('cmd-input');
     if (!palette || !input) return;
+    registerCloser('cmd-palette', closePalette);
     palette.classList.remove('hidden');
     palette.classList.add('flex');
     input.value = '';
@@ -61,9 +65,10 @@ export function openPalette() {
     input.focus();
 }
 
-function closePalette() {
+export function closePalette() {
     const palette = getEl('cmd-palette');
     if (!palette) return;
+    unregisterCloser('cmd-palette');
     palette.classList.add('hidden');
     palette.classList.remove('flex');
 }
