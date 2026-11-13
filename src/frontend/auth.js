@@ -3,7 +3,7 @@ import { setLoggedIn, setCategories } from './state.js';
 import { openAlert, openConfirm } from './overlay.js';
 
 // 会话失效三件事（清凭证 + 退登录态 + 告警）单处实现，告警文案由调用方传入
-async function sessionExpired(message, { storage = localStorage, setLoggedInImpl = setLoggedIn, notify = openAlert } = {}) {
+async function expireSession(message, { storage = localStorage, setLoggedInImpl = setLoggedIn, notify = openAlert } = {}) {
     storage.removeItem('authToken');
     setLoggedInImpl(false);
     await notify(message);
@@ -15,16 +15,24 @@ async function validateToken() {
     try {
         const r = await fetchWithAuth('/api/validateToken');
         return r.status === 200;
-    } catch (e) { return false; }
+    } catch (e) {
+        if (e.message === 'Unauthorized') throw e; // fetchWithAuth 已完成会话失效三件事，交由上层跳过二次告警
+        return false;
+    }
 }
 
 export async function validateTokenOrRedirect() {
-    const valid = await validateToken();
-    if (!valid) {
-        await sessionExpired('登录凭证已过期，请重新登录');
-        return false;
+    try {
+        const valid = await validateToken();
+        if (!valid) {
+            await expireSession('登录凭证已过期，请重新登录');
+            return false;
+        }
+        return true;
+    } catch (e) {
+        if (e.message === 'Unauthorized') return false;
+        throw e;
     }
-    return true;
 }
 
 export async function refreshAccessToken() {
@@ -74,7 +82,7 @@ export function createFetchWithAuth({
                     throw new Error('Refresh token expired');
                 }
             } catch (refreshError) {
-                await sessionExpired('登录已过期，请重新登录', { storage, setLoggedInImpl, notify });
+                await expireSession('登录已过期，请重新登录', { storage, setLoggedInImpl, notify });
                 throw new Error('Unauthorized');
             }
         }

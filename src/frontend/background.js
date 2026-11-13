@@ -124,16 +124,20 @@ export function initBackground() {
         _saveSettingsTimer = setTimeout(async () => {
             const { fetchWithAuth, validateTokenOrRedirect } = await import('./auth.js');
             if (!(await validateTokenOrRedirect())) return;
-            await fetchWithAuth('/api/settings', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    backgroundImage: bgImageInput ? bgImageInput.value.trim() : '',
-                    backgroundOpacity: bgOpacitySlider ? parseInt(bgOpacitySlider.value) : DEFAULTS.backgroundOpacity,
-                    backgroundBlur: bgBlurSlider ? parseInt(bgBlurSlider.value) : DEFAULTS.backgroundBlur,
-                    siteTitle: siteTitleInput ? siteTitleInput.value.trim() : '',
-                }),
-            });
+            try {
+                await fetchWithAuth('/api/settings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        backgroundImage: bgImageInput ? bgImageInput.value.trim() : '',
+                        backgroundOpacity: bgOpacitySlider ? parseInt(bgOpacitySlider.value) : DEFAULTS.backgroundOpacity,
+                        backgroundBlur: bgBlurSlider ? parseInt(bgBlurSlider.value) : DEFAULTS.backgroundBlur,
+                        siteTitle: siteTitleInput ? siteTitleInput.value.trim() : '',
+                    }),
+                });
+            } catch (e) {
+                // 会话失效已由 fetchWithAuth 统一处理，settings 保存静默失败（与旧行为一致）
+            }
         }, 500);
     }
 
