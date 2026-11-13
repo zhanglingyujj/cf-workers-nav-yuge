@@ -1,6 +1,5 @@
 // drag.js - 拖拽排序 (PC + 移动端) ★ 本地优先 + 合并异步保存
-import { isEditMode, getCategories, reorderCards, findLinkById } from './state.js';
-import { patchCategory, renderAll } from './render.js';
+import { isEditMode, moveLink } from './state.js';
 import { commitSoon } from './commit.js';
 
 let draggedCard = null;
@@ -40,7 +39,7 @@ function dragEnd() {
     if (draggedCard) draggedCard.classList.remove('dragging');
 }
 
-async function drop(e) {
+function drop(e) {
     if (!isEditMode()) return;
     e.preventDefault();
     if (!draggedCard) return;
@@ -48,46 +47,21 @@ async function drop(e) {
     const newState = getCardState(draggedCard);
     const changed = newState.category !== initialDragState.category || newState.index !== initialDragState.index;
     if (changed) {
-        updateCardCategory(draggedCard, newState.category);
-        const newLinks = readLinksFromDOM(newState.category);
-        reorderCards(newState.category, newLinks);
-if (initialDragState.category !== newState.category) {
-            renderAll();
-        } else {
-            patchCategory(newState.category);
-        }
-        debouncedSaveOrder();
+        const cardId = draggedCard.getAttribute('data-card-id');
+        // 先读落点顺序（被拖卡仍在目标容器内），再移除被拖元素：
+        // flush 对账时该卡走 create 分支由 createCardElement 重建，卡片形态与编辑控件随目标分组一次正确
+        const ids = readCardIdsFromDOM(newState.category);
+        draggedCard.remove();
+        if (moveLink(cardId, newState.category, ids)) commitSoon('保存排序');
     }
     draggedCard = null;
 }
 
-// 合并高频拖拽的落库（300ms 尾沿）
-function debouncedSaveOrder() {
-    commitSoon('保存排序');
-}
-
-function updateCardCategory(card, newCategory) {
-    const id = card.getAttribute('data-card-id');
-    let item = null;
-    const categories = getCategories();
-    for (const cat in categories) {
-        const idx = categories[cat].links.findIndex(l => l.id === id);
-        if (idx !== -1) {
-            item = categories[cat].links.splice(idx, 1)[0];
-            break;
-        }
-    }
-    if (item) {
-        item.category = newCategory;
-        categories[newCategory].links.push(item);
-    }
-}
-
-function readLinksFromDOM(categoryName) {
+// 只读目标容器卡片 id 顺序：手势→意图翻译是 drag 的职责，DOM 仅提供落点不作为真相源
+function readCardIdsFromDOM(categoryName) {
     const section = document.getElementById(categoryName);
     if (!section) return [];
-const cards = section.querySelectorAll('.card');
-    return Array.from(cards).map(c => findLinkById(c.getAttribute('data-card-id'))).filter(Boolean);
+    return Array.from(section.querySelectorAll('.card')).map(c => c.getAttribute('data-card-id'));
 }
 
 // -------- 移动端拖拽 --------
@@ -286,15 +260,11 @@ function handleTouchEnd() {
                         const newState = getCardState(mobilePlaceholder);
                         const changed = newState.category !== initialDragState.category || newState.index !== initialDragState.index;
                         if (changed) {
-                            updateCardCategory(mobilePlaceholder, newState.category);
-                            const newLinks = readLinksFromDOM(newState.category);
-                            reorderCards(newState.category, newLinks);
-                            if (initialDragState.category !== newState.category) {
-                                renderAll();
-                            } else {
-                                patchCategory(newState.category);
-                            }
-                            debouncedSaveOrder();
+                            const cardId = mobilePlaceholder.getAttribute('data-card-id');
+                            // 同 PC drop：先读落点顺序再移除被拖元素，flush 对账走 create 分支重建
+                            const ids = readCardIdsFromDOM(newState.category);
+                            mobilePlaceholder.remove();
+                            if (moveLink(cardId, newState.category, ids)) commitSoon('保存排序');
                         }
                         mobilePlaceholder = null;
                     }

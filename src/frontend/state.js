@@ -188,6 +188,38 @@ export function setCategoryHidden(category, isHidden) {
     markAllDirty();
 }
 
+// 拖拽落库唯一深接口：按 id 迁移卡片并落位（手势→意图翻译后的数据面收口）
+// orderedIds 防御归一：不在目标组的 id 忽略、未列出的既有卡追加末尾（DOM 回读与 state 漂移时以 state 为真）
+export function moveLink(cardId, toCategory, orderedIds) {
+    let fromCat = null;
+    let fromIdx = -1;
+    for (const cat in _categories) {
+        const idx = (_categories[cat].links || []).findIndex(l => l.id === cardId);
+        if (idx !== -1) { fromCat = cat; fromIdx = idx; break; }
+    }
+    if (fromCat === null || !_categories[toCategory]) return false; // id 已被删或目标组不存在：no-op，防脏数据落库
+
+    const links = _categories[toCategory].links;
+    if (fromCat !== toCategory) {
+        const item = _categories[fromCat].links.splice(fromIdx, 1)[0];
+        item.category = toCategory;
+        links.push(item);
+        markDirty(fromCat);
+    }
+    const byId = new Map(links.map(l => [l.id, l]));
+    const seen = new Set();
+    const ordered = [];
+    for (const id of orderedIds) {
+        const l = byId.get(id);
+        if (l && !seen.has(id)) { ordered.push(l); seen.add(id); }
+    }
+    for (const l of links) {
+        if (!seen.has(l.id)) { ordered.push(l); seen.add(l.id); }
+    }
+    reorderCards(toCategory, ordered);
+    return true;
+}
+
 export function reorderCards(categoryName, orderedLinks) {
     if (!_categories[categoryName]) return;
     _categories[categoryName].links = orderedLinks;

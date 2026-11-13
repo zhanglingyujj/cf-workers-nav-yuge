@@ -7,6 +7,7 @@ import {
     addCategory, renameCategory, deleteCategory,
     moveCategory, pinCategory, setCategoryHidden,
     reorderCards, isCategoryAppLayout, setCategoryAppLayout,
+    moveLink,
     markAllDirty, markDirty,
     setFlushHandler,
 } from '../src/frontend/state.js';
@@ -174,6 +175,80 @@ test('同一帧内多次变更合并为一次 flush', async () => {
     addLink('B', link('3.com', 'B'));
     await flushNow();
     assert.equal(flushCount, 1);
+});
+
+test('moveLink 组内重排：按 orderedIds 落位并标脏该组', async () => {
+    const dirty = new Set();
+    setFlushHandler(d => d.forEach(c => dirty.add(c)));
+    setCategories({ A: { isHidden: false, links: [link('1.com', 'A'), link('2.com', 'A'), link('3.com', 'A')] } });
+    await flushNow();
+    dirty.clear();
+    const ids = getCategories().A.links.map(l => l.id);
+    assert.equal(moveLink(ids[2], 'A', [ids[2], ids[0], ids[1]]), true);
+    await flushNow();
+    assert.deepEqual(getCategories().A.links.map(l => l.url), ['3.com', '1.com', '2.com']);
+    assert.deepEqual([...dirty], ['A']);
+});
+
+test('moveLink 跨组移动：源组移除、目标组按序落位，两组均标脏', async () => {
+    const dirty = new Set();
+    setFlushHandler(d => d.forEach(c => dirty.add(c)));
+    setCategories({
+        A: { isHidden: false, links: [link('1.com', 'A'), link('2.com', 'A')] },
+        B: { isHidden: false, links: [link('3.com', 'B')] },
+    });
+    await flushNow();
+    dirty.clear();
+    const moved = getCategories().A.links[1];
+    const bId = getCategories().B.links[0].id;
+    assert.equal(moveLink(moved.id, 'B', [moved.id, bId]), true);
+    await flushNow();
+    assert.deepEqual(getCategories().A.links.map(l => l.url), ['1.com']);
+    assert.deepEqual(getCategories().B.links.map(l => l.url), ['2.com', '3.com']);
+    assert.equal(getCategories().B.links[0].id, moved.id); // 身份随卡片迁移保留
+    assert.equal(getCategories().B.links[0].category, 'B');
+    assert.deepEqual([...dirty].sort(), ['A', 'B']);
+});
+
+test('moveLink orderedIds 归一：多余 id 忽略、缺失 id 追加末尾', async () => {
+    setCategories({
+        A: { isHidden: false, links: [link('1.com', 'A')] },
+        B: { isHidden: false, links: [link('4.com', 'B'), link('5.com', 'B')] },
+    });
+    const id1 = getCategories().A.links[0].id;
+    const id4 = getCategories().B.links[0].id;
+    // 'ghost' 不在目标组忽略；id5 未列出追加末尾；被拖卡未列出也追加末尾
+    assert.equal(moveLink(id1, 'B', ['ghost', id4]), true);
+    assert.deepEqual(getCategories().B.links.map(l => l.url), ['4.com', '5.com', '1.com']);
+    assert.deepEqual(getCategories().A.links.map(l => l.url), []);
+});
+
+test('moveLink id 不存在或目标组不存在：返回 false 且 no-op', async () => {
+    const dirty = new Set();
+    setFlushHandler(d => d.forEach(c => dirty.add(c)));
+    setCategories({ A: { isHidden: false, links: [link('1.com', 'A')] } });
+    await flushNow();
+    dirty.clear();
+    const id1 = getCategories().A.links[0].id;
+    assert.equal(moveLink('不存在', 'A', []), false); // 拖拽中卡片被删的竞态
+    assert.equal(moveLink(id1, '不存在的组', [id1]), false);
+    assert.deepEqual(getCategories().A.links.map(l => l.url), ['1.com']);
+    await flushNow();
+    assert.deepEqual([...dirty], []);
+});
+
+test('moveLink 源组拖空后非编辑态可见集自动略去', () => {
+    resetState({ loggedIn: false });
+    setCategories({
+        A: { isHidden: false, links: [link('1.com', 'A')] },
+        B: { isHidden: false, links: [link('2.com', 'B')] },
+    });
+    const id1 = getCategories().A.links[0].id;
+    const id2 = getCategories().B.links[0].id;
+    assert.equal(moveLink(id1, 'B', [id1, id2]), true);
+    const v = getVisibleCategories();
+    assert.deepEqual(Object.keys(v), ['B']); // 空分组非编辑态略去
+    assert.deepEqual(v.B.links.map(l => l.url), ['1.com', '2.com']);
 });
 
 import {

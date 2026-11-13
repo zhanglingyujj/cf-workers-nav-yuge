@@ -27,6 +27,7 @@ node build.js --check-classes   # 校验源码 class 全部命中生成的 CSS�
 
 - `src/frontend/state.js` 是唯一数据源。UI 事件处理器只调 mutator + commit，**不手动 renderAll**（管线会自动渲染；例外：切换分类 APP 布局涉及整块卡片形态重建，才手动 renderAll）。
 - 删除/改名分组靠 `reconcileSections` 对账（脏集合无法表达"键消失"），勿绕过。
+- 拖拽落库走 `state.moveLink(cardId, 目标分组, 落点 id 序列)`，勿在 UI 层直改 `getCategories()` 返回的原始对象。
 - 可见性规则（隐藏分组、私密卡、空分组）唯一出处是 `state.getVisibleCategories()`；渲染、站内搜索、命令面板统一消费它，勿在各处重写布尔判断。
 - `requestAnimationFrame` 在 state.js 中有 node 回退（`setTimeout(0)`），别在模块顶层直接引用浏览器全局。
 

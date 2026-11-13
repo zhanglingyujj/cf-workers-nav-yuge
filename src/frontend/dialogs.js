@@ -1,6 +1,6 @@
 // dialogs.js - 弹窗管理 (添加/编辑卡片, 密码登录)
 import { addLink, updateLink, removeLink, getCategories, findLinkById, addCategory, setEditMode } from './state.js';
-import { updateUIState, renderAll } from './render.js';
+import { updateUIState } from './render.js';
 import { commit } from './commit.js';
 import { getEl } from './utils.js';
 import { openAlert, openConfirm, openPrompt, runDialog } from './overlay.js';
@@ -159,7 +159,7 @@ export function showEditDialog(link, categoryName) {
     if (confirmBtn) {
         const newBtn = confirmBtn.cloneNode(true);
         confirmBtn.parentNode.replaceChild(newBtn, confirmBtn);
-        newBtn.addEventListener('click', () => updateCard(link, categoryName));
+        newBtn.addEventListener('click', () => updateCard(link));
     }
 
     const cancelBtn = getEl('dialog-cancel-btn');
@@ -194,7 +194,7 @@ async function addCard() {
     await commit('保存数据');
 }
 
-async function updateCard(oldLink, categoryName) {
+async function updateCard(oldLink) {
     const { validateTokenOrRedirect } = await import('./auth.js');
     if (!(await validateTokenOrRedirect())) return;
 
@@ -208,11 +208,7 @@ async function updateCard(oldLink, categoryName) {
         isPrivate: getEl('private-checkbox').checked
     };
 
-const categoryChanged = (categoryName || oldLink.category) !== newLink.category;
     updateLink(oldLink, newLink);
-    if (categoryChanged) {
-        renderAll();
-    }
     toggleOverlay('dialog-overlay', false);
 
     await commit('保存数据');
