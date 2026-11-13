@@ -93,10 +93,18 @@ function buildItems(query) {
         }
     });
 
-    if (q && items.length === 0) {
-        items.push({ type: 'search', name: query, meta: '搜索网页' });
+    if (q) {
+        items.push({ type: 'search', name: query, meta: searchMeta() });
     }
     if (selectedIndex >= items.length) selectedIndex = Math.max(0, items.length - 1);
+}
+
+// search 行 meta 按当前引擎显示：site 提示进筛选态，外部引擎提示搜索网页
+function searchMeta() {
+    const eng = getEngine();
+    if (eng === 'site') return '筛选本站';
+    const found = getEngineList().find(e => e.key === eng);
+    return `用${found ? found.label : eng}搜索`;
 }
 
 function renderList(query) {

@@ -1,4 +1,4 @@
-// 回归取证：issues #12-#17 深化批次的手动验收项 Playwright 自动化
+// 回归取证：issues #12-#17 深化批次的手动验收项 Playwright 自动化（#18 修复后补齐 #15 筛选态可达性断言）
 // 前置：wrangler dev --port 8787 已运行且已播种（见脚本内 seed()）
 import { chromium } from 'playwright';
 import { readFileSync } from 'fs';
@@ -41,10 +41,14 @@ async function seed() {
     if (!res.ok) throw new Error('seed saveData failed');
 }
 
-// 统计 sections-container 的全量重建次数（renderAll 的 innerHTML='' 产生一次大批量移除）
+// 统计 sections-container 的全量重建次数（renderAll 的 innerHTML='' 产生一次大批量移除）；
+// 同时记录 window.open 调用（本环境外部 URL 的 popup 事件仅在 teardown 才派发，不可靠）
 const RENDER_ALL_COUNTER = `
 (() => {
     window.__renderAllCount = 0;
+    window.__openCalls = [];
+    const __origOpen = window.open.bind(window);
+    window.open = (...args) => { window.__openCalls.push(String(args[0])); return __origOpen(...args); };
     // 告警开启次数（跃迁计数，同一弹窗只计一次）
     window.__alertLog = [];
     window.__lastAlertOpen = false;
@@ -347,13 +351,40 @@ async function main() {
     }
 
     // ============ #15 筛选态 ============
-    // 注：有结果的筛选态在 UI 上不可达（44c5af5 面板化引入的既有缺口：buildItems 仅在
-    // 无匹配时追加 search 行，匹配词 Enter 直达 link/cat，不进 doSearch site 分支）。
-    // #15 的管线行为已由 node:test 6 组覆盖（setFilter/getViewCategories/结构脏联动）；
-    // 此处仅验可达路径：空结果 alert 与面板链路本身。
+    // #18 起面板 search 行常驻（q 非空时总在 cat/link 行之后追加），Enter 走 doSearch：
+    // site 引擎进筛选态、外部引擎开搜索页。管线本身（setFilter/getViewCategories/
+    // 结构脏联动）另有 node:test 6 组覆盖，此处验 UI 可达性与端到端表现。
     {
         const { context, page } = await newPage(browser);
         await login(page);
+
+        // 打开面板输入词，选中 search 行（总在最后）回车；返回该行 meta 文案
+        const searchViaPalette = async (keyword, beforeType) => {
+            await page.keyboard.press('/');
+            await page.waitForTimeout(400);
+            if (beforeType) await beforeType();
+            await page.fill('#cmd-input', keyword);
+            await page.waitForTimeout(200);
+            const meta = await page.evaluate(() => {
+                const rows = document.querySelectorAll('.cmd-row');
+                const last = rows[rows.length - 1];
+                return last ? ((last.querySelector('.ml-auto') || {}).textContent || '') : '';
+            });
+            const rows = await page.locator('.cmd-row').count();
+            for (let i = 0; i < rows - 1; i++) await page.keyboard.press('ArrowDown');
+            await page.keyboard.press('Enter');
+            await page.waitForTimeout(500);
+            return meta;
+        };
+        const sections = () => page.evaluate(() => {
+            const chip = document.getElementById('filter-chip');
+            return {
+                a: !!document.getElementById('常规A'),
+                b: !!document.getElementById('常规B'),
+                app: !!document.getElementById('应用面板'),
+                chip: !!chip && !chip.classList.contains('hidden'),
+            };
+        });
 
         // 空结果：alert 且不进筛选态
         await page.keyboard.press('/');
@@ -370,7 +401,7 @@ async function main() {
         await page.evaluate(() => document.getElementById('custom-alert-confirm')?.click());
         await page.waitForTimeout(300);
 
-        // 匹配词 Enter 直达 link（面板现状行为，确认链路不炸 + 新窗口打开）
+        // 匹配词 Enter 直达 link（selectedIndex=0 仍指向第一匹配，44c5af5 既有直达行为）
         const popupPromise = page.waitForEvent('popup', { timeout: 5000 }).catch(() => null);
         await page.keyboard.press('/');
         await page.waitForTimeout(400);
@@ -384,7 +415,71 @@ async function main() {
         const noChip = await page.evaluate(() => !document.getElementById('filter-chip'));
         report('15', '直达路径不残留筛选浮标（setFilter 未被误触）', noChip);
 
-        console.log('⚠ [#15] 筛选态渲染/APP 网格/chip/编辑保持视图/不匹配卡不可见 —— UI 入口缺失（44c5af5 既有），待修复后补验；管线已由 node:test 覆盖');
+        // ① 筛选渲染：选中 search 行 Enter 进筛选态，命中分组出图、未命中分组消失
+        const siteMeta = await searchViaPalette('甲');
+        const filtered = await sections();
+        report('15', '筛选态渲染：命中分组出图、未命中分组 section 消失',
+            filtered.a && !filtered.b && !filtered.app && filtered.chip && siteMeta === '筛选本站',
+            `sections=${JSON.stringify(filtered)} search行meta="${siteMeta}"`);
+
+        // ③ chip 清除恢复全量
+        await page.click('#filter-chip');
+        await page.waitForTimeout(500);
+        const restored = await sections();
+        report('15', '点击筛选浮标清除：全部分组回来、chip 消失',
+            restored.a && restored.b && restored.app && !restored.chip, JSON.stringify(restored));
+
+        // ② APP 布局网格列宽 minmax(56px,68px)（筛选态下端到端）
+        await searchViaPalette('git');
+        const gridCheck = await page.evaluate(() => {
+            const container = document.querySelector('#应用面板 .card-container');
+            if (!container) return '应用面板 section 缺失';
+            const tracks = getComputedStyle(container).gridTemplateColumns.split(' ').map(parseFloat);
+            if (tracks.length < 2) return `轨道数 ${tracks.length}`;
+            const bad = tracks.find(v => !(v >= 56 && v <= 68));
+            return bad === undefined ? 'ok' : `轨道宽 ${bad}`;
+        });
+        report('15', '筛选态 APP 布局网格 minmax(56px,68px) 端到端生效', gridCheck === 'ok', gridCheck);
+        await page.click('#filter-chip');
+        await page.waitForTimeout(500);
+
+        // ④ 筛选态进入编辑模式保持筛选视图
+        await searchViaPalette('甲');
+        await enterEditMode(page);
+        const editFiltered = await sections();
+        report('15', '筛选态进入编辑模式：保持筛选视图（非命中分组仍消失）',
+            editFiltered.a && !editFiltered.b && !editFiltered.app, JSON.stringify(editFiltered));
+
+        // ⑤ 筛选态编辑模式新增不匹配卡：当前视图不出现，清除 chip 后可见
+        await page.click('#常规A [aria-label="新增链接"]');
+        await page.waitForTimeout(400);
+        await page.fill('#name-input', '零站');
+        await page.fill('#url-input', 'https://z9.example.com');
+        await page.click('#dialog-confirm-btn');
+        await page.waitForTimeout(800);
+        const hiddenCard = await page.evaluate(() => {
+            const sec = document.getElementById('常规A');
+            return !sec || !sec.textContent.includes('零站');
+        });
+        await page.click('#filter-chip');
+        await page.waitForTimeout(500);
+        const visibleCard = await page.evaluate(() => {
+            const sec = document.getElementById('常规A');
+            return !!sec && sec.textContent.includes('零站');
+        });
+        report('15', '筛选态编辑模式新增不匹配卡：当前视图不出现，清除 chip 后可见', hiddenCard && visibleCard);
+
+        // 非 site 引擎防呆：外部引擎下 search 行 Enter 开引擎搜索页，不进筛选态
+        const extMeta = await searchViaPalette('甲', async () => {
+            await page.locator('#cmd-engines button', { hasText: '谷歌' }).click();
+            await page.waitForTimeout(200);
+        });
+        await page.waitForTimeout(500);
+        const opened = await page.evaluate(() => window.__openCalls);
+        const noFilter = await sections();
+        report('15', '外部引擎：search 行 Enter 开引擎搜索页且不出现筛选浮标',
+            opened.some(u => u.includes('google.com/search?q=')) && !noFilter.chip,
+            `opened=${JSON.stringify(opened)} search行meta="${extMeta}"`);
 
         await context.close();
     }
