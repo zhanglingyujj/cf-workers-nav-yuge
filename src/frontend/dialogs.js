@@ -238,7 +238,7 @@ export function initDialogs() {
     // 导入导出（单一导入入口，弹窗选择类型）
     const importFileInput = getEl('import-file-input');
     if (importFileInput) {
-        document.getElementById('data-tools-menu')?.querySelector('[onclick="exportData()"]')?.addEventListener('click', async () => {
+        document.getElementById('data-tools-menu')?.querySelector('#export-data-btn')?.addEventListener('click', async () => {
             const { exportData } = await import('./auth.js');
             await exportData();
         });

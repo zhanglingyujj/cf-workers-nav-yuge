@@ -55,6 +55,12 @@ if (menuToggleBtn && dropdown) {
         }, { passive: true });
     }
 
+    // 站点标题点击刷新（原 index.html 内联 onclick，CSP 不再依赖 unsafe-inline 的事件入口）
+    getEl('reload-site-link')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        location.reload();
+    });
+
     // 工具提示
     const { initTooltip } = await import('./tooltip.js');
     initTooltip();

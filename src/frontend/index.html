@@ -16,6 +16,7 @@
             will-change: transform;
             backface-visibility: hidden;
             transform-style: preserve-3d;
+            transform: translateZ(0);
         }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
@@ -25,11 +26,6 @@
         @media (max-width: 640px) {
             ::-webkit-scrollbar { display: none; }
             * { scrollbar-width: none; /* Firefox */ }
-        }
-        
-        .animate-blob {
-            will-change: transform;
-            transform: translateZ(0);
         }
 
         .card {
@@ -136,7 +132,7 @@
 
     <!-- 浮岛：标题 + 命令条 + 设置（宽度与内容区卡片边界对齐） -->
     <div class="fixed top-5 left-1/2 -translate-x-1/2 z-50 flex items-center gap-1 h-14 pl-4 pr-2 w-[calc(100vw-2rem)] sm:w-[calc(100vw-4rem)] lg:w-[calc(100vw-5rem)] max-w-[1200px] rounded-2xl border border-white/15 bg-[#2a2a2a8c] backdrop-blur-2xl shadow-[0_0_15px_2px_rgba(0,0,0,0.25)]">
-        <a class="flex items-center gap-2.5 pr-2 flex-shrink-0 group cursor-pointer" href="#" onclick="location.reload()">
+        <a id="reload-site-link" class="flex items-center gap-2.5 pr-2 flex-shrink-0 group cursor-pointer" href="#">
             <div class="w-8 h-8 flex items-center justify-center bg-gradient-to-tr from-heritage-400 to-heritage-600 rounded-lg text-heritage-dark-900 shadow-md shadow-black/30 group-hover:scale-105 transition-transform">
                 <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
             </div>
@@ -163,7 +159,7 @@
 
                     <!-- 导入导出 (仅登录显示) -->
                     <div id="data-tools-menu" class="hidden border-t border-zinc-200/80 my-1 pt-1">
-                        <button onclick="exportData()" class="w-full text-left px-3 py-2.5 rounded-lg text-sm text-zinc-700 hover:bg-zinc-200 hover:text-zinc-900 transition-colors flex items-center gap-3">
+                        <button id="export-data-btn" class="w-full text-left px-3 py-2.5 rounded-lg text-sm text-zinc-700 hover:bg-zinc-200 hover:text-zinc-900 transition-colors flex items-center gap-3">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                             导出配置
                         </button>
