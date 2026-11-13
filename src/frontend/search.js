@@ -53,8 +53,7 @@ localStorage.setItem('searchEngine', value);
 export function doSearch(query) {
     if (currentEngine === 'site') {
         const filtered = searchCategories(query);
-        const hasResults = Object.values(filtered).some(c => c.links.length > 0);
-        if (!hasResults) {
+        if (Object.keys(filtered).length === 0) {
             import('./overlay.js').then(m => m.openAlert('没有找到相关站点。'));
             return;
         }

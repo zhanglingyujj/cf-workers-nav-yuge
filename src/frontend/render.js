@@ -30,10 +30,10 @@ export function initRender() {
 function reconcileSections() {
     const container = getEl(containerId);
     if (!container) return;
-    const visible = getViewCategories();
+    const view = getViewCategories();
 
     for (const name of _renderedCategories) {
-        if (!visible[name]) {
+        if (!view[name]) {
             const section = document.getElementById(name);
             if (section) section.remove();
             _renderedCategories.delete(name);
@@ -41,7 +41,7 @@ function reconcileSections() {
     }
 
     let ref = null;
-    for (const key of Object.keys(visible)) {
+    for (const key of Object.keys(view)) {
         const section = document.getElementById(key);
         if (!section) continue;
         if (ref) {
@@ -59,10 +59,10 @@ export function renderAll() {
     if (!container) return;
 
     container.innerHTML = '';
-    const visible = getViewCategories();
+    const view = getViewCategories();
     const fragment = document.createDocumentFragment();
 
-    for (const [catName, { links, isHidden }] of Object.entries(visible)) {
+    for (const [catName, { links, isHidden }] of Object.entries(view)) {
         const section = createCategorySection(catName, links, isHidden);
         if (section) {
             fragment.appendChild(section);
@@ -75,8 +75,8 @@ export function renderAll() {
 }
 
 export function patchCategory(categoryName) {
-    const visible = getViewCategories();
-    const catData = visible[categoryName];
+    const view = getViewCategories();
+    const catData = view[categoryName];
 
     if (!catData) {
         const oldSection = document.getElementById(categoryName);
@@ -93,7 +93,7 @@ export function patchCategory(categoryName) {
         if (newSection) {
             const container = getEl(containerId);
             if (!container) return;
-            const keys = Object.keys(visible);
+            const keys = Object.keys(view);
             const idx = keys.indexOf(categoryName);
             const afterSection = idx > 0 ? document.getElementById(keys[idx - 1]) : null;
             if (afterSection && afterSection.nextSibling) {
