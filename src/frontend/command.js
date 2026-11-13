@@ -186,6 +186,8 @@ function renderEngines() {
         btn.addEventListener('click', () => {
             setEngineByIndex(i);
             renderEngines();
+            // 重列以刷新 search 行 meta（input 空时重渲 cat 列表，无行为变化）
+            renderList(getEl('cmd-input').value.trim());
         });
         container.appendChild(btn);
     });

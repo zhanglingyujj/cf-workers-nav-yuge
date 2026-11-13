@@ -385,6 +385,10 @@ async function main() {
                 chip: !!chip && !chip.classList.contains('hidden'),
             };
         });
+        const clearFilter = async () => {
+            await page.click('#filter-chip');
+            await page.waitForTimeout(500);
+        };
 
         // 空结果：alert 且不进筛选态
         await page.keyboard.press('/');
@@ -402,15 +406,15 @@ async function main() {
         await page.waitForTimeout(300);
 
         // 匹配词 Enter 直达 link（selectedIndex=0 仍指向第一匹配，44c5af5 既有直达行为）
-        const popupPromise = page.waitForEvent('popup', { timeout: 5000 }).catch(() => null);
+        await page.evaluate(() => { window.__openCalls = []; });
         await page.keyboard.press('/');
         await page.waitForTimeout(400);
         await page.fill('#cmd-input', 'GitHub');
         await page.keyboard.press('Enter');
-        const popup = await popupPromise;
-        report('15', '面板匹配词 Enter 直达卡片链接（44c5af5 既有行为，非筛选路径）', !!popup);
-        await popup?.close();
-        await page.waitForTimeout(300);
+        await page.waitForTimeout(500);
+        const direct = await page.evaluate(() => window.__openCalls);
+        report('15', '面板匹配词 Enter 直达卡片链接（44c5af5 既有行为，非筛选路径）',
+            direct.some(u => u.includes('github.com')), JSON.stringify(direct));
 
         const noChip = await page.evaluate(() => !document.getElementById('filter-chip'));
         report('15', '直达路径不残留筛选浮标（setFilter 未被误触）', noChip);
@@ -423,8 +427,7 @@ async function main() {
             `sections=${JSON.stringify(filtered)} search行meta="${siteMeta}"`);
 
         // ③ chip 清除恢复全量
-        await page.click('#filter-chip');
-        await page.waitForTimeout(500);
+        await clearFilter();
         const restored = await sections();
         report('15', '点击筛选浮标清除：全部分组回来、chip 消失',
             restored.a && restored.b && restored.app && !restored.chip, JSON.stringify(restored));
@@ -440,8 +443,7 @@ async function main() {
             return bad === undefined ? 'ok' : `轨道宽 ${bad}`;
         });
         report('15', '筛选态 APP 布局网格 minmax(56px,68px) 端到端生效', gridCheck === 'ok', gridCheck);
-        await page.click('#filter-chip');
-        await page.waitForTimeout(500);
+        await clearFilter();
 
         // ④ 筛选态进入编辑模式保持筛选视图
         await searchViaPalette('甲');
@@ -461,8 +463,7 @@ async function main() {
             const sec = document.getElementById('常规A');
             return !sec || !sec.textContent.includes('零站');
         });
-        await page.click('#filter-chip');
-        await page.waitForTimeout(500);
+        await clearFilter();
         const visibleCard = await page.evaluate(() => {
             const sec = document.getElementById('常规A');
             return !!sec && sec.textContent.includes('零站');
