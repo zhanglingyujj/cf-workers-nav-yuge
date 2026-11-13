@@ -1,5 +1,5 @@
 // dialogs.js - 弹窗管理 (添加/编辑卡片, 密码登录)
-import { addLink, updateLink, removeLink, getCategories, findLinkById, addCategory } from './state.js';
+import { addLink, updateLink, removeLink, getCategories, findLinkById, addCategory, isEditMode, isLoggedIn, setEditMode } from './state.js';
 import { commit } from './commit.js';
 import { getEl } from './utils.js';
 import { openAlert, openConfirm, openPrompt, runDialog } from './overlay.js';
@@ -200,13 +200,11 @@ export function initDialogs() {
             const dropdown = getEl('profile-dropdown');
             if (dropdown) dropdown.classList.add('hidden');
 
-            const { isLoggedIn, setEditMode } = await import('./state.js');
             if (!isLoggedIn()) {
                 showPasswordDialog();
                 return;
             }
-            const edit = !(await import('./state.js')).isEditMode();
-            setEditMode(edit);
+            setEditMode(!isEditMode());
         });
     }
 
@@ -214,7 +212,6 @@ export function initDialogs() {
     const loginBtn = getEl('login-Btn');
     if (loginBtn) {
         loginBtn.addEventListener('click', async () => {
-            const { isLoggedIn } = await import('./state.js');
             if (!isLoggedIn()) {
                 showPasswordDialog();
             } else {
