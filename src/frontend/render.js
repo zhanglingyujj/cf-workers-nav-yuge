@@ -251,13 +251,7 @@ function createCategoryControls(categoryName, isHidden, isApp) {
 
     const buttons = controls.querySelectorAll('button');
     buttons[0].addEventListener('click', () => {
-        import('./dialogs.js').then(m => {
-            m.showAddDialog();
-            const catVal = document.getElementById('category-select-value');
-            const catText = document.getElementById('category-select-text');
-            if (catVal) catVal.value = categoryName;
-            if (catText) catText.textContent = categoryName;
-        });
+        import('./dialogs.js').then(m => m.showAddDialog(categoryName));
     });
     buttons[1].addEventListener('click', () => {
         import('./dialogs.js').then(m => m.editCategoryName(categoryName));

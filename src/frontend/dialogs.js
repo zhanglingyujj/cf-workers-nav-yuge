@@ -1,32 +1,9 @@
 // dialogs.js - 弹窗管理 (添加/编辑卡片, 密码登录)
-import { addLink, updateLink, removeLink, getCategories, findLinkById, addCategory, setEditMode } from './state.js';
-import { updateUIState } from './render.js';
+import { addLink, updateLink, removeLink, getCategories, findLinkById, addCategory } from './state.js';
 import { commit } from './commit.js';
 import { getEl } from './utils.js';
 import { openAlert, openConfirm, openPrompt, runDialog } from './overlay.js';
-import { registerCloser, unregisterCloser } from './overlay-layers.js';
-
-function toggleOverlay(id, show) {
-    const overlay = document.getElementById(id);
-    if (!overlay) return;
-    const box = overlay.querySelector('div[id$="-box"]');
-    if (show) {
-        registerCloser(id, () => toggleOverlay(id, false));
-        overlay.classList.remove('hidden');
-        void overlay.offsetWidth;
-        overlay.classList.remove('overlay-hidden');
-        overlay.classList.add('overlay-visible');
-        if (box) { box.classList.remove('dialog-scale-hidden'); box.classList.add('dialog-scale-visible'); }
-    } else {
-        unregisterCloser(id);
-        overlay.classList.remove('overlay-visible');
-        overlay.classList.add('overlay-hidden');
-        if (box) { box.classList.remove('dialog-scale-visible'); box.classList.add('dialog-scale-hidden'); }
-        setTimeout(() => {
-            if (overlay.classList.contains('overlay-hidden')) overlay.classList.add('hidden');
-        }, 300);
-    }
-}
+import { createCardForm } from './card-form.js';
 
 const BG_COLOR_PRESETS = [
     '#2a2a2a6b', '#1e293bd9', '#B8422Ed9', '#4285F4d9', '#34A853d9',
@@ -61,58 +38,34 @@ function initBgColorPicker() {
     }
 }
 
-function setBgColorValue(color) {
-    const input = getEl('bg-color-input');
-    if (input) input.value = color || '';
-    const swatches = getEl('bg-color-swatches');
-    if (swatches) swatches.querySelectorAll('button').forEach(b => b.style.outline = '');
-}
-
-function getBgColorValue() {
-    const input = getEl('bg-color-input');
-    const v = (input && input.value.trim()) || '';
-    return /^#([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(v) ? v : '';
-}
-
 function setCardDialogTitle(text) {
     const title = getEl('card-dialog-title');
     if (title) title.textContent = text;
 }
 
-export function showAddDialog() {
-    toggleOverlay('dialog-overlay', true);
-    setCardDialogTitle('新增链接');
-    const nameInput = getEl('name-input');
-    const urlInput = getEl('url-input');
-    const tipsInput = getEl('tips-input');
-    const iconInput = getEl('icon-input');
-    const privateCheckbox = getEl('private-checkbox');
-    const catValue = getEl('category-select-value');
-    const catText = getEl('category-select-text');
-    if (nameInput) nameInput.value = '';
-    if (urlInput) urlInput.value = '';
-    if (tipsInput) tipsInput.value = '';
-    if (iconInput) iconInput.value = '';
-    initBgColorPicker();
-    setBgColorValue('');
-    if (privateCheckbox) privateCheckbox.checked = false;
-    if (catValue) catValue.value = '';
-    if (catText) catText.textContent = '请选择分类';
-
-    const confirmBtn = getEl('dialog-confirm-btn');
-    if (confirmBtn) {
-        const newBtn = confirmBtn.cloneNode(true);
-        confirmBtn.parentNode.replaceChild(newBtn, confirmBtn);
-        newBtn.addEventListener('click', addCard);
-    }
-
-    const cancelBtn = getEl('dialog-cancel-btn');
-    if (cancelBtn) cancelBtn.onclick = () => toggleOverlay('dialog-overlay', false);
-
-    updateCategorySelectDropdown();
+// 新增/编辑卡弹窗走 runDialog 协议：动画 + registerCloser + 关闭即 resolve，onclick 可重复绑定不叠加
+function openCardDialog(onConfirm) {
+    const overlay = document.getElementById('dialog-overlay');
+    if (!overlay) return null;
+    return runDialog(overlay, close => {
+        const confirmBtn = getEl('dialog-confirm-btn');
+        const cancelBtn = getEl('dialog-cancel-btn');
+        if (confirmBtn) confirmBtn.onclick = () => onConfirm(close);
+        if (cancelBtn) cancelBtn.onclick = () => close();
+    });
 }
 
-function updateCategorySelectDropdown() {
+const cardForm = createCardForm();
+
+export function showAddDialog(categoryName) {
+    setCardDialogTitle('新增链接');
+    initBgColorPicker();
+    cardForm.clearForm(categoryName);
+    updateCategorySelectDropdown();
+    openCardDialog(close => addCard(close));
+}
+
+export function updateCategorySelectDropdown() {
     const menu = getEl('category-select-menu');
     if (!menu) return;
     menu.innerHTML = '';
@@ -136,80 +89,42 @@ function updateCategorySelectDropdown() {
 }
 
 export function showEditDialog(link, categoryName) {
-    toggleOverlay('dialog-overlay', true);
     setCardDialogTitle('编辑链接');
-    const nameInput = getEl('name-input');
-    const urlInput = getEl('url-input');
-    const tipsInput = getEl('tips-input');
-    const iconInput = getEl('icon-input');
-    const privateCheckbox = getEl('private-checkbox');
-    const catValue = getEl('category-select-value');
-    const catText = getEl('category-select-text');
-    if (nameInput) nameInput.value = link.name;
-    if (urlInput) urlInput.value = link.url;
-    if (tipsInput) tipsInput.value = link.tips || '';
-    if (iconInput) iconInput.value = link.icon || '';
     initBgColorPicker();
-    setBgColorValue(link.backgroundColor || '');
-    if (privateCheckbox) privateCheckbox.checked = link.isPrivate;
-    if (catValue) catValue.value = categoryName || link.category || '';
-    if (catText) catText.textContent = categoryName || link.category || '请选择分类';
-
-    const confirmBtn = getEl('dialog-confirm-btn');
-    if (confirmBtn) {
-        const newBtn = confirmBtn.cloneNode(true);
-        confirmBtn.parentNode.replaceChild(newBtn, confirmBtn);
-        newBtn.addEventListener('click', () => updateCard(link));
-    }
-
-    const cancelBtn = getEl('dialog-cancel-btn');
-    if (cancelBtn) cancelBtn.onclick = () => toggleOverlay('dialog-overlay', false);
-
+    cardForm.writeForm(link, categoryName);
     updateCategorySelectDropdown();
+    openCardDialog(close => updateCard(link, close));
 }
 
-async function addCard() {
+async function addCard(close) {
     const { validateTokenOrRedirect } = await import('./auth.js');
     if (!(await validateTokenOrRedirect())) return;
 
-    const name = getEl('name-input').value.trim();
-    const url = getEl('url-input').value.trim();
-    const category = getEl('category-select-value').value;
-    if (!name || !url || !category) {
-        await openAlert('请填写必要信息 (名称, URL, 分类)');
+    const error = cardForm.validate();
+    if (error) {
+        await openAlert(error);
         return;
     }
 
-    const newLink = {
-        name, url, category,
-        tips: getEl('tips-input').value.trim(),
-        icon: getEl('icon-input').value.trim(),
-        backgroundColor: getBgColorValue(),
-        isPrivate: getEl('private-checkbox').checked
-    };
-
-    addLink(category, newLink);
-    toggleOverlay('dialog-overlay', false);
+    const newLink = cardForm.readForm();
+    addLink(newLink.category, newLink);
+    close();
 
     await commit('保存数据');
 }
 
-async function updateCard(oldLink) {
+async function updateCard(oldLink, close) {
     const { validateTokenOrRedirect } = await import('./auth.js');
     if (!(await validateTokenOrRedirect())) return;
 
-    const newLink = {
-        name: getEl('name-input').value.trim(),
-        url: getEl('url-input').value.trim(),
-        tips: getEl('tips-input').value.trim(),
-        icon: getEl('icon-input').value.trim(),
-        backgroundColor: getBgColorValue(),
-        category: getEl('category-select-value').value,
-        isPrivate: getEl('private-checkbox').checked
-    };
+    const error = cardForm.validate();
+    if (error) {
+        await openAlert(error);
+        return;
+    }
 
-    updateLink(oldLink, newLink);
-    toggleOverlay('dialog-overlay', false);
+    updateLink(oldLink, cardForm.readForm());
+    close();
 
     await commit('保存数据');
 }
@@ -257,22 +172,27 @@ export async function addCategoryAction() {
     await commit('新增分类');
 }
 
-export function initDialogs() {
-    // 密码确认按钮
-    const passwordConfirmBtn = getEl('password-confirm-btn');
-    const passwordCancelBtn = getEl('password-cancel-btn');
-    if (passwordConfirmBtn) {
-        passwordConfirmBtn.addEventListener('click', async () => {
+// 密码登录弹窗：登录失败不 close（弹窗留着重试），重开不清空输入框，打开后 focus
+function showPasswordDialog() {
+    const overlay = document.getElementById('password-dialog-overlay');
+    if (!overlay) return null;
+    const p = runDialog(overlay, close => {
+        const confirmBtn = getEl('password-confirm-btn');
+        const cancelBtn = getEl('password-cancel-btn');
+        if (confirmBtn) confirmBtn.onclick = async () => {
             const pwd = getEl('password-input').value;
             if (!pwd) return;
             const { login } = await import('./auth.js');
-            if (await login(pwd)) toggleOverlay('password-dialog-overlay', false);
-        });
-    }
-    if (passwordCancelBtn) {
-        passwordCancelBtn.addEventListener('click', () => toggleOverlay('password-dialog-overlay', false));
-    }
+            if (await login(pwd)) close();
+        };
+        if (cancelBtn) cancelBtn.onclick = () => close();
+    });
+    const pwdInput = getEl('password-input');
+    if (pwdInput) pwdInput.focus();
+    return p;
+}
 
+export function initDialogs() {
     // 编辑模式按钮 (来自 profile dropdown)
     const editModeBtn = getEl('edit-mode-btn');
     if (editModeBtn) {
@@ -282,9 +202,7 @@ export function initDialogs() {
 
             const { isLoggedIn, setEditMode } = await import('./state.js');
             if (!isLoggedIn()) {
-                toggleOverlay('password-dialog-overlay', true);
-                const pwdInput = getEl('password-input');
-                if (pwdInput) pwdInput.focus();
+                showPasswordDialog();
                 return;
             }
             const edit = !(await import('./state.js')).isEditMode();
@@ -298,9 +216,7 @@ export function initDialogs() {
         loginBtn.addEventListener('click', async () => {
             const { isLoggedIn } = await import('./state.js');
             if (!isLoggedIn()) {
-                toggleOverlay('password-dialog-overlay', true);
-                const pwdInput = getEl('password-input');
-                if (pwdInput) pwdInput.focus();
+                showPasswordDialog();
             } else {
                 if (await openConfirm('确定退出登录吗？')) {
                     const { logout } = await import('./auth.js');
