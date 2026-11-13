@@ -1,5 +1,5 @@
 // card.js - 卡片 DOM 元素创建/更新（Sun-Panel 对齐：详情卡 / 极简卡）
-import { isEditMode, isLoggedIn, isCategoryAppLayout, removeLink, updateLink, findLinkById } from './state.js';
+import { isEditMode, isLoggedIn, isCategoryAppLayout, findLinkById } from './state.js';
 import { getEl } from './utils.js';
 
 const imgApi = '/api/icon?url=';

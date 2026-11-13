@@ -242,8 +242,6 @@ export async function editCategoryName(oldName) {
 
     const { renameCategory } = await import('./state.js');
     if (!renameCategory(oldName, newName)) return;
-    const { renderAll } = await import('./render.js');
-    renderAll();
     await commit('重命名分类');
 }
 
@@ -259,8 +257,6 @@ export async function addCategoryAction() {
         return;
     }
     addCategory(name);
-    const { renderAll } = await import('./render.js');
-    renderAll();
     setTimeout(() => window.scrollTo(0, document.body.scrollHeight), 100);
     await commit('新增分类');
 }
@@ -297,8 +293,6 @@ export function initDialogs() {
             }
             const edit = !(await import('./state.js')).isEditMode();
             setEditMode(edit);
-            const { renderAll } = await import('./render.js');
-            renderAll();
         });
     }
 

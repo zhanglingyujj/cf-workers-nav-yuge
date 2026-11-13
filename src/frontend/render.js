@@ -1,7 +1,7 @@
 // render.js - 增量 DOM 渲染引擎
 import {
     getCategories, isEditMode, isLoggedIn, getVisibleCategories,
-    setFlushHandler, subscribe,
+    setFlushHandler,
     addCategory, renameCategory, deleteCategory, moveCategory, pinCategory, setCategoryHidden,
     isCategoryAppLayout, setCategoryAppLayout
 } from './state.js';
@@ -15,19 +15,14 @@ const addCategoryContainerId = 'add-category-container';
 let _renderedCategories = new Set();
 
 export function initRender() {
-    setFlushHandler((dirtyCategories) => {
+    // 结构脏（编辑/登录/整表替换等）走全量重建；否则增量对账 + 分组级 patch
+    setFlushHandler((dirtyCategories, structureDirty) => {
+        if (structureDirty) {
+            renderAll();
+            return;
+        }
         reconcileSections();
         dirtyCategories.forEach(cat => patchCategory(cat));
-    });
-
-    subscribe('editMode', () => {
-        renderAll();
-        updateUIState();
-    });
-    subscribe('loggedIn', () => renderAll());
-    subscribe('categoriesLoaded', () => {
-        renderAll();
-        updateUIState();
     });
 }
 

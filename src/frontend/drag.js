@@ -86,7 +86,7 @@ function updateCardCategory(card, newCategory) {
 function readLinksFromDOM(categoryName) {
     const section = document.getElementById(categoryName);
     if (!section) return [];
-const cards = section.querySelectorAll('.card:not(.add-card-placeholder)');
+const cards = section.querySelectorAll('.card');
     return Array.from(cards).map(c => findLinkById(c.getAttribute('data-card-id'))).filter(Boolean);
 }
 
@@ -193,18 +193,13 @@ function touchStart(e) {
     function detectSort(fingerX, fingerY) {
         let elementBelow = document.elementFromPoint(fingerX, fingerY);
         if (!elementBelow) return;
-        let targetCard = elementBelow.closest('.card') || elementBelow.closest('.add-card-placeholder');
+        let targetCard = elementBelow.closest('.card');
         let targetContainer = targetCard ? targetCard.parentElement : elementBelow.closest('.card-container');
         if (!targetContainer) return;
 
         if (activeContainer !== targetContainer) {
             activeContainer = targetContainer;
-            const placeholderBtn = activeContainer.querySelector('.add-card-placeholder');
-            if (placeholderBtn) {
-                activeContainer.insertBefore(mobilePlaceholder, placeholderBtn);
-            } else {
-                activeContainer.appendChild(mobilePlaceholder);
-            }
+            activeContainer.appendChild(mobilePlaceholder);
             lastSwapTime = Date.now();
             return;
         }
@@ -216,7 +211,7 @@ function touchStart(e) {
         const cloneRelY = cloneViewportCenterY - containerRect.top + activeContainer.scrollTop;
 
         const siblings = Array.from(activeContainer.children).filter(c =>
-            (c.classList.contains('card') || c.classList.contains('add-card-placeholder')) && c !== mobilePlaceholder
+            c.classList.contains('card') && c !== mobilePlaceholder
         );
         if (siblings.length === 0) return;
 
@@ -235,7 +230,7 @@ function touchStart(e) {
         if (closestElement) {
             const positionsBefore = new Map();
             const allChildren = Array.from(activeContainer.children).filter(el =>
-                el.classList.contains('card') || el.classList.contains('add-card-placeholder')
+                el.classList.contains('card')
             );
             allChildren.forEach(el => positionsBefore.set(el, el.getBoundingClientRect()));
             const placeholderIndex = allChildren.indexOf(mobilePlaceholder);

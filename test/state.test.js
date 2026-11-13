@@ -7,7 +7,8 @@ import {
     addCategory, renameCategory, deleteCategory,
     moveCategory, pinCategory, setCategoryHidden,
     reorderCards, isCategoryAppLayout, setCategoryAppLayout,
-    setFlushHandler, subscribe,
+    markAllDirty, markDirty,
+    setFlushHandler,
 } from '../src/frontend/state.js';
 
 function flushNow() {
@@ -34,13 +35,26 @@ test('addLink 为新卡生成 id', () => {
     assert.ok(getCategories().A.links[0].id);
 });
 
-test('setCategories 装载数据并触发 categoriesLoaded', () => {
-    let loaded = null;
-    const unsub = subscribe('categoriesLoaded', c => { loaded = c; });
+test('setCategories 装载数据并同步触发结构脏 flush', async () => {
+    await flushNow(); // 排干前序用例遗留的脏集合与挂起调度
+    let seen = null;
+    setFlushHandler((dirty, structureDirty) => { if (structureDirty) seen = [...dirty]; });
     setCategories({ 工具: { isHidden: false, links: [link('a.com', '工具')] } });
     assert.deepEqual(Object.keys(getCategories()), ['工具']);
-    assert.equal(loaded, getCategories());
-    unsub();
+    assert.deepEqual(seen, ['工具']);
+});
+
+test('结构脏标志：markAllDirty 置位，markDirty 单组不置位', async () => {
+    const seen = [];
+    setFlushHandler((dirty, structureDirty) => seen.push(structureDirty));
+    setCategories({ A: { isHidden: false, links: [] } });
+    await flushNow(); // 消化 setCategories 的同步 flush 与其遗留的空调度
+    seen.length = 0;
+    markAllDirty();
+    await flushNow();
+    markDirty('A');
+    await flushNow();
+    assert.deepEqual(seen, [true, false]);
 });
 
 test('addLink 标记所在分类为脏', async () => {
@@ -136,16 +150,11 @@ test('APP 布局开关读写', () => {
     assert.equal(isCategoryAppLayout('A'), true);
 });
 
-test('订阅事件触发与退订', () => {
-    const seen = [];
-    const unsub = subscribe('editMode', v => seen.push(v));
+test('setEditMode/setLoggedIn 切换状态', () => {
     setEditMode(true);
-    setEditMode(false);
-    unsub();
-    setEditMode(true);
-    assert.deepEqual(seen, [true, false]);
     assert.equal(isEditMode(), true);
     setEditMode(false);
+    assert.equal(isEditMode(), false);
     assert.equal(isLoggedIn(), false);
     setLoggedIn(true);
     assert.equal(isLoggedIn(), true);

@@ -8,8 +8,8 @@ let _categories = {};
 let _isEditMode = false;
 let _isLoggedIn = false;
 
-const _subscribers = {};
 const _dirtyCategories = new Set();
+let _structureDirty = false;
 let _renderScheduled = false;
 let _onFlush = null;
 
@@ -29,17 +29,13 @@ export function setEditMode(v) {
     _isEditMode = v;
     markAllDirty();
     flushNow();
-    emit('editMode', v);
 }
 
 export function setLoggedIn(v) {
     _isLoggedIn = v;
     markAllDirty();
     flushNow();
-    emit('loggedIn', v);
 }
-
-export function setAppLayout(v) {}
 
 let _linkIdCounter = 0;
 
@@ -76,7 +72,6 @@ export function setCategories(data) {
     Object.assign(_categories, data);
     markAllDirty();
     flushNow();
-    emit('categoriesLoaded', _categories);
 }
 
 export function addLink(category, link) {
@@ -86,7 +81,6 @@ export function addLink(category, link) {
     if (!link.id) link.id = newLinkId();
     _categories[category].links.push(link);
     markDirty(category);
-    emit('linksChanged', { action: 'add', category, link });
 }
 
 // 按对象引用定位（兜底按 id，覆盖弹窗打开期间 state 被 load() 整体替换的陈旧引用）
@@ -115,7 +109,6 @@ export function updateLink(oldLink, newLink) {
             markDirty(cat);
             markDirty(newLink.category);
         }
-        emit('linksChanged', { action: 'update', oldLink, newLink });
     }
 }
 
@@ -126,7 +119,6 @@ export function removeLink(linkRef) {
         const link = _categories[cat].links[idx];
         _categories[cat].links.splice(idx, 1);
         markDirty(cat);
-        emit('linksChanged', { action: 'remove', category: cat, link });
     }
 }
 
@@ -134,7 +126,6 @@ export function addCategory(name) {
     if (_categories[name]) return false;
     _categories[name] = { isHidden: false, links: [] };
     markAllDirty();
-    emit('categoriesChanged', { action: 'add', name });
     return true;
 }
 
@@ -152,7 +143,6 @@ export function renameCategory(oldName, newName) {
     }
     _categories = newCategories;
     markAllDirty();
-    emit('categoriesChanged', { action: 'rename', oldName, newName });
     return true;
 }
 
@@ -160,7 +150,6 @@ export function deleteCategory(name) {
     if (!_categories[name]) return false;
     delete _categories[name];
     markAllDirty();
-    emit('categoriesChanged', { action: 'delete', name });
     return true;
 }
 
@@ -176,7 +165,6 @@ export function moveCategory(name, direction) {
     reordered.forEach(key => newCategories[key] = _categories[key]);
     _categories = newCategories;
     markAllDirty();
-    emit('categoriesChanged', { action: 'move', name, direction });
     return true;
 }
 
@@ -191,7 +179,6 @@ export function pinCategory(name) {
     reordered.forEach(key => newCategories[key] = _categories[key]);
     _categories = newCategories;
     markAllDirty();
-    emit('categoriesChanged', { action: 'pin', name });
     return true;
 }
 
@@ -199,14 +186,12 @@ export function setCategoryHidden(category, isHidden) {
     if (!_categories[category]) return;
     _categories[category].isHidden = isHidden;
     markAllDirty();
-    emit('categoriesChanged', { action: 'hidden', category, isHidden });
 }
 
 export function reorderCards(categoryName, orderedLinks) {
     if (!_categories[categoryName]) return;
     _categories[categoryName].links = orderedLinks;
     markDirty(categoryName);
-    emit('linksChanged', { action: 'reorder', category: categoryName });
 }
 
 export function isCategoryAppLayout(categoryName) {
@@ -217,7 +202,6 @@ export function setCategoryAppLayout(categoryName, v) {
     if (!_categories[categoryName]) return;
     _categories[categoryName].isAppLayout = v;
     markDirty(categoryName);
-    emit('categoriesChanged', { action: 'appLayout', category: categoryName, value: v });
 }
 
 // 可见性规则唯一出处：隐藏分组在登录/编辑态豁免，私密卡仅登录可见；非编辑态空分组略去
@@ -262,18 +246,14 @@ export function markAllDirty() {
     for (const cat in _categories) {
         _dirtyCategories.add(cat);
     }
+    _structureDirty = true;
     scheduleFlush();
 }
 
 function scheduleFlush() {
     if (!_renderScheduled) {
         _renderScheduled = true;
-        _scheduleFlushFrame(() => {
-            _renderScheduled = false;
-            const dirty = new Set(_dirtyCategories);
-            _dirtyCategories.clear();
-            if (_onFlush) _onFlush(dirty);
-        });
+        _scheduleFlushFrame(flushNow);
     }
 }
 
@@ -287,19 +267,7 @@ function flushNow() {
     }
     const dirty = new Set(_dirtyCategories);
     _dirtyCategories.clear();
-    if (_onFlush) _onFlush(dirty);
-}
-
-export function subscribe(event, callback) {
-    if (!_subscribers[event]) _subscribers[event] = [];
-    _subscribers[event].push(callback);
-    return () => {
-        _subscribers[event] = _subscribers[event].filter(cb => cb !== callback);
-    };
-}
-
-function emit(event, data) {
-    if (_subscribers[event]) {
-        _subscribers[event].forEach(cb => cb(data));
-    }
+    const structureDirty = _structureDirty;
+    _structureDirty = false;
+    if (_onFlush) _onFlush(dirty, structureDirty);
 }

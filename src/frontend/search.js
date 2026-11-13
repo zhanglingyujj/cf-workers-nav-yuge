@@ -1,5 +1,4 @@
 // search.js - 搜索引擎 + 站内筛选
-import { renderAll } from './render.js';
 import { searchCategories } from './state.js';
 import { getEl } from './utils.js';
 
