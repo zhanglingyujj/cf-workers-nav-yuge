@@ -1,5 +1,5 @@
 // search.js - 搜索引擎 + 站内筛选
-import { searchCategories } from './state.js';
+import { searchCategories, setFilter } from './state.js';
 import { getEl } from './utils.js';
 
 const searchEngines = {
@@ -58,40 +58,7 @@ export function doSearch(query) {
             import('./overlay.js').then(m => m.openAlert('没有找到相关站点。'));
             return;
         }
-        // 搜索模式: 全量重建过滤后的视图
-        const container = getEl('sections-container');
-        if (!container) return;
-        container.innerHTML = '';
-        const fragment = document.createDocumentFragment();
-        for (const [cat, { links }] of Object.entries(filtered)) {
-            const section = document.createElement('div');
-            section.className = 'section section-anchor';
-            section.id = cat;
-
-            const titleContainer = document.createElement('div');
-            titleContainer.className = 'flex items-center gap-3 mb-6';
-            const title = document.createElement('h2');
-            title.className = 'text-xl font-extrabold text-white flex items-center gap-2 drop-shadow-sm';
-            title.textContent = cat;
-            titleContainer.appendChild(title);
-            section.appendChild(titleContainer);
-
-            const cardContainer = document.createElement('div');
-            cardContainer.className = 'grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-[18px] card-container relative';
-            cardContainer.dataset.category = cat;
-            section.appendChild(cardContainer);
-
-            import('./card.js').then(m => {
-                links.forEach(link => {
-                    const card = m.createCardElement(link, cat);
-                    if (card) cardContainer.appendChild(card);
-                });
-            });
-
-            fragment.appendChild(section);
-        }
-        container.innerHTML = '';
-        container.appendChild(fragment);
+        setFilter(query);
         showFilterChip(query);
     } else {
         window.open(searchEngines[currentEngine] + encodeURIComponent(query), '_blank');
@@ -106,10 +73,9 @@ function showFilterChip(query) {
         chip.id = 'filter-chip';
         chip.className = 'fixed top-20 right-4 sm:right-8 lg:right-10 z-40 flex items-center gap-2 h-11 px-4 rounded-2xl border border-zinc-300 bg-white/95 backdrop-blur-xl shadow-lg shadow-black/20 text-sm text-zinc-700 hover:bg-zinc-100 transition-colors';
         chip.innerHTML = '<span class="font-medium truncate"></span><svg class="w-3.5 h-3.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"></path></svg>';
-        chip.addEventListener('click', async () => {
+        chip.addEventListener('click', () => {
+            setFilter('');
             hideFilterChip();
-            const { renderAll } = await import('./render.js');
-            renderAll();
         });
         document.body.appendChild(chip);
     }

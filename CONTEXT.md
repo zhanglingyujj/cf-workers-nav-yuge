@@ -18,7 +18,8 @@
 ## 数据变更
 
 - **提交（commit）**：一次导航数据变更落库的动作单元；除站点设置（标题/壁纸）外的全部增删改/排序/分组持久化都经由它。_Avoid_：保存（泛指整体动作）、saveDataToServer（实现名）。
-- **可见集（Visible Categories）**：当前登录/编辑态下用户实际可见的分组集合（隐藏分组、私密卡、非编辑态空分组被排除），由 `state.getVisibleCategories()` 唯一定义；渲染、站内搜索与命令面板统一消费。_Avoid_：在渲染层用 `isHidden`/`isPrivate` 布尔组合自行判断可见性。
+- **可见集（Visible Categories）**：当前登录/编辑态下用户实际可见的分组集合（隐藏分组、私密卡、非编辑态空分组被排除），由 `state.getVisibleCategories()` 唯一定义；命令面板与渲染视图集（见「筛选态」）统一消费。_Avoid_：在渲染层用 `isHidden`/`isPrivate` 布尔组合自行判断可见性。
+- **筛选态（Filter）**：站内搜索的筛选词作为 state 的一部分（`state.setFilter` / `getFilter`），渲染管线经视图集 `getViewCategories()` 统一消费——筛选叠加在可见集之上，不改变可见性规则本身。筛选即视图：编辑结果以当前视图为准，不匹配筛选词的卡片或分组即时从视图消失，清除筛选后可见。_Avoid_：在渲染层直接重建过滤视图（平行渲染器）。
 - **会话（Session）**：登录态的生命周期单元，接口为 `login(password)` / `logout()` / `load()` 三个动作（auth.js 承载）；token 存取、加载遮罩与链接数据的联动细节藏在其后。_Avoid_：把登录逻辑散落在弹窗或按钮处理器中各自实现。
 
 ## 视觉基线

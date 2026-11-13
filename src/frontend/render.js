@@ -1,6 +1,6 @@
 // render.js - 增量 DOM 渲染引擎
 import {
-    getCategories, isEditMode, isLoggedIn, getVisibleCategories,
+    getCategories, isEditMode, isLoggedIn, getViewCategories,
     setFlushHandler,
     addCategory, renameCategory, deleteCategory, moveCategory, pinCategory, setCategoryHidden,
     isCategoryAppLayout, setCategoryAppLayout
@@ -30,7 +30,7 @@ export function initRender() {
 function reconcileSections() {
     const container = getEl(containerId);
     if (!container) return;
-    const visible = getVisibleCategories();
+    const visible = getViewCategories();
 
     for (const name of _renderedCategories) {
         if (!visible[name]) {
@@ -59,7 +59,7 @@ export function renderAll() {
     if (!container) return;
 
     container.innerHTML = '';
-    const visible = getVisibleCategories();
+    const visible = getViewCategories();
     const fragment = document.createDocumentFragment();
 
     for (const [catName, { links, isHidden }] of Object.entries(visible)) {
@@ -75,7 +75,7 @@ export function renderAll() {
 }
 
 export function patchCategory(categoryName) {
-    const visible = getVisibleCategories();
+    const visible = getViewCategories();
     const catData = visible[categoryName];
 
     if (!catData) {

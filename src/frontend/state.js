@@ -7,6 +7,7 @@ const _scheduleFlushFrame = typeof requestAnimationFrame === 'function'
 let _categories = {};
 let _isEditMode = false;
 let _isLoggedIn = false;
+let _filter = '';
 
 const _dirtyCategories = new Set();
 let _structureDirty = false;
@@ -24,6 +25,7 @@ export function getState() {
 export function getCategories() { return _categories; }
 export function isEditMode() { return _isEditMode; }
 export function isLoggedIn() { return _isLoggedIn; }
+export function getFilter() { return _filter; }
 
 export function setEditMode(v) {
     _isEditMode = v;
@@ -267,6 +269,17 @@ export function searchCategories(query) {
         }
     }
     return result;
+}
+
+// 筛选态：站内搜索的筛选词入 state，置词/清除均走结构脏（复用 #12 的 renderAll 通道）
+export function setFilter(query) {
+    _filter = query || '';
+    markAllDirty();
+}
+
+// 视图集：渲染管线唯一消费口——有筛选词时在可见集之上叠加筛选，可见性规则保持唯一出处
+export function getViewCategories() {
+    return _filter ? searchCategories(_filter) : getVisibleCategories();
 }
 
 export function markDirty(categoryName) {

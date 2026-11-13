@@ -253,6 +253,7 @@ test('moveLink 源组拖空后非编辑态可见集自动略去', () => {
 
 import {
     getVisibleCategories, searchCategories,
+    setFilter, getFilter, getViewCategories,
 } from '../src/frontend/state.js';
 
 function resetState({ loggedIn = false, editMode = false } = {}) {
@@ -325,6 +326,78 @@ test('searchCategories 空查询返回全量可见集', () => {
     const r = searchCategories('');
     assert.deepEqual(Object.keys(r), ['工具']);
     assert.equal(r.工具.links.length, 1);
+});
+
+test('setFilter/getFilter：置词与清除', () => {
+    resetState({ loggedIn: false });
+    assert.equal(getFilter(), '');
+    setFilter('git');
+    assert.equal(getFilter(), 'git');
+    setFilter('');
+    assert.equal(getFilter(), '');
+});
+
+test('getViewCategories 无筛选词时等于可见集', () => {
+    resetState({ loggedIn: false });
+    setCategories({ 工具: { isHidden: false, links: [link('a.com', '工具')] } });
+    setFilter('');
+    assert.deepEqual(getViewCategories(), getVisibleCategories());
+});
+
+test('getViewCategories 有筛选词时叠加筛选，卡片引用保持', () => {
+    resetState({ loggedIn: false });
+    setCategories({
+        工具: { isHidden: false, links: [link('github.com', '工具'), link('news.com', '工具')] },
+        资讯: { isHidden: false, links: [link('gitlab.com', '资讯')] },
+    });
+    setFilter('git');
+    const v = getViewCategories();
+    assert.deepEqual(Object.keys(v), ['工具', '资讯']);
+    assert.deepEqual(v.工具.links.map(l => l.url), ['github.com']);
+    assert.equal(v.工具.links[0], getCategories().工具.links[0]); // 浅拷贝保持引用，patch 对账可命中
+    setFilter('news');
+    assert.deepEqual(Object.keys(getViewCategories()), ['工具']); // 资讯组整组不匹配从视图消失
+});
+
+test('getViewCategories 不命中时为空集，清除筛选恢复全量', () => {
+    resetState({ loggedIn: false });
+    setCategories({ 工具: { isHidden: false, links: [link('a.com', '工具')] } });
+    setFilter('不存在的词');
+    assert.deepEqual(getViewCategories(), {});
+    setFilter('');
+    assert.deepEqual(Object.keys(getViewCategories()), ['工具']);
+});
+
+test('getViewCategories 与可见集规则叠加：隐藏分组、私密卡不进视图', () => {
+    resetState({ loggedIn: false });
+    setCategories({
+        普通分组: { isHidden: false, links: [link('git.com', '普通分组')] },
+        隐藏分组: { isHidden: true, links: [link('github.com', '隐藏分组')] },
+        纯私密: { isHidden: false, links: [{ ...link('gitlab.com', '纯私密'), isPrivate: true }] },
+    });
+    setFilter('git');
+    const v = getViewCategories();
+    assert.deepEqual(Object.keys(v), ['普通分组']);
+    assert.deepEqual(v.普通分组.links.map(l => l.url), ['git.com']);
+});
+
+test('setFilter 联动结构脏：flush 收到 structureDirty 且全量置脏', async () => {
+    resetState({ loggedIn: false });
+    setCategories({
+        A: { isHidden: false, links: [link('a.com', 'A')] },
+        B: { isHidden: false, links: [link('b.com', 'B')] },
+    });
+    await flushNow(); // 排干前序同步 flush 与遗留空调度
+    const events = [];
+    setFlushHandler((dirty, structureDirty) => events.push({ dirty: [...dirty], structureDirty }));
+    setFilter('a');
+    await flushNow();
+    const structureFlush = events.find(e => e.structureDirty);
+    assert.ok(structureFlush, 'setFilter 后 flush 收到 structureDirty');
+    assert.deepEqual(structureFlush.dirty.sort(), ['A', 'B']); // markAllDirty 全量置脏 → renderAll 通道
+    setFilter('');
+    await flushNow();
+    assert.equal(events.filter(e => e.structureDirty).length, 2); // 清除同样走结构脏
 });
 
 import {
