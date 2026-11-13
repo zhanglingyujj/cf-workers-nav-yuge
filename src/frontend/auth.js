@@ -2,6 +2,13 @@
 import { setLoggedIn, setCategories } from './state.js';
 import { openAlert, openConfirm } from './overlay.js';
 
+// 会话失效三件事（清凭证 + 退登录态 + 告警）单处实现，告警文案由调用方传入
+async function sessionExpired(message, { storage = localStorage, setLoggedInImpl = setLoggedIn, notify = openAlert } = {}) {
+    storage.removeItem('authToken');
+    setLoggedInImpl(false);
+    await notify(message);
+}
+
 async function validateToken() {
     const t = localStorage.getItem('authToken');
     if (!t) return false;
@@ -14,9 +21,7 @@ async function validateToken() {
 export async function validateTokenOrRedirect() {
     const valid = await validateToken();
     if (!valid) {
-        localStorage.removeItem('authToken');
-        setLoggedIn(false);
-        await openAlert('登录凭证已过期，请重新登录');
+        await sessionExpired('登录凭证已过期，请重新登录');
         return false;
     }
     return true;
@@ -38,35 +43,54 @@ export async function refreshAccessToken() {
     }
 }
 
-export async function fetchWithAuth(url, options = {}) {
-    const token = localStorage.getItem('authToken');
-    const headers = options.headers || {};
-    if (token) {
-        headers.Authorization = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
-    }
-    options.headers = headers;
-    options.cache = 'no-store';
-
-    let res = await fetch(url, options);
-
-    if (res.status === 401) {
-        try {
-            const newToken = await refreshAccessToken();
-            if (newToken) {
-                headers.Authorization = `Bearer ${newToken}`;
-                options.headers = headers;
-                res = await fetch(url, options);
-            } else {
-                throw new Error('Refresh token expired');
-            }
-        } catch (refreshError) {
-            localStorage.removeItem('authToken');
-            setLoggedIn(false);
-            await openAlert('登录已过期，请重新登录');
-            throw new Error('Unauthorized');
+// 401 语义：首响 401 先 refresh 重试一次；重试仍 401 或 refresh 失败 → 会话失效并抛 Unauthorized，
+// 因此 fetchWithAuth 返回的响应永不带 401（调用方只需处理传输与业务结果）
+export function createFetchWithAuth({
+    storage = localStorage,
+    refresh = refreshAccessToken,
+    notify = openAlert,
+    setLoggedInImpl = setLoggedIn,
+} = {}) {
+    return async function fetchWithAuth(url, options = {}) {
+        const token = storage.getItem('authToken');
+        const headers = options.headers || {};
+        if (token) {
+            headers.Authorization = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
         }
-    }
-    return res;
+        options.headers = headers;
+        options.cache = 'no-store';
+
+        let res = await fetch(url, options);
+
+        if (res.status === 401) {
+            try {
+                const newToken = await refresh();
+                if (newToken) {
+                    headers.Authorization = `Bearer ${newToken}`;
+                    options.headers = headers;
+                    res = await fetch(url, options);
+                    if (res.status === 401) throw new Error('Still unauthorized after refresh');
+                } else {
+                    throw new Error('Refresh token expired');
+                }
+            } catch (refreshError) {
+                await sessionExpired('登录已过期，请重新登录', { storage, setLoggedInImpl, notify });
+                throw new Error('Unauthorized');
+            }
+        }
+        return res;
+    };
+}
+
+// 惰性单例：模块加载时不触碰 localStorage，保证纯 Node 环境可导入测试
+let fetchWithAuthInstance = null;
+function getFetchWithAuth() {
+    if (!fetchWithAuthInstance) fetchWithAuthInstance = createFetchWithAuth();
+    return fetchWithAuthInstance;
+}
+
+export function fetchWithAuth(url, options = {}) {
+    return getFetchWithAuth()(url, options);
 }
 
 function defaultRunWithMask(fn) {
